@@ -14,8 +14,7 @@ import type {
 export const NAV_LINKS: NavLink[] = [
   { label: "Platform",  href: "#workflow"  },
   { label: "Services",  href: "#services"  },
-  { label: "Results",   href: "#cases"     },
-  { label: "Process",   href: "#process"   },
+  { label: "Approach",  href: "#process"   },
   { label: "Security",  href: "#security"  },
 ];
 
@@ -33,31 +32,31 @@ export const TICKER_ITEMS: string[] = [
   "System Orchestration",
 ];
 
-// ─── Stats ───────────────────────────────────────────────────────────────────
+// ─── Founding principles (replaces fabricated stats) ─────────────────────────
 export const STATS: Stat[] = [
-  {
-    value: "87",
-    accent: "+",
-    label: "Enterprise workflows automated across client portfolios",
-    description: "Deployments active",
-  },
-  {
-    value: "$2.4",
-    accent: "B",
-    label: "Operational spend touched by our integration layer",
-    description: "Annual flow managed",
-  },
-  {
-    value: "99.97",
-    accent: "%",
-    label: "System uptime across all client environments",
-    description: "SLA maintained",
-  },
   {
     value: "14",
     accent: "d",
-    label: "Average time from discovery to first production deployment",
+    label: "Target time from discovery to first production deployment",
     description: "Time to value",
+  },
+  {
+    value: "Zero",
+    accent: "",
+    label: "Downtime deployments — staged rollout with full rollback capability",
+    description: "Deployment standard",
+  },
+  {
+    value: "100",
+    accent: "%",
+    label: "Of automated decisions are logged, auditable, and human-reviewable",
+    description: "Auditability",
+  },
+  {
+    value: "SOC 2",
+    accent: "",
+    label: "Security and governance baseline for every engagement, from day one",
+    description: "Compliance standard",
   },
 ];
 
@@ -140,42 +139,10 @@ export const SERVICES: Service[] = [
   },
 ];
 
-// ─── Case Studies ────────────────────────────────────────────────────────────
-export const CASE_STUDIES: CaseStudy[] = [
-  {
-    featured: true,
-    tag: "Manufacturing · ERP + Finance Integration",
-    headline:
-      "Eliminated 3,400 manual finance reconciliation hours per year for a $280M manufacturer.",
-    body: "[Client Name] was running SAP and NetSuite alongside a custom procurement tool — with a 9-person team manually reconciling data across systems every month-end. We built an integration layer that automated 94% of reconciliation tasks, reduced close time from 12 days to 3, and eliminated the data quality issues that had caused two material restatements in three years.\n\nThe client now runs a real-time operational P&L with zero manual intervention. The finance team was reallocated to analysis work.",
-    metrics: [
-      { value: "94%",   label: "Reconciliation automated" },
-      { value: "3,400", label: "Hours reclaimed / yr"      },
-      { value: "12→3",  label: "Days to month close"       },
-    ],
-    industry: "Manufacturing · $280M Revenue",
-  },
-  {
-    tag: "Professional Services · CRM + Pipeline Automation",
-    headline: "50% faster proposal cycle for a 600-person consulting firm.",
-    body: "[Client Name] needed proposal data from three systems assembled manually for each bid. We integrated Salesforce, their internal knowledge base, and their financial modeling tools into a single automated proposal workflow.",
-    metrics: [
-      { value: "50%",   label: "Faster proposal cycle"         },
-      { value: "$4.2M", label: "Additional pipeline captured"  },
-    ],
-    industry: "Consulting · 600 Employees",
-  },
-  {
-    tag: "Logistics · Operations Intelligence",
-    headline: "Real-time exception management across a 14-country supply chain.",
-    body: "[Client Name] needed visibility across fragmented logistics systems. We built an AI exception-detection layer that identifies issues 6 hours earlier and routes resolutions automatically to the right teams.",
-    metrics: [
-      { value: "6hrs",  label: "Earlier detection"    },
-      { value: "$1.8M", label: "Penalty cost avoided" },
-    ],
-    industry: "Logistics · 14 Countries",
-  },
-];
+// ─── Case Studies — empty until real work exists ─────────────────────────────
+// This array intentionally has no entries.
+// Add real case studies here once engagements are complete.
+export const CASE_STUDIES: CaseStudy[] = [];
 
 // ─── Systems ─────────────────────────────────────────────────────────────────
 export const SYSTEM_CATEGORIES: SystemCategory[] = [
@@ -338,27 +305,10 @@ export const SECURITY_PILLARS: SecurityPillar[] = [
   },
 ];
 
-// ─── Testimonials ────────────────────────────────────────────────────────────
-export const TESTIMONIALS: Testimonial[] = [
-  {
-    quote:
-      "The DZen team thinks the way operators think. They didn't ask us to change our processes — they made our processes intelligent. The difference is significant.",
-    name: "[Name, Placeholder]",
-    role: "COO · [Company Name], Manufacturing",
-  },
-  {
-    quote:
-      "For the first time, I have a real-time view of operational performance without asking anyone for a report. It just surfaces. That's what I needed as a CEO.",
-    name: "[Name, Placeholder]",
-    role: "CEO · [Company Name], Professional Services",
-  },
-  {
-    quote:
-      "Month-end used to be a 12-day scramble. Now it's 3 days, the numbers are right, and the finance team is doing analysis instead of data entry. Transformational.",
-    name: "[Name, Placeholder]",
-    role: "CFO · [Company Name], Logistics",
-  },
-];
+// ─── Testimonials — empty until real clients exist ────────────────────────────
+// This array intentionally has no entries.
+// Add real testimonials here once engagements are complete.
+export const TESTIMONIALS: Testimonial[] = [];
 
 // ─── Compliance badges ────────────────────────────────────────────────────────
 export const COMPLIANCE_BADGES = ["SOC 2", "ISO 27001", "GDPR"];
@@ -376,12 +326,10 @@ export const FOOTER_LINKS = {
   Company: [
     "About DZen",
     "Our Methodology",
-    "Case Studies",
     "Careers",
     "Press",
   ],
   Resources: [
-    "Documentation",
     "Security Overview",
     "Integration Guides",
     "ROI Calculator",

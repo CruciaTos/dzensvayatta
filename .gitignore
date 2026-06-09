@@ -49,3 +49,5 @@ yarn-error.log*
 node_modules
 /.next/static
 /.next
+/.next
+/.next/cache

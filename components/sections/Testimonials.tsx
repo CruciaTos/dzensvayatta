@@ -5,43 +5,37 @@ import { Container } from "@/components/ui/Container";
 import { SectionIndex } from "@/components/ui/SectionIndex";
 import { FadeIn } from "@/components/ui/FadeIn";
 import { StaggerContainer, StaggerItem } from "@/components/ui/StaggerContainer";
-import { TESTIMONIALS } from "@/lib/data";
-import type { Testimonial } from "@/types";
 
-function TestimonialCard({ quote, name, role }: Testimonial) {
-  return (
-    <motion.figure
-      className="bg-bg-panel border border-border p-12 px-10 flex flex-col justify-between gap-10 transition-colors duration-300"
-      whileHover={{ borderColor: "rgba(216,211,203,0.16)" }}
-    >
-      <blockquote className="font-serif text-[18px] font-normal italic text-stone-100 leading-[1.55] tracking-[-0.01em]">
-        &ldquo;{quote}&rdquo;
-      </blockquote>
-
-      <figcaption className="pt-6 border-t border-border flex flex-col gap-1">
-        <span className="font-sans text-[13px] font-normal text-stone-100">
-          {name}
-        </span>
-        <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-stone-500">
-          {role}
-        </span>
-      </figcaption>
-    </motion.figure>
-  );
-}
+const PRINCIPLES = [
+  {
+    num: "I",
+    title: "We don't replace your systems.",
+    body: "The systems you've invested in — your ERP, your CRM, your finance stack — are not the problem. The gaps between them are. We build the intelligence layer that makes them work as one.",
+  },
+  {
+    num: "II",
+    title: "We scope everything before we build anything.",
+    body: "Every engagement begins with a fixed-scope discovery. You get a documented integration map, a business-case model, and a clear technical plan — before a single line of production code is written.",
+  },
+  {
+    num: "III",
+    title: "Every decision is auditable.",
+    body: "AI operating in mission-critical workflows requires the same governance standards as the workflows themselves. Every automated action is logged, attributable, and reversible. No black boxes.",
+  },
+];
 
 export function Testimonials() {
   return (
     <section
       id="testimonials"
-      aria-label="Client testimonials"
+      aria-label="Our founding principles"
       className="py-[120px] bg-bg-secondary border-t border-border"
     >
       <Container>
         <FadeIn>
-          <SectionIndex number="07" tag="From the Field" className="mb-6" />
+          <SectionIndex number="07" tag="Our Philosophy" className="mb-6" />
           <h2 className="font-serif text-display-3 font-normal text-stone-100 max-w-[560px]">
-            What operators say.
+            How we think about this work.
           </h2>
         </FadeIn>
 
@@ -50,9 +44,24 @@ export function Testimonials() {
           staggerDelay={0.1}
           initialDelay={0.1}
         >
-          {TESTIMONIALS.map((t) => (
-            <StaggerItem key={t.role}>
-              <TestimonialCard {...t} />
+          {PRINCIPLES.map((p) => (
+            <StaggerItem key={p.num}>
+              <motion.article
+                className="bg-bg-panel border border-border p-12 px-10 flex flex-col gap-8 transition-colors duration-300"
+                whileHover={{ borderColor: "rgba(216,211,203,0.16)" }}
+              >
+                <span className="font-serif text-[48px] font-normal text-stone-600 leading-none tracking-[-0.02em]">
+                  {p.num}
+                </span>
+                <div>
+                  <h3 className="font-serif text-[20px] font-normal text-stone-100 leading-[1.3] tracking-[-0.01em] mb-4">
+                    {p.title}
+                  </h3>
+                  <p className="font-sans text-[14px] font-light text-stone-400 leading-[1.7]">
+                    {p.body}
+                  </p>
+                </div>
+              </motion.article>
             </StaggerItem>
           ))}
         </StaggerContainer>

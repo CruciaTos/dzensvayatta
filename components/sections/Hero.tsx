@@ -90,8 +90,8 @@ export function Hero() {
               <Button as="a" href="#cta" variant="primary" size="md">
                 Request a Discovery Call
               </Button>
-              <Button as="a" href="#cases" variant="ghost" size="md">
-                View Case Studies
+              <Button as="a" href="#services" variant="ghost" size="md">
+                See What We Build
               </Button>
             </div>
 
