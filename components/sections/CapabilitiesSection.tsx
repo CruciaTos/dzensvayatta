@@ -1,1178 +1,866 @@
 "use client";
 
-import {
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-} from "react";
-import { motion, AnimatePresence, useInView } from "framer-motion";
+import { useRef, useEffect, useState, useCallback } from "react";
+import { motion, useInView } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// ── Types ──────────────────────────────────────────────────────────────────
 
-interface ModuleSpec {
-  id: string;
-  shortId: string;
-  label: string;
-  signal: string;
-  headline: string;
-  thesis: string;
-  operationalNote: string;
-  telemetry: { label: string; value: string }[];
-  systemDiagram: React.FC<{ active: boolean }>;
+interface DeliverableItem {
+  icon: string;
+  name: string;
+  desc: string;
 }
 
-// ── System Diagrams ──────────────────────────────────────────────────────────
-
-function DiagnosticDiagram({ active }: { active: boolean }) {
-  return (
-    <svg
-      viewBox="0 0 520 220"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-full"
-      aria-hidden="true"
-    >
-      {/* Grid background */}
-      <pattern id="dgrid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
-        <path d="M24 0H0V24" stroke="rgba(255,255,255,0.03)" strokeWidth="0.5" />
-      </pattern>
-      <rect width="520" height="220" fill="url(#dgrid)" />
-
-      {/* Source nodes */}
-      {[
-        { x: 20, y: 30, label: "ERP", latency: "142ms" },
-        { x: 20, y: 80, label: "CRM", latency: "89ms" },
-        { x: 20, y: 130, label: "HRIS", latency: "204ms" },
-        { x: 20, y: 180, label: "COMM", latency: "67ms" },
-      ].map(({ x, y, label, latency }, i) => (
-        <g key={label}>
-          <motion.rect
-            x={x} y={y} width={60} height={22} rx={2}
-            fill="rgba(143,120,96,0.08)" stroke="rgba(143,120,96,0.3)" strokeWidth={0.5}
-            initial={{ opacity: 0 }}
-            animate={active ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.1 + i * 0.08 }}
-          />
-          <motion.text
-            x={x + 30} y={y + 14} textAnchor="middle"
-            fill="#c9a96e" fontSize={8} fontFamily="monospace" letterSpacing="0.1em"
-            initial={{ opacity: 0 }}
-            animate={active ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.2 + i * 0.08 }}
-          >{label}</motion.text>
-
-          {/* Flow line to scanner */}
-          <motion.line
-            x1={x + 60} y1={y + 11} x2={175} y2={105 + (i - 1.5) * 16}
-            stroke="rgba(201,169,110,0.2)" strokeWidth={0.5} strokeDasharray="3 3"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={active ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 + i * 0.1 }}
-          />
-
-          {/* Latency label */}
-          <motion.text
-            x={x + 68} y={y + 9} fill="rgba(255,255,255,0.2)" fontSize={7} fontFamily="monospace"
-            initial={{ opacity: 0 }}
-            animate={active ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.5 + i * 0.08 }}
-          >{latency}</motion.text>
-        </g>
-      ))}
-
-      {/* Central scanner */}
-      <motion.rect
-        x={175} y={72} width={100} height={66} rx={4}
-        fill="rgba(143,120,96,0.1)" stroke="rgba(143,120,96,0.5)" strokeWidth={1}
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={active ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
-        transition={{ duration: 0.4, delay: 0.2 }}
-        style={{ transformOrigin: "225px 105px" }}
-      />
-      <motion.text
-        x={225} y={95} textAnchor="middle"
-        fill="#c9a96e" fontSize={9} fontFamily="monospace" letterSpacing="0.12em"
-        initial={{ opacity: 0 }}
-        animate={active ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.3, delay: 0.35 }}
-      >DIAGNOSTIC</motion.text>
-      <motion.text
-        x={225} y={108} textAnchor="middle"
-        fill="rgba(201,169,110,0.5)" fontSize={7.5} fontFamily="monospace"
-        initial={{ opacity: 0 }}
-        animate={active ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.3, delay: 0.4 }}
-      >SCAN ACTIVE</motion.text>
-      {/* Scan line animation */}
-      <motion.line
-        x1={176} y1={105} x2={274} y2={105}
-        stroke="rgba(201,169,110,0.6)" strokeWidth={0.5}
-        initial={{ scaleX: 0 }}
-        animate={active ? { scaleX: [0, 1, 1, 0], x: [0, 0, 0, 0] } : { scaleX: 0 }}
-        transition={{ duration: 2, delay: 0.5, repeat: active ? Infinity : 0, repeatDelay: 1 }}
-        style={{ transformOrigin: "176px 105px" }}
-      />
-      <motion.text
-        x={225} y={126} textAnchor="middle"
-        fill="rgba(255,255,255,0.25)" fontSize={7} fontFamily="monospace"
-        initial={{ opacity: 0 }}
-        animate={active ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.3, delay: 0.45 }}
-      >47 processes mapped</motion.text>
-
-      {/* Output nodes */}
-      {[
-        { y: 42, label: "WORKFLOW MAP", status: "GEN" },
-        { y: 82, label: "FRICTION INDEX", status: "CALC" },
-        { y: 122, label: "AUTO TARGETS", status: "RANK" },
-        { y: 162, label: "ROI PROJECTIONS", status: "EST" },
-      ].map(({ y, label, status }, i) => (
-        <g key={label}>
-          <motion.line
-            x1={275} y1={105 + (i - 1.5) * 16} x2={340} y2={y + 11}
-            stroke="rgba(201,169,110,0.2)" strokeWidth={0.5} strokeDasharray="3 3"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={active ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
-            transition={{ duration: 0.5, delay: 0.6 + i * 0.1 }}
-          />
-          <motion.rect
-            x={340} y={y} width={120} height={22} rx={2}
-            fill="rgba(143,120,96,0.06)" stroke="rgba(143,120,96,0.2)" strokeWidth={0.5}
-            initial={{ opacity: 0, x: 10 }}
-            animate={active ? { opacity: 1, x: 0 } : { opacity: 0, x: 10 }}
-            transition={{ duration: 0.4, delay: 0.7 + i * 0.1 }}
-          />
-          <motion.text
-            x={352} y={y + 14} fill="rgba(255,255,255,0.4)" fontSize={7.5} fontFamily="monospace" letterSpacing="0.08em"
-            initial={{ opacity: 0 }}
-            animate={active ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.8 + i * 0.1 }}
-          >{label}</motion.text>
-          <motion.text
-            x={450} y={y + 14} fill="rgba(201,169,110,0.5)" fontSize={7} fontFamily="monospace"
-            initial={{ opacity: 0 }}
-            animate={active ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.85 + i * 0.1 }}
-          >{status}</motion.text>
-        </g>
-      ))}
-
-      {/* Status bar */}
-      <motion.rect
-        x={0} y={205} width={520} height={15} fill="rgba(143,120,96,0.04)"
-        initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.4, delay: 1.1 }}
-      />
-      <motion.text
-        x={12} y={215} fill="rgba(201,169,110,0.4)" fontSize={7} fontFamily="monospace" letterSpacing="0.1em"
-        initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.3, delay: 1.2 }}
-      >DZEN.OS — DIAGNOSTIC MODULE v2.1 — ALL SYSTEMS NOMINAL</motion.text>
-    </svg>
-  );
+interface Phase {
+  index: string;
+  navLabel: string;
+  tag: string;
+  title: string;
+  description: string;
+  outcomeLabel: string;
+  outcome: string;
+  listLabel: string;
+  items: DeliverableItem[];
 }
 
-function ArchitectureDiagram({ active }: { active: boolean }) {
-  const layers = [
-    { y: 20, label: "AGENT LAYER", sublabel: "Autonomous decision execution", color: "rgba(201,169,110,0.85)" },
-    { y: 72, label: "ORCHESTRATION", sublabel: "Multi-system coordination + routing", color: "rgba(201,169,110,0.65)" },
-    { y: 124, label: "INTEGRATION LAYER", sublabel: "API contracts + event streams", color: "rgba(201,169,110,0.45)" },
-    { y: 176, label: "DATA SUBSTRATE", sublabel: "Unified schema + transformation", color: "rgba(201,169,110,0.28)" },
-  ];
+// ── Data ───────────────────────────────────────────────────────────────────
 
-  return (
-    <svg viewBox="0 0 520 220" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full" aria-hidden="true">
-      <pattern id="agrid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
-        <path d="M24 0H0V24" stroke="rgba(255,255,255,0.03)" strokeWidth="0.5" />
-      </pattern>
-      <rect width="520" height="220" fill="url(#agrid)" />
-
-      {layers.map(({ y, label, sublabel, color }, i) => (
-        <g key={label}>
-          <motion.rect
-            x={40} y={y} width={360} height={40} rx={2}
-            fill={`rgba(143,120,96,0.${i === 0 ? "12" : i === 1 ? "08" : i === 2 ? "05" : "03"})`}
-            stroke={`rgba(201,169,110,${i === 0 ? "0.4" : i === 1 ? "0.25" : "0.15"})`}
-            strokeWidth={0.5}
-            initial={{ scaleX: 0, opacity: 0 }}
-            animate={active ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0 }}
-            transition={{ duration: 0.5, delay: 0.15 + i * 0.12, ease: [0.22, 1, 0.36, 1] }}
-            style={{ transformOrigin: "40px center" }}
-          />
-          <motion.rect
-            x={40} y={y} width={3} height={40}
-            fill={color}
-            initial={{ opacity: 0 }}
-            animate={active ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.3 + i * 0.12 }}
-          />
-          <motion.text
-            x={56} y={y + 17} fill={color} fontSize={8.5} fontFamily="monospace" letterSpacing="0.1em"
-            initial={{ opacity: 0 }}
-            animate={active ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.35 + i * 0.12 }}
-          >{label}</motion.text>
-          <motion.text
-            x={56} y={y + 30} fill="rgba(255,255,255,0.22)" fontSize={7.5} fontFamily="monospace"
-            initial={{ opacity: 0 }}
-            animate={active ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.4 + i * 0.12 }}
-          >{sublabel}</motion.text>
-          <motion.text
-            x={390} y={y + 24} fill="rgba(255,255,255,0.15)" fontSize={7} fontFamily="monospace"
-            initial={{ opacity: 0 }}
-            animate={active ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.45 + i * 0.12 }}
-          >DESIGNED</motion.text>
-        </g>
-      ))}
-
-      {/* Connection lines between layers */}
-      {[60, 112, 164].map((y, i) => (
-        <motion.line key={y} x1={220} y1={y} x2={220} y2={y + 12}
-          stroke="rgba(201,169,110,0.3)" strokeWidth={0.5}
-          initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.3, delay: 0.65 + i * 0.12 }}
-        />
-      ))}
-
-      {/* Integration points on right */}
-      {[
-        { y: 32, system: "SALESFORCE", dir: "→" },
-        { y: 84, system: "ORACLE", dir: "→" },
-        { y: 136, system: "WORKDAY", dir: "←" },
-        { y: 188, system: "SNOWFLAKE", dir: "←" },
-      ].map(({ y, system, dir }) => (
-        <g key={system}>
-          <motion.text x={420} y={y} fill="rgba(201,169,110,0.35)" fontSize={7} fontFamily="monospace"
-            initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.9 }}
-          >{dir} {system}</motion.text>
-        </g>
-      ))}
-
-      {/* Status */}
-      <motion.rect x={0} y={205} width={520} height={15} fill="rgba(143,120,96,0.04)"
-        initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.4, delay: 1.1 }}
-      />
-      <motion.text x={12} y={215} fill="rgba(201,169,110,0.4)" fontSize={7} fontFamily="monospace" letterSpacing="0.1em"
-        initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.3, delay: 1.2 }}
-      >ARCHITECTURE FINALIZED — 4 LAYERS — CLIENT SIGN-OFF COMPLETE</motion.text>
-    </svg>
-  );
-}
-
-function RuntimeDiagram({ active }: { active: boolean }) {
-  const agents = [
-    { cx: 90, cy: 80, label: "INVOICE\nAGENT", tasks: 847 },
-    { cx: 220, cy: 50, label: "ROUTING\nAGENT", tasks: 2340 },
-    { cx: 350, cy: 80, label: "REPORT\nAGENT", tasks: 445 },
-    { cx: 220, cy: 150, label: "APPROVAL\nAGENT", tasks: 1128 },
-  ];
-
-  return (
-    <svg viewBox="0 0 520 220" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full" aria-hidden="true">
-      <pattern id="rgrid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
-        <path d="M24 0H0V24" stroke="rgba(255,255,255,0.03)" strokeWidth="0.5" />
-      </pattern>
-      <rect width="520" height="220" fill="url(#rgrid)" />
-
-      {/* Connecting edges */}
-      {[
-        [90, 80, 220, 50],
-        [220, 50, 350, 80],
-        [90, 80, 220, 150],
-        [350, 80, 220, 150],
-        [220, 50, 220, 150],
-      ].map(([x1, y1, x2, y2], i) => (
-        <motion.line key={i} x1={x1} y1={y1} x2={x2} y2={y2}
-          stroke="rgba(201,169,110,0.15)" strokeWidth={0.5} strokeDasharray="3 5"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={active ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
-          transition={{ duration: 0.7, delay: 0.3 + i * 0.1 }}
-        />
-      ))}
-
-      {/* Agent nodes */}
-      {agents.map(({ cx, cy, label, tasks }, i) => (
-        <g key={label}>
-          <motion.circle cx={cx} cy={cy} r={28}
-            fill="rgba(143,120,96,0.1)" stroke="rgba(201,169,110,0.4)" strokeWidth={0.8}
-            initial={{ scale: 0, opacity: 0 }}
-            animate={active ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
-            transition={{ duration: 0.4, delay: 0.15 + i * 0.12, ease: [0.22, 1, 0.36, 1] }}
-            style={{ transformOrigin: `${cx}px ${cy}px` }}
-          />
-          {/* Pulse ring */}
-          <motion.circle cx={cx} cy={cy} r={32}
-            fill="none" stroke="rgba(201,169,110,0.12)" strokeWidth={0.5}
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={active ? {
-              scale: [1, 1.2, 1],
-              opacity: [0, 0.6, 0],
-            } : { scale: 0.8, opacity: 0 }}
-            transition={{ duration: 2.4, delay: 0.6 + i * 0.3, repeat: active ? Infinity : 0, ease: "easeOut" }}
-            style={{ transformOrigin: `${cx}px ${cy}px` }}
-          />
-          {label.split("\n").map((line, j) => (
-            <motion.text key={j} x={cx} y={cy - 4 + j * 11} textAnchor="middle"
-              fill="#c9a96e" fontSize={7.5} fontFamily="monospace" letterSpacing="0.1em"
-              initial={{ opacity: 0 }}
-              animate={active ? { opacity: 1 } : { opacity: 0 }}
-              transition={{ duration: 0.3, delay: 0.4 + i * 0.12 }}
-            >{line}</motion.text>
-          ))}
-          <motion.text x={cx} y={cy + 19} textAnchor="middle"
-            fill="rgba(255,255,255,0.3)" fontSize={7} fontFamily="monospace"
-            initial={{ opacity: 0 }}
-            animate={active ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.55 + i * 0.12 }}
-          >{tasks}/day</motion.text>
-        </g>
-      ))}
-
-      {/* Metrics panel */}
-      <motion.rect x={420} y={30} width={88} height={140} rx={3}
-        fill="rgba(143,120,96,0.05)" stroke="rgba(143,120,96,0.2)" strokeWidth={0.5}
-        initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.4, delay: 0.7 }}
-      />
-      {[
-        { label: "AGENTS", value: "4" },
-        { label: "TASKS/D", value: "4,760" },
-        { label: "LATENCY", value: "840ms" },
-        { label: "ERRORS", value: "0.03%" },
-        { label: "STATUS", value: "LIVE" },
-      ].map(({ label, value }, i) => (
-        <g key={label}>
-          <motion.text x={430} y={52 + i * 22} fill="rgba(255,255,255,0.25)" fontSize={7} fontFamily="monospace"
-            initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.8 + i * 0.07 }}
-          >{label}</motion.text>
-          <motion.text x={500} y={52 + i * 22} textAnchor="end"
-            fill={value === "LIVE" ? "#c9a96e" : "rgba(201,169,110,0.7)"} fontSize={7.5} fontFamily="monospace"
-            initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.85 + i * 0.07 }}
-          >{value}</motion.text>
-        </g>
-      ))}
-
-      <motion.rect x={0} y={205} width={520} height={15} fill="rgba(143,120,96,0.04)"
-        initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.4, delay: 1.2 }}
-      />
-      <motion.text x={12} y={215} fill="rgba(201,169,110,0.4)" fontSize={7} fontFamily="monospace" letterSpacing="0.1em"
-        initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.3, delay: 1.3 }}
-      >RUNTIME ACTIVE — 4 AGENTS RUNNING — WEEK 2 OF DEPLOYMENT</motion.text>
-    </svg>
-  );
-}
-
-function DeploymentDiagram({ active }: { active: boolean }) {
-  const stages = [
-    { x: 20, label: "STAGING", check: true },
-    { x: 135, label: "CANARY 10%", check: true },
-    { x: 260, label: "ROLLOUT 50%", check: true },
-    { x: 385, label: "PRODUCTION", check: false },
-  ];
-
-  return (
-    <svg viewBox="0 0 520 220" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full" aria-hidden="true">
-      <pattern id="dpgrid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
-        <path d="M24 0H0V24" stroke="rgba(255,255,255,0.03)" strokeWidth="0.5" />
-      </pattern>
-      <rect width="520" height="220" fill="url(#dpgrid)" />
-
-      {/* Pipeline track */}
-      <motion.line x1={20} y1={90} x2={500} y2={90}
-        stroke="rgba(201,169,110,0.08)" strokeWidth={1}
-        initial={{ pathLength: 0 }} animate={active ? { pathLength: 1 } : { pathLength: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-      />
-
-      {stages.map(({ x, label, check }, i) => (
-        <g key={label}>
-          {/* Node */}
-          <motion.circle cx={x + 50} cy={90} r={18}
-            fill={i < 3 ? "rgba(201,169,110,0.12)" : "rgba(143,120,96,0.18)"}
-            stroke={i < 3 ? "rgba(201,169,110,0.35)" : "rgba(201,169,110,0.7)"} strokeWidth={i < 3 ? 0.5 : 1}
-            initial={{ scale: 0, opacity: 0 }}
-            animate={active ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
-            transition={{ duration: 0.35, delay: 0.25 + i * 0.18, ease: [0.22, 1, 0.36, 1] }}
-            style={{ transformOrigin: `${x + 50}px 90px` }}
-          />
-
-          {check ? (
-            <motion.text x={x + 50} y={94} textAnchor="middle"
-              fill="rgba(201,169,110,0.8)" fontSize={11} fontFamily="monospace"
-              initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-              transition={{ duration: 0.3, delay: 0.45 + i * 0.18 }}
-            >✓</motion.text>
-          ) : (
-            <>
-              <motion.circle cx={x + 50} cy={90} r={5}
-                fill="#c9a96e"
-                initial={{ opacity: 0 }}
-                animate={active ? { opacity: [0, 1, 0.4, 1] } : { opacity: 0 }}
-                transition={{ duration: 1.2, delay: 1.0, repeat: active ? Infinity : 0 }}
-              />
-            </>
-          )}
-
-          <motion.text x={x + 50} y={118} textAnchor="middle"
-            fill={i === 3 ? "#c9a96e" : "rgba(255,255,255,0.3)"} fontSize={7.5} fontFamily="monospace" letterSpacing="0.08em"
-            initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.4 + i * 0.18 }}
-          >{label}</motion.text>
-
-          {i < 3 && (
-            <motion.line x1={x + 68} y1={90} x2={x + 132} y2={90}
-              stroke="rgba(201,169,110,0.25)" strokeWidth={0.5}
-              initial={{ pathLength: 0 }} animate={active ? { pathLength: 1 } : { pathLength: 0 }}
-              transition={{ duration: 0.4, delay: 0.6 + i * 0.18 }}
-            />
-          )}
-        </g>
-      ))}
-
-      {/* Timeline */}
-      {[
-        { x: 70, label: "09:14", note: "deploy triggered" },
-        { x: 185, label: "09:15", note: "tests 47/47" },
-        { x: 310, label: "09:16", note: "canary stable" },
-        { x: 435, label: "09:18", note: "full rollout" },
-      ].map(({ x, label, note }) => (
-        <g key={label}>
-          <motion.text x={x} y={140} textAnchor="middle"
-            fill="rgba(201,169,110,0.45)" fontSize={7.5} fontFamily="monospace"
-            initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.9 }}
-          >{label}</motion.text>
-          <motion.text x={x} y={153} textAnchor="middle"
-            fill="rgba(255,255,255,0.18)" fontSize={7} fontFamily="monospace"
-            initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.3, delay: 1.0 }}
-          >{note}</motion.text>
-        </g>
-      ))}
-
-      {/* Zero-downtime badge */}
-      <motion.rect x={160} y={165} width={200} height={24} rx={2}
-        fill="rgba(143,120,96,0.08)" stroke="rgba(143,120,96,0.25)" strokeWidth={0.5}
-        initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.4, delay: 1.1 }}
-      />
-      <motion.text x={260} y={181} textAnchor="middle"
-        fill="rgba(201,169,110,0.6)" fontSize={8} fontFamily="monospace" letterSpacing="0.12em"
-        initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.3, delay: 1.2 }}
-      >ZERO DOWNTIME — ALL PROTOCOLS ACTIVE</motion.text>
-
-      <motion.rect x={0} y={205} width={520} height={15} fill="rgba(143,120,96,0.04)"
-        initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.4, delay: 1.3 }}
-      />
-      <motion.text x={12} y={215} fill="rgba(201,169,110,0.4)" fontSize={7} fontFamily="monospace" letterSpacing="0.1em"
-        initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.3, delay: 1.4 }}
-      >DEPLOYMENT PIPELINE — ROLLBACK READY — 4-MINUTE FULL REVERT</motion.text>
-    </svg>
-  );
-}
-
-function ObservabilityDiagram({ active }: { active: boolean }) {
-  const metrics = [
-    { label: "UPTIME", value: "99.97%", w: 0.9997, y: 30 },
-    { label: "THROUGHPUT", value: "4,840 tasks/d", w: 0.76, y: 65 },
-    { label: "P99 LATENCY", value: "1.2s", w: 0.55, y: 100 },
-    { label: "ERROR RATE", value: "0.03%", w: 0.08, y: 135 },
-    { label: "COVERAGE", value: "100% ops", w: 1.0, y: 170 },
-  ];
-
-  return (
-    <svg viewBox="0 0 520 220" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full" aria-hidden="true">
-      <pattern id="obgrid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
-        <path d="M24 0H0V24" stroke="rgba(255,255,255,0.03)" strokeWidth="0.5" />
-      </pattern>
-      <rect width="520" height="220" fill="url(#obgrid)" />
-
-      {metrics.map(({ label, value, w, y }, i) => (
-        <g key={label}>
-          <motion.text x={12} y={y + 13} fill="rgba(255,255,255,0.3)" fontSize={7.5} fontFamily="monospace"
-            initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.15 + i * 0.1 }}
-          >{label}</motion.text>
-
-          {/* Bar track */}
-          <motion.rect x={120} y={y} width={280} height={22} rx={2}
-            fill="rgba(143,120,96,0.05)"
-            initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.2, delay: 0.2 + i * 0.1 }}
-          />
-          {/* Bar fill */}
-          <motion.rect x={120} y={y} width={0} height={22} rx={2}
-            fill={`rgba(201,169,110,${0.12 + (1 - w) * 0.05})`}
-            stroke={`rgba(201,169,110,${0.2 + w * 0.2})`} strokeWidth={0.5}
-            initial={{ width: 0 }}
-            animate={active ? { width: 280 * w } : { width: 0 }}
-            transition={{ duration: 0.7, delay: 0.35 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
-          />
-
-          <motion.text x={410} y={y + 14} fill="rgba(201,169,110,0.8)" fontSize={8.5} fontFamily="monospace"
-            initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.6 + i * 0.1 }}
-          >{value}</motion.text>
-
-          {/* Trending indicator */}
-          <motion.text x={500} y={y + 14} textAnchor="end"
-            fill={label === "ERROR RATE" ? "rgba(201,169,110,0.5)" : "rgba(201,169,110,0.5)"}
-            fontSize={8} fontFamily="monospace"
-            initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.65 + i * 0.1 }}
-          >{label === "ERROR RATE" ? "↓" : "→"}</motion.text>
-        </g>
-      ))}
-
-      <motion.rect x={0} y={205} width={520} height={15} fill="rgba(143,120,96,0.04)"
-        initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.4, delay: 1.2 }}
-      />
-      <motion.text x={12} y={215} fill="rgba(201,169,110,0.4)" fontSize={7} fontFamily="monospace" letterSpacing="0.1em"
-        initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.3, delay: 1.3 }}
-      >OBSERVABILITY MODULE — LIVE DATA — 24/7 MONITORING ACTIVE</motion.text>
-    </svg>
-  );
-}
-
-function ExpansionDiagram({ active }: { active: boolean }) {
-  const nodes = [
-    { cx: 260, cy: 100, label: "CORE\nSYSTEM", r: 30, depth: 0 },
-    { cx: 130, cy: 60, label: "FINANCE", r: 20, depth: 1 },
-    { cx: 390, cy: 60, label: "HR OPS", r: 20, depth: 1 },
-    { cx: 130, cy: 145, label: "SALES", r: 20, depth: 1 },
-    { cx: 390, cy: 145, label: "LEGAL", r: 20, depth: 1 },
-    { cx: 55, cy: 100, label: "PAYROLL", r: 14, depth: 2 },
-    { cx: 465, cy: 100, label: "RECRUIT", r: 14, depth: 2 },
-    { cx: 80, cy: 35, label: "AP/AR", r: 14, depth: 2 },
-    { cx: 440, cy: 35, label: "ONBOARD", r: 14, depth: 2 },
-  ];
-
-  const edges = [
-    [260, 100, 130, 60], [260, 100, 390, 60],
-    [260, 100, 130, 145], [260, 100, 390, 145],
-    [130, 60, 55, 100], [390, 60, 465, 100],
-    [130, 60, 80, 35], [390, 60, 440, 35],
-  ];
-
-  return (
-    <svg viewBox="0 0 520 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full" aria-hidden="true">
-      <pattern id="exgrid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
-        <path d="M24 0H0V24" stroke="rgba(255,255,255,0.03)" strokeWidth="0.5" />
-      </pattern>
-      <rect width="520" height="200" fill="url(#exgrid)" />
-
-      {edges.map(([x1, y1, x2, y2], i) => (
-        <motion.line key={i} x1={x1} y1={y1} x2={x2} y2={y2}
-          stroke="rgba(201,169,110,0.18)" strokeWidth={0.5} strokeDasharray="3 4"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={active ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 + i * 0.08 }}
-        />
-      ))}
-
-      {nodes.map(({ cx, cy, label, r, depth }, i) => (
-        <g key={label}>
-          <motion.circle cx={cx} cy={cy} r={r}
-            fill={`rgba(143,120,96,${depth === 0 ? "0.18" : depth === 1 ? "0.1" : "0.06"})`}
-            stroke={`rgba(201,169,110,${depth === 0 ? "0.6" : depth === 1 ? "0.3" : "0.2"})`}
-            strokeWidth={depth === 0 ? 1 : 0.5}
-            initial={{ scale: 0, opacity: 0 }}
-            animate={active ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 + i * 0.07, ease: [0.22, 1, 0.36, 1] }}
-            style={{ transformOrigin: `${cx}px ${cy}px` }}
-          />
-          {label.split("\n").map((line, j) => (
-            <motion.text key={j} x={cx} y={cy - (label.includes("\n") ? 4 : 0) + j * 10}
-              textAnchor="middle"
-              fill={depth === 0 ? "#c9a96e" : "rgba(201,169,110,0.55)"}
-              fontSize={depth === 0 ? 7.5 : depth === 1 ? 7 : 6.5}
-              fontFamily="monospace" letterSpacing="0.08em"
-              initial={{ opacity: 0 }}
-              animate={active ? { opacity: 1 } : { opacity: 0 }}
-              transition={{ duration: 0.3, delay: 0.35 + i * 0.07 }}
-            >{line}</motion.text>
-          ))}
-        </g>
-      ))}
-
-      <motion.text x={260} y={190} textAnchor="middle"
-        fill="rgba(201,169,110,0.35)" fontSize={7.5} fontFamily="monospace" letterSpacing="0.1em"
-        initial={{ opacity: 0 }} animate={active ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.3, delay: 1.1 }}
-      >OPERATIONAL GRAPH — 4 DEPARTMENTS LIVE — 4 IN QUEUE</motion.text>
-    </svg>
-  );
-}
-
-// ── Module Data ────────────────────────────────────────────────────────────────
-
-const MODULES: ModuleSpec[] = [
+const PHASES: Phase[] = [
   {
-    id: "diagnostic",
-    shortId: "DIAG",
-    label: "Systems Intelligence",
-    signal: "SCAN COMPLETE",
-    headline: "We map exactly how your business operates — before writing a line of automation.",
-    thesis:
-      "Most AI projects fail because they're built on assumptions about how a business works, not direct observation. We embed ourselves in your actual operations — interviewing the people doing the work, shadowing processes, analyzing system logs — and produce a precise operational map. Every workflow documented. Every friction point named. Every manual dependency quantified. This is the intelligence layer that makes everything that follows exact rather than approximate.",
-    operationalNote:
-      "The diagnostic engagement runs 5 business days and produces a prioritized automation opportunity map with ROI projections tied to actual operational data. No assumptions, no boilerplate. Every finding is evidenced.",
-    telemetry: [
-      { label: "Delivery", value: "5 business days" },
-      { label: "Scope", value: "Full operations audit" },
-      { label: "Output", value: "Ranked opportunity map" },
-      { label: "Method", value: "Direct observation" },
+    index: "01",
+    navLabel: "Audit",
+    tag: "Workflow Audit",
+    title: "Workflow Audit",
+    description:
+      "We embed ourselves in how your business actually operates — not how it's documented. Through team interviews, process shadowing, and systems analysis, we map every workflow, data flow, handoff, and manual touchpoint. No assumption goes untested. We surface the bottlenecks, redundancies, and repetitive dependencies that slow your team down and quietly erode margin.",
+    outcomeLabel: "What you receive",
+    outcome:
+      "A complete, unambiguous picture of how your business currently operates — every workflow documented, every friction point named, and every manual dependency understood before a single line of automation is written.",
+    listLabel: "Deliverables",
+    items: [
+      { icon: "users", name: "Stakeholder interviews", desc: "Structured sessions with the people doing the actual work, not just leadership" },
+      { icon: "sitemap", name: "Workflow maps", desc: "Visual documentation of every process, system, and cross-team handoff" },
+      { icon: "activity", name: "Systems inventory", desc: "Full audit of tools, integrations, and data flows currently in use" },
+      { icon: "alert-triangle", name: "Bottleneck analysis", desc: "Ranked list of friction points, manual dependencies, and process failures" },
+      { icon: "repeat", name: "Redundancy report", desc: "Duplicate work, re-entry tasks, and unnecessary manual steps identified" },
     ],
-    systemDiagram: DiagnosticDiagram,
   },
   {
-    id: "architecture",
-    shortId: "ARCH",
-    label: "Integration Architecture",
-    signal: "BLUEPRINT READY",
-    headline: "The system design that makes automation buildable, auditable, and extensible from day one.",
-    thesis:
-      "Architecture is where most AI engagements quietly fail — not in development, but in design. A system that looks functional in isolation falls apart when it has to interact with a live CRM, a legacy ERP, and a data warehouse simultaneously. We design the integration architecture before any code is written: the agent topology, the event stream contracts, the data models, the approval routing logic, the audit trail. Every technical decision is tied to a specific operational outcome.",
-    operationalNote:
-      "Architecture design runs 2–3 weeks and produces a client-reviewed technical specification. Development only begins after sign-off. No scope surprises, no mid-build pivots.",
-    telemetry: [
-      { label: "Duration", value: "2–3 weeks" },
-      { label: "Deliverable", value: "Technical specification" },
-      { label: "Protocol", value: "Client sign-off required" },
-      { label: "Coverage", value: "All layers documented" },
+    index: "02",
+    navLabel: "Blueprint",
+    tag: "Blueprint & Solution Design",
+    title: "Blueprint & Solution Design",
+    description:
+      "Audit findings become a precise implementation plan. We prioritize automation opportunities by impact and complexity, design the agent workflows and system architecture, and select the integrations that fit your existing stack. Every decision is tied back to a measurable business outcome — hours saved, error rates reduced, throughput increased.",
+    outcomeLabel: "What you receive",
+    outcome:
+      "A detailed implementation blueprint with prioritized opportunities, architecture decisions, integration strategy, ROI projections, and a phased roadmap — everything needed to move into development with complete clarity.",
+    listLabel: "Deliverables",
+    items: [
+      { icon: "sparkles", name: "Automation opportunities", desc: "Ranked by ROI potential and implementation complexity" },
+      { icon: "cpu", name: "Architecture design", desc: "Agent topology, orchestration layers, and data flow specifications" },
+      { icon: "plug-connected", name: "Integration strategy", desc: "Tool selection and connection plan mapped to your existing stack" },
+      { icon: "trending-up", name: "ROI projections", desc: "Hours saved, cost reduction, and capacity unlocked per initiative" },
+      { icon: "route", name: "Implementation roadmap", desc: "Phased delivery plan with milestones, priorities, and timelines" },
     ],
-    systemDiagram: ArchitectureDiagram,
   },
   {
-    id: "runtime",
-    shortId: "RUN",
-    label: "Agentic Runtime",
-    signal: "AGENTS ACTIVE",
-    headline: "Production-grade AI agents that execute operational tasks autonomously, not just assist with them.",
-    thesis:
-      "There is a significant gap between an AI that answers questions and an AI system that actually does the work. The second requires agents with precise decision logic, reliable tool use, structured error handling, escalation protocols, and integration with the systems where work actually happens. We build the runtime — the infrastructure of autonomous business execution. Agents that route approvals, process invoices, generate reports, flag anomalies, and coordinate across departments without a human in the loop unless the task requires one.",
-    operationalNote:
-      "First prototype of highest-priority workflows in 3–4 weeks. Structured feedback cycles before full production deployment. Every agent has complete observability built in from day one.",
-    telemetry: [
-      { label: "First prototype", value: "3–4 weeks" },
-      { label: "Agent types", value: "Multi-agent systems" },
-      { label: "Integration", value: "Your existing stack" },
-      { label: "Oversight", value: "Human escalation paths" },
+    index: "03",
+    navLabel: "Prototype",
+    tag: "Prototype Development",
+    title: "Prototype Development",
+    description:
+      "We build. Starting from the highest-priority workflows in your blueprint, we develop AI agents, automation pipelines, and the integrations that connect them — all designed to slot into your existing tools, not replace them. Each prototype is scoped for rapid delivery so you can see real system behavior and give meaningful feedback before we move to full production.",
+    outcomeLabel: "Timeline",
+    outcome:
+      "A working prototype of your highest-priority automations in 3–4 weeks, followed by structured feedback cycles and refinement before production deployment.",
+    listLabel: "What we build",
+    items: [
+      { icon: "robot", name: "AI agents", desc: "Autonomous systems that execute operational tasks end-to-end without manual intervention" },
+      { icon: "arrows-transfer-down", name: "Workflow automation", desc: "Multi-step business process orchestration across teams and systems" },
+      { icon: "git-branch", name: "Multi-agent systems", desc: "Coordinated agents handling complex, branching, and conditional operations" },
+      { icon: "database", name: "Data pipelines", desc: "Reliable movement, transformation, and routing of business-critical data" },
+      { icon: "plug-connected", name: "CRM & ERP integrations", desc: "Native connections to your existing stack — no rip-and-replace required" },
+      { icon: "layout-dashboard", name: "Internal tooling", desc: "Custom interfaces built precisely for how your team actually works" },
     ],
-    systemDiagram: RuntimeDiagram,
   },
   {
-    id: "deployment",
-    shortId: "OPS",
-    label: "Zero-Downtime Operations",
-    signal: "PROD STABLE",
-    headline: "Staged deployment with rollback-ready protocols. Your operations don't pause for AI.",
-    thesis:
-      "Deploying AI to mission-critical workflows requires the same operational discipline as deploying any critical infrastructure change. We use staged rollout sequences — canary releases, phased expansion, automated regression testing — with complete rollback protocols at each stage. The first 30 days post-deployment are treated as the highest-leverage period of the engagement: weekly feedback loops, rapid iteration, real-time performance monitoring. The system improves on actual usage, not theoretical design.",
-    operationalNote:
-      "Zero-downtime deployment standard on all engagements. Full revert capability maintained for 30 days post-launch. Weekly iteration cycles during stabilization period.",
-    telemetry: [
-      { label: "Downtime", value: "Zero" },
-      { label: "Rollback SLA", value: "< 4 minutes" },
-      { label: "Iteration cycle", value: "Weekly" },
-      { label: "Stabilization", value: "30 days" },
+    index: "04",
+    navLabel: "Deploy",
+    tag: "Deploy & Continuously Optimize",
+    title: "Deploy & Continuously Optimize",
+    description:
+      "We ship to production, then stay close. The first 30 days after deployment are where most automation projects fail — we treat them as the highest-leverage period of the engagement. Weekly feedback sessions, rapid iteration cycles, and real-time performance monitoring ensure every system improves on actual usage, not theoretical design.",
+    outcomeLabel: "First gains",
+    outcome:
+      "Most clients see measurable operational improvements within the first few weeks of deployment. The system gets sharper every week.",
+    listLabel: "How we operate",
+    items: [
+      { icon: "message-circle", name: "Client feedback loops", desc: "Structured weekly sessions to capture what's working, what's breaking, and what to improve" },
+      { icon: "bolt", name: "Rapid iteration cycles", desc: "Changes scoped, built, and deployed in days — not multi-week sprints" },
+      { icon: "activity", name: "Performance monitoring", desc: "Real-time observability across every running automation and agent workflow" },
+      { icon: "test-pipe", name: "Automated testing", desc: "Every change validated in staging before it touches your production environment" },
+      { icon: "shield-check", name: "Reliability engineering", desc: "Rollback protocols, failover logic, and zero-downtime deployment standards" },
     ],
-    systemDiagram: DeploymentDiagram,
   },
   {
-    id: "observability",
-    shortId: "OBS",
-    label: "Continuous Observability",
-    signal: "MONITORING LIVE",
-    headline: "Every automated decision logged, every system monitored, every anomaly surfaced before it becomes an incident.",
-    thesis:
-      "An AI system operating in production without comprehensive observability is a liability, not an asset. Every automated action needs to be logged, attributed, and reviewable. Every performance metric needs to be tracked over time. Every anomalous behavior needs to surface to the right people before it compounds. We implement full observability across every agent and workflow: structured audit logs, performance dashboards, anomaly detection, and proactive alerting — so your team has complete visibility into what the system is doing and why.",
-    operationalNote:
-      "24/7 monitoring across all live automations. Proactive alerting before issues become incidents. Scheduled performance reports with optimization recommendations.",
-    telemetry: [
-      { label: "Monitoring", value: "24/7 continuous" },
-      { label: "Log retention", value: "Fully auditable" },
-      { label: "Alerting", value: "Proactive" },
-      { label: "Reporting", value: "Scheduled + on-demand" },
+    index: "05",
+    navLabel: "Support",
+    tag: "Ongoing Support & Optimization",
+    title: "Ongoing Support & Optimization",
+    description:
+      "Once your automations are live and stable, we shift into a continuous support model. Through our ongoing plans, we handle monitoring, maintenance, and incremental workflow adjustments — keeping your systems reliable, current, and aligned with how your business actually evolves. You shouldn't need an internal AI team to keep the lights on.",
+    outcomeLabel: "Long-term value",
+    outcome:
+      "A continuously maintained automation system backed by dedicated support — reliable, monitored, and adapted as your processes and tools change over time.",
+    listLabel: "What we handle",
+    items: [
+      { icon: "shield-check", name: "System monitoring", desc: "24/7 observability across all live automations with proactive issue detection" },
+      { icon: "wrench", name: "Maintenance & updates", desc: "Dependency updates, API changes, and workflow adjustments as platforms evolve" },
+      { icon: "sliders", name: "Workflow refinements", desc: "Small process changes and logic updates without full rebuild cycles" },
+      { icon: "bell", name: "Incident response", desc: "Fast triage and resolution when something breaks or behaves unexpectedly" },
+      { icon: "file-analytics", name: "Performance reporting", desc: "Regular summaries of system health, efficiency gains, and optimization opportunities" },
     ],
-    systemDiagram: ObservabilityDiagram,
   },
   {
-    id: "expansion",
-    shortId: "EXP",
-    label: "Operational Scaling",
-    signal: "SCALING ACTIVE",
-    headline: "Proven automation becomes infrastructure. Coverage expands to every department without starting from zero.",
-    thesis:
-      "The highest-ROI automation is the one you don't have to rebuild. As your first workflows stabilize, they become the foundation for expanding coverage — new departments, new processes, new data sources. We identify the next tier of automation opportunities, replicate proven patterns across teams, and extend the intelligence layer to absorb operational growth. The system compounds in value over time. The business scales its operational capacity without a proportional increase in headcount or overhead.",
-    operationalNote:
-      "Expansion planning begins at 60 days post-initial deployment. Departmental rollout follows proven workflow patterns to minimize delivery risk.",
-    telemetry: [
-      { label: "Expansion start", value: "60 days post-launch" },
-      { label: "Model", value: "Pattern replication" },
-      { label: "Coverage goal", value: "Org-wide automation" },
-      { label: "Growth curve", value: "Compounding" },
+    index: "06",
+    navLabel: "Scale",
+    tag: "Scale & Expand Operations",
+    title: "Scale & Expand Operations",
+    description:
+      "Proven automations become the foundation for operational expansion. As your business grows, we extend coverage into new departments, replicate successful workflows across teams, and identify the next tier of AI opportunities — so your capacity scales without a proportional increase in headcount or overhead. Automation stops being a project and becomes infrastructure.",
+    outcomeLabel: "Strategic outcome",
+    outcome:
+      "A scalable operational foundation where automation absorbs growth — new departments covered, more workflows running, and a compounding advantage over businesses still doing this manually.",
+    listLabel: "What we expand",
+    items: [
+      { icon: "building", name: "Department expansion", desc: "Proven workflows replicated and adapted across finance, ops, HR, and sales" },
+      { icon: "copy", name: "Workflow replication", desc: "High-performing automations extended to new teams without building from scratch" },
+      { icon: "users-plus", name: "Headcount-free growth", desc: "Operational capacity scales with the business — not the org chart" },
+      { icon: "sparkles", name: "New AI opportunities", desc: "Continuous identification of the next highest-leverage automation targets" },
+      { icon: "layers", name: "Automation as infrastructure", desc: "Interconnected systems that compound in value as coverage expands" },
     ],
-    systemDiagram: ExpansionDiagram,
   },
 ];
 
-// ── Module Navigator (Left Panel) ─────────────────────────────────────────────
+const ROI_STATS = [
+  { value: "5d", label: "Audit to roadmap" },
+  { value: "30d", label: "First operational gains" },
+  { value: "60d", label: "Measurable ROI" },
+  { value: "0", label: "Downtime deployments" },
+];
 
-function ModuleNavigator({
-  modules,
-  activeId,
-  onSelect,
-}: {
-  modules: ModuleSpec[];
-  activeId: string;
-  onSelect: (id: string) => void;
-}) {
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+function useScrollInView(threshold = 0.15) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { amount: threshold });
+  const [playKey, setPlayKey] = useState(0);
+  const prevInView = useRef(false);
+
+  useEffect(() => {
+    if (inView && !prevInView.current) {
+      setPlayKey((k) => k + 1);
+    }
+    prevInView.current = inView;
+  }, [inView]);
+
+  return { ref, inView, playKey };
+}
+
+// ── Transition Graphics ────────────────────────────────────────────────────
+
+function AuditToBlueprintGraphic() {
+  const { ref, playKey } = useScrollInView(0.3);
   return (
-    <nav
-      aria-label="Capabilities modules"
-      className="flex flex-col gap-0 border-r border-white/[.06]"
-    >
-      {/* System header */}
-      <div className="px-5 pt-6 pb-5 border-b border-white/[.06]">
-        <div className="font-mono text-[9px] tracking-[0.18em] uppercase text-white/20 mb-1">
-          DZen OS
-        </div>
-        <div className="font-mono text-[10px] tracking-[0.12em] text-[#c9a96e]">
-          Capability Modules
-        </div>
-      </div>
-
-      {/* Module list */}
-      <div className="flex flex-col flex-1 py-3">
-        {modules.map((mod, i) => {
-          const isActive = mod.id === activeId;
-          return (
-            <button
-              key={mod.id}
-              onClick={() => onSelect(mod.id)}
-              className={cn(
-                "group relative flex items-center gap-3 px-5 py-3.5 text-left transition-all duration-200 cursor-pointer",
-                isActive
-                  ? "bg-white/[.03]"
-                  : "hover:bg-white/[.015]"
+    <div ref={ref} className="flex items-center justify-center py-2">
+      <motion.div key={playKey} className="w-full flex justify-center">
+        <svg width="520" height="72" viewBox="0 0 520 72" fill="none" className="max-w-full">
+          {[
+            { x: 60, label: "People", sub: "interviewed" },
+            { x: 200, label: "Processes", sub: "mapped" },
+            { x: 340, label: "Systems", sub: "inventoried" },
+            { x: 460, label: "Blueprint", sub: "designed" },
+          ].map(({ x, label, sub }, i) => (
+            <g key={label}>
+              <motion.circle cx={x} cy={36} r={20} fill="rgba(201,169,110,0.08)" stroke="rgba(201,169,110,0.35)" strokeWidth={1}
+                initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.5, delay: i * 0.18, ease: [0.22, 1, 0.36, 1] }} />
+              <motion.text x={x} y={39} textAnchor="middle" fill="#c9a96e" fontSize={8} fontFamily="monospace" letterSpacing="0.07em"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                transition={{ duration: 0.4, delay: i * 0.18 + 0.25 }}>{label.toUpperCase()}</motion.text>
+              <motion.text x={x} y={62} textAnchor="middle" fill="rgba(255,255,255,0.2)" fontSize={7.5} fontFamily="monospace"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                transition={{ duration: 0.4, delay: i * 0.18 + 0.35 }}>{sub}</motion.text>
+              {i < 3 && (
+                <motion.line x1={x + 21} y1={36} x2={x + 119} y2={36} stroke="rgba(201,169,110,0.25)" strokeWidth={1} strokeDasharray="4 4"
+                  initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: i * 0.18 + 0.4 }} />
               )}
-              aria-current={isActive ? "true" : undefined}
-            >
-              {/* Active indicator */}
-              <span
-                className={cn(
-                  "absolute left-0 top-0 bottom-0 w-px transition-all duration-300",
-                  isActive ? "bg-[#c9a96e]" : "bg-transparent"
-                )}
-              />
-
-              {/* Module index */}
-              <span
-                className={cn(
-                  "font-mono text-[8px] tracking-[0.1em] flex-shrink-0 w-8 transition-colors duration-200",
-                  isActive ? "text-[#c9a96e]" : "text-white/20 group-hover:text-white/30"
-                )}
-              >
-                {mod.shortId}
-              </span>
-
-              <div className="flex flex-col gap-0.5 min-w-0">
-                <span
-                  className={cn(
-                    "font-sans text-[12px] font-light leading-tight transition-colors duration-200 whitespace-nowrap truncate",
-                    isActive ? "text-stone-100" : "text-white/40 group-hover:text-white/60"
-                  )}
-                >
-                  {mod.label}
-                </span>
-
-                {isActive && (
-                  <motion.span
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: "auto" }}
-                    exit={{ opacity: 0, width: 0 }}
-                    className="font-mono text-[8px] tracking-[0.12em] text-[#c9a96e] overflow-hidden whitespace-nowrap"
-                  >
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#c9a96e] mr-1.5 align-middle animate-[pulse_2s_ease-in-out_infinite]" />
-                    {mod.signal}
-                  </motion.span>
-                )}
-              </div>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* System status footer */}
-      <div className="px-5 py-4 border-t border-white/[.06]">
-        <div className="font-mono text-[8px] tracking-[0.1em] uppercase text-white/15 leading-relaxed">
-          <div className="flex justify-between mb-1">
-            <span>Status</span>
-            <span className="text-[#c9a96e]">Operational</span>
-          </div>
-          <div className="flex justify-between mb-1">
-            <span>Modules</span>
-            <span className="text-white/30">{modules.length} active</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Version</span>
-            <span className="text-white/30">2.1.0</span>
-          </div>
-        </div>
-      </div>
-    </nav>
+              {i < 3 && (
+                <motion.polygon points={`${x + 118},31 ${x + 126},36 ${x + 118},41`} fill="rgba(201,169,110,0.4)"
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3, delay: i * 0.18 + 0.7 }} />
+              )}
+            </g>
+          ))}
+        </svg>
+      </motion.div>
+    </div>
   );
 }
 
-// ── Module Content Panel ───────────────────────────────────────────────────────
-
-function ModuleContent({ module }: { module: ModuleSpec }) {
-  const Diagram = module.systemDiagram;
-
+function BlueprintToPrototypeGraphic() {
+  const { ref, playKey } = useScrollInView(0.3);
+  const nodes = [
+    { x: 80, y: 20, label: "ROI MAP" },
+    { x: 200, y: 48, label: "ARCH" },
+    { x: 320, y: 20, label: "INTEGR." },
+    { x: 440, y: 48, label: "ROADMAP" },
+  ];
+  const edges = [[0, 1], [1, 2], [2, 3], [0, 2]];
   return (
-    <motion.div
-      key={module.id}
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -12 }}
-      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className="flex flex-col h-full"
-    >
-      {/* Module header */}
-      <div className="px-10 pt-8 pb-6 border-b border-white/[.06] flex-shrink-0">
-        <div className="flex items-center gap-3 mb-4">
-          <span className="font-mono text-[9px] tracking-[0.16em] uppercase border border-[rgba(201,169,110,0.25)] text-[#c9a96e] px-2 py-1">
-            {module.shortId}
-          </span>
-          <span className="font-mono text-[9px] tracking-[0.14em] uppercase text-white/20">
-            {module.label}
-          </span>
-        </div>
-
-        <h3 className="font-serif text-[clamp(1.4rem,2.2vw,2rem)] font-normal text-stone-100 leading-[1.12] tracking-[-0.02em] max-w-[620px]">
-          {module.headline}
-        </h3>
-      </div>
-
-      {/* Content grid */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-0 min-h-0">
-
-          {/* Left: description + diagram */}
-          <div className="px-10 py-7 border-r border-white/[.04]">
-
-            {/* System diagram */}
-            <div className="mb-7">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="h-px flex-1 bg-white/[.04]" />
-                <span className="font-mono text-[8px] tracking-[0.14em] uppercase text-white/15">
-                  System Diagram
-                </span>
-                <div className="h-px flex-1 bg-white/[.04]" />
-              </div>
-              <div className="bg-[rgba(255,255,255,0.012)] border border-white/[.04] p-4 relative overflow-hidden">
-                {/* Corner marks */}
-                <span className="absolute top-2 left-2 w-2.5 h-2.5 border-t border-l border-[rgba(201,169,110,0.2)]" />
-                <span className="absolute top-2 right-2 w-2.5 h-2.5 border-t border-r border-[rgba(201,169,110,0.2)]" />
-                <span className="absolute bottom-2 left-2 w-2.5 h-2.5 border-b border-l border-[rgba(201,169,110,0.2)]" />
-                <span className="absolute bottom-2 right-2 w-2.5 h-2.5 border-b border-r border-[rgba(201,169,110,0.2)]" />
-                <Diagram active={true} />
-              </div>
-            </div>
-
-            {/* Description */}
-            <p className="font-sans text-[14px] font-light text-stone-400 leading-[1.85] mb-5">
-              {module.thesis}
-            </p>
-
-            {/* Operational note */}
-            <div className="border border-[rgba(201,169,110,0.15)] bg-[rgba(201,169,110,0.03)] px-5 py-4">
-              <div className="font-mono text-[8px] tracking-[0.14em] uppercase text-[#c9a96e] mb-2">
-                Operational Note
-              </div>
-              <p className="font-sans text-[13px] font-light text-stone-300 leading-[1.8]">
-                {module.operationalNote}
-              </p>
-            </div>
-          </div>
-
-          {/* Right: telemetry spec */}
-          <div className="px-7 py-7 flex flex-col gap-5">
-            <div>
-              <div className="font-mono text-[8px] tracking-[0.16em] uppercase text-white/20 mb-4">
-                Module Spec
-              </div>
-              <div className="flex flex-col gap-0 border border-white/[.06] overflow-hidden">
-                {module.telemetry.map(({ label, value }, i) => (
-                  <div
-                    key={label}
-                    className={cn(
-                      "flex items-center justify-between px-4 py-3.5 gap-4",
-                      i < module.telemetry.length - 1 && "border-b border-white/[.05]"
-                    )}
-                  >
-                    <span className="font-mono text-[9px] tracking-[0.1em] uppercase text-white/25 flex-shrink-0">
-                      {label}
-                    </span>
-                    <span className="font-mono text-[10px] text-[#c9a96e] text-right">
-                      {value}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* System integrity */}
-            <div>
-              <div className="font-mono text-[8px] tracking-[0.16em] uppercase text-white/20 mb-3">
-                Compliance
-              </div>
-              <div className="flex flex-col gap-1.5">
-                {["SOC 2 Type II", "ISO 27001", "Full audit trail", "Human oversight controls"].map((item) => (
-                  <div key={item} className="flex items-center gap-2">
-                    <span className="w-1 h-1 rounded-full bg-[rgba(201,169,110,0.4)] flex-shrink-0" />
-                    <span className="font-mono text-[9px] text-white/30">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Module CTA */}
-            <div className="mt-auto pt-5 border-t border-white/[.05]">
-              <a
-                href="#cta"
-                className="group flex items-center gap-2 font-mono text-[10px] tracking-[0.12em] uppercase text-white/30 hover:text-[#c9a96e] transition-colors duration-200"
-              >
-                <span>Discuss this module</span>
-                <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </motion.div>
+    <div ref={ref} className="flex items-center justify-center py-2">
+      <motion.div key={playKey} className="w-full flex justify-center">
+        <svg width="520" height="88" viewBox="0 0 520 88" fill="none" className="max-w-full">
+          {edges.map(([a, b], i) => {
+            const na = nodes[a], nb = nodes[b];
+            return (
+              <motion.line key={i} x1={na.x} y1={na.y + 14} x2={nb.x} y2={nb.y + 14} stroke="rgba(201,169,110,0.2)" strokeWidth={1} strokeDasharray="3 5"
+                initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }}
+                transition={{ duration: 0.6, delay: i * 0.1 + 0.3 }} />
+            );
+          })}
+          {nodes.map(({ x, y, label }, i) => (
+            <g key={label}>
+              <motion.rect x={x - 30} y={y} width={60} height={28} rx={3} fill="rgba(201,169,110,0.07)" stroke="rgba(201,169,110,0.3)" strokeWidth={1}
+                initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.45, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
+                style={{ transformOrigin: `${x}px ${y + 14}px` }} />
+              <motion.text x={x} y={y + 18} textAnchor="middle" fill="#c9a96e" fontSize={8} fontFamily="monospace" letterSpacing="0.08em"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                transition={{ duration: 0.3, delay: i * 0.12 + 0.25 }}>{label}</motion.text>
+            </g>
+          ))}
+        </svg>
+      </motion.div>
+    </div>
   );
 }
 
-// ── Mobile Module Accordion ────────────────────────────────────────────────────
-
-function MobileModuleAccordion({ module, index }: { module: ModuleSpec; index: number }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.1 });
-  const Diagram = module.systemDiagram;
-
+function PrototypeToDeployGraphic() {
+  const { ref, playKey } = useScrollInView(0.3);
+  const layers = [
+    { label: "AI Agents", color: "rgba(201,169,110,0.9)" },
+    { label: "Orchestration", color: "rgba(201,169,110,0.65)" },
+    { label: "Integrations", color: "rgba(201,169,110,0.4)" },
+    { label: "Data Layer", color: "rgba(201,169,110,0.2)" },
+  ];
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
-      className="border-b border-white/[.07] last:border-b-0"
-    >
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between px-6 py-5 text-left"
-        aria-expanded={open}
-      >
-        <div className="flex items-center gap-3">
-          <span className="font-mono text-[9px] tracking-[0.14em] text-[#c9a96e]">
-            {module.shortId}
-          </span>
-          <span className="font-sans text-[14px] font-light text-stone-200">
-            {module.label}
-          </span>
-        </div>
-        <motion.span
-          animate={{ rotate: open ? 45 : 0 }}
-          transition={{ duration: 0.25 }}
-          className="font-mono text-[16px] text-white/30 flex-shrink-0"
-        >
-          +
-        </motion.span>
-      </button>
-
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden"
-          >
-            <div className="px-6 pb-7">
-              <div className="bg-[rgba(255,255,255,0.012)] border border-white/[.04] p-3 mb-5 relative">
-                <span className="absolute top-1.5 left-1.5 w-2 h-2 border-t border-l border-[rgba(201,169,110,0.2)]" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 border-t border-r border-[rgba(201,169,110,0.2)]" />
-                <span className="absolute bottom-1.5 left-1.5 w-2 h-2 border-b border-l border-[rgba(201,169,110,0.2)]" />
-                <span className="absolute bottom-1.5 right-1.5 w-2 h-2 border-b border-r border-[rgba(201,169,110,0.2)]" />
-                <Diagram active={open} />
-              </div>
-
-              <h3 className="font-serif text-[18px] font-normal text-stone-100 leading-[1.2] tracking-[-0.015em] mb-4">
-                {module.headline}
-              </h3>
-
-              <p className="font-sans text-[13px] font-light text-stone-400 leading-[1.8] mb-4">
-                {module.thesis}
-              </p>
-
-              <div className="grid grid-cols-2 gap-px bg-white/[.05] border border-white/[.05] mb-4">
-                {module.telemetry.map(({ label, value }) => (
-                  <div key={label} className="bg-[#0f0e0d] px-3 py-3">
-                    <div className="font-mono text-[8px] tracking-[0.1em] uppercase text-white/25 mb-1">{label}</div>
-                    <div className="font-mono text-[10px] text-[#c9a96e]">{value}</div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="border border-[rgba(201,169,110,0.15)] bg-[rgba(201,169,110,0.03)] px-4 py-3">
-                <div className="font-mono text-[8px] tracking-[0.14em] uppercase text-[#c9a96e] mb-1.5">Operational Note</div>
-                <p className="font-sans text-[12px] font-light text-stone-300 leading-[1.75]">{module.operationalNote}</p>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+    <div ref={ref} className="flex items-center justify-center py-2">
+      <motion.div key={playKey} className="w-full flex justify-center">
+        <svg width="520" height="88" viewBox="0 0 520 88" fill="none" className="max-w-full">
+          {layers.map(({ label, color }, i) => (
+            <g key={label}>
+              <motion.rect x={80} y={8 + i * 18} width={360} height={14} rx={2} fill="rgba(201,169,110,0.05)" stroke="rgba(201,169,110,0.15)" strokeWidth={1}
+                initial={{ scaleX: 0, opacity: 0 }} animate={{ scaleX: 1, opacity: 1 }}
+                transition={{ duration: 0.55, delay: 0.1 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                style={{ transformOrigin: "80px center" }} />
+              <motion.rect x={80} y={8 + i * 18} width={4} height={14} rx={1} fill={color}
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                transition={{ duration: 0.3, delay: 0.35 + i * 0.1 }} />
+              <motion.text x={94} y={19 + i * 18} textAnchor="start" fill={color} fontSize={8} fontFamily="monospace" letterSpacing="0.09em"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                transition={{ duration: 0.3, delay: 0.4 + i * 0.1 }}>{label.toUpperCase()}</motion.text>
+              <motion.text x={430} y={19 + i * 18} textAnchor="end" fill="rgba(201,169,110,0.35)" fontSize={7.5} fontFamily="monospace"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                transition={{ duration: 0.3, delay: 0.55 + i * 0.1 }}>LIVE</motion.text>
+            </g>
+          ))}
+          <motion.text x={260} y={82} textAnchor="middle" fill="rgba(255,255,255,0.15)" fontSize={8} fontFamily="monospace" letterSpacing="0.1em"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.9 }}>PRODUCTION STACK — ALL LAYERS DEPLOYED</motion.text>
+        </svg>
+      </motion.div>
+    </div>
   );
 }
 
-// ── Section Header ─────────────────────────────────────────────────────────────
-
-function SectionHeader() {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.2 });
-
+function DeployToSupportGraphic() {
+  const { ref, playKey } = useScrollInView(0.3);
+  const events = [
+    { time: "09:14", label: "Deployment complete" },
+    { time: "09:18", label: "Monitoring active" },
+    { time: "09:45", label: "First task processed" },
+    { time: "10:02", label: "Performance nominal" },
+  ];
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 24 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-      className="px-10 pt-16 pb-10 border-b border-white/[.06] max-md:px-6 max-md:pt-12"
-    >
-      <div className="flex items-end justify-between gap-8 max-md:flex-col max-md:items-start max-md:gap-4">
+    <div ref={ref} className="flex items-center justify-center py-2">
+      <motion.div key={playKey} className="w-full flex justify-center">
+        <svg width="520" height="72" viewBox="0 0 520 72" fill="none" className="max-w-full">
+          <motion.line x1={60} y1={36} x2={460} y2={36} stroke="rgba(201,169,110,0.1)" strokeWidth={1}
+            initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.6, delay: 0.1 }} />
+          {events.map(({ time, label }, i) => {
+            const x = 60 + i * (400 / 3);
+            return (
+              <g key={time}>
+                <motion.circle cx={x} cy={36} r={4} fill="rgba(201,169,110,0.15)" stroke="rgba(201,169,110,0.5)" strokeWidth={1}
+                  initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.35, delay: 0.2 + i * 0.15, ease: [0.22, 1, 0.36, 1] }} />
+                <motion.text x={x} y={22} textAnchor="middle" fill="rgba(201,169,110,0.5)" fontSize={7.5} fontFamily="monospace"
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3, delay: 0.35 + i * 0.15 }}>{time}</motion.text>
+                <motion.text x={x} y={56} textAnchor="middle" fill="rgba(255,255,255,0.2)" fontSize={7.5} fontFamily="monospace"
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3, delay: 0.4 + i * 0.15 }}>{label}</motion.text>
+              </g>
+            );
+          })}
+        </svg>
+      </motion.div>
+    </div>
+  );
+}
+
+function SupportToScaleGraphic() {
+  const { ref, playKey } = useScrollInView(0.3);
+  const branches = [
+    { x: 360, y: 6, label: "Finance" },
+    { x: 360, y: 30, label: "Sales" },
+    { x: 360, y: 54, label: "HR" },
+    { x: 360, y: 78, label: "Ops" },
+  ];
+  return (
+    <div ref={ref} className="flex items-center justify-center py-2">
+      <motion.div key={playKey} className="w-full flex justify-center">
+        <svg width="520" height="96" viewBox="0 0 520 96" fill="none" className="max-w-full">
+          <motion.rect x={100} y={34} width={80} height={28} rx={3} fill="rgba(201,169,110,0.1)" stroke="rgba(201,169,110,0.4)" strokeWidth={1}
+            initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }} style={{ transformOrigin: "140px 48px" }} />
+          <motion.text x={140} y={51} textAnchor="middle" fill="#c9a96e" fontSize={8} fontFamily="monospace" letterSpacing="0.1em"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.3 }}>CORE FLOW</motion.text>
+          {branches.map(({ x, y, label }, i) => (
+            <g key={label}>
+              <motion.path d={`M180,48 C270,48 270,${y + 14} ${x},${y + 14}`} stroke="rgba(201,169,110,0.22)" strokeWidth={1} strokeDasharray="3 4" fill="none"
+                initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }}
+                transition={{ duration: 0.55, delay: 0.35 + i * 0.1 }} />
+              <motion.rect x={x} y={y} width={72} height={28} rx={3} fill="rgba(201,169,110,0.06)" stroke="rgba(201,169,110,0.25)" strokeWidth={1}
+                initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.45, delay: 0.5 + i * 0.1, ease: [0.22, 1, 0.36, 1] }} />
+              <motion.text x={x + 36} y={y + 18} textAnchor="middle" fill="rgba(201,169,110,0.65)" fontSize={8} fontFamily="monospace" letterSpacing="0.08em"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                transition={{ duration: 0.3, delay: 0.65 + i * 0.1 }}>{label.toUpperCase()}</motion.text>
+            </g>
+          ))}
+        </svg>
+      </motion.div>
+    </div>
+  );
+}
+
+const TRANSITION_GRAPHICS = [
+  { label: "Audit → Blueprint", component: AuditToBlueprintGraphic },
+  { label: "Blueprint → Build", component: BlueprintToPrototypeGraphic },
+  { label: "Build → Deploy", component: PrototypeToDeployGraphic },
+  { label: "Deploy → Support", component: DeployToSupportGraphic },
+  { label: "Support → Scale", component: SupportToScaleGraphic },
+];
+
+function PhaseDivider({ index }: { index: number }) {
+  const { ref, playKey } = useScrollInView(0.3);
+  const GraphicComponent = TRANSITION_GRAPHICS[index].component;
+  return (
+    <div ref={ref} className="my-20 mx-auto max-w-[640px]">
+      <motion.div key={playKey} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }}>
+        <div className="flex items-center gap-4 mb-6">
+          <div className="flex-1 h-px bg-white/[.05]" />
+          <span className="font-mono text-[9px] tracking-[.16em] uppercase text-white/20">{TRANSITION_GRAPHICS[index].label}</span>
+          <div className="flex-1 h-px bg-white/[.05]" />
+        </div>
+        <GraphicComponent />
+      </motion.div>
+    </div>
+  );
+}
+
+function DeliverableCard({ item, index }: { item: DeliverableItem; index: number }) {
+  const { ref, playKey } = useScrollInView(0.1);
+  return (
+    <div ref={ref}>
+      <motion.div key={playKey} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, delay: index * 0.065, ease: [0.22, 1, 0.36, 1] }}
+        className="group flex items-start gap-4 px-5 py-5 border border-white/[.07] bg-white/[.01] hover:border-white/[.13] hover:bg-white/[.025] transition-all duration-300 cursor-default">
         <div>
-          <div className="flex items-center gap-3 mb-5">
-            <div className="w-8 h-px bg-[#c9a96e]" aria-hidden="true" />
-            <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-[#c9a96e]">
-              What We Build
-            </span>
-          </div>
-          <h2 className="font-serif text-[clamp(2rem,4vw,3.25rem)] font-normal text-stone-100 leading-[1.06] tracking-[-0.025em]">
-            An AI operating system
-            <br />
-            for your <em className="not-italic text-stone-400">entire organization.</em>
-          </h2>
+          <div className="text-[12px] font-medium text-stone-200 mb-1.5">{item.name}</div>
+          <div className="text-[11px] font-light text-white/30 leading-[1.65]">{item.desc}</div>
         </div>
-        <div className="max-w-[380px] flex-shrink-0">
-          <p className="font-sans text-[14px] font-light text-stone-400 leading-[1.8]">
-            Six interconnected capability modules. Each one a layer of the intelligence infrastructure we build for you — from initial diagnostic through to organization-wide operational scaling.
-          </p>
-        </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }
 
-// ── Main Component ─────────────────────────────────────────────────────────────
+function PhaseBlock({ phase, phaseIndex, onVisible }: { phase: Phase; phaseIndex: number; onVisible: (i: number) => void }) {
+  const blockRef = useRef<HTMLDivElement>(null);
+  const isEven = phaseIndex % 2 === 0;
 
-export function CapabilitiesSection() {
-  const [activeId, setActiveId] = useState(MODULES[0].id);
-  const sectionRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = blockRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) onVisible(phaseIndex); },
+      { threshold: 0.35 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [phaseIndex, onVisible]);
 
-  const activeModule = MODULES.find((m) => m.id === activeId) ?? MODULES[0];
+  const { ref: headerRef, playKey: headerKey } = useScrollInView(0.2);
+  const { ref: bodyRef, playKey: bodyKey } = useScrollInView(0.15);
+  const { ref: gridRef, playKey: gridKey } = useScrollInView(0.1);
 
-  const handleSelect = useCallback((id: string) => {
-    setActiveId(id);
+  const ContentCol = (
+    <div className="flex-1 min-w-0">
+      <div ref={headerRef}>
+        <motion.div key={headerKey} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }} className="mb-8">
+          <span className="font-mono text-[clamp(3.5rem,9vw,6rem)] font-bold text-white/[.04] leading-none select-none block -mb-4 -ml-1">{phase.index}</span>
+          <div className="inline-flex items-center gap-1.5 font-mono text-[9px] tracking-[.16em] uppercase text-[#c9a96e] border border-[rgba(201,169,110,0.25)] px-2.5 py-1 mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#c9a96e] opacity-70 animate-[pulse-dot_2s_ease-in-out_infinite]" /> Phase {phase.index}
+          </div>
+          <h3 className="text-[clamp(1.75rem,3.5vw,2.75rem)] font-bold tracking-[-0.025em] text-stone-100 leading-[1.08]">{phase.title}</h3>
+        </motion.div>
+      </div>
+      <div ref={bodyRef}>
+        <motion.div key={bodyKey} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: 0.1, ease: [0.22, 1, 0.36, 1] }} className="space-y-6">
+          <p className="text-[15px] font-light text-stone-400 leading-[1.85] max-w-[520px]">{phase.description}</p>
+          <div className="border border-[rgba(201,169,110,0.18)] bg-[rgba(201,169,110,0.04)] px-5 py-5 max-w-[420px]">
+            <div className="font-mono text-[9px] tracking-[.14em] uppercase text-[#c9a96e] mb-2.5">{phase.outcomeLabel}</div>
+            <p className="text-[13px] font-light text-stone-300 leading-[1.8]">{phase.outcome}</p>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+
+  const VisualCol = (
+    <div className="flex-shrink-0 w-full lg:w-[340px] xl:w-[380px]">
+      <motion.div key={bodyKey} initial={{ opacity: 0, x: isEven ? 20 : -20 }} animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+        className="relative h-[240px] border border-white/[.07] bg-[rgba(255,255,255,.015)] overflow-hidden">
+        <PhaseVisual index={phaseIndex} inView={true} />
+        <span className="absolute top-2.5 left-2.5 w-3 h-3 border-t border-l border-[rgba(201,169,110,0.25)]" />
+        <span className="absolute top-2.5 right-2.5 w-3 h-3 border-t border-r border-[rgba(201,169,110,0.25)]" />
+        <span className="absolute bottom-2.5 left-2.5 w-3 h-3 border-b border-l border-[rgba(201,169,110,0.25)]" />
+        <span className="absolute bottom-2.5 right-2.5 w-3 h-3 border-b border-r border-[rgba(201,169,110,0.25)]" />
+      </motion.div>
+    </div>
+  );
+
+  return (
+    <div ref={blockRef} id={`phase-${phaseIndex}`} className="mb-4">
+      <div className={cn("flex flex-col lg:flex-row gap-10 xl:gap-16 items-start mb-12", !isEven && "lg:flex-row-reverse")}>
+        {ContentCol}
+        {VisualCol}
+      </div>
+      <div ref={gridRef}>
+        <motion.div key={gridKey} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
+          className="font-mono text-[9px] tracking-[.16em] uppercase text-white/20 mb-5">{phase.listLabel}</motion.div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {phase.items.map((item, i) => <DeliverableCard key={item.name} item={item} index={i} />)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Phase Visuals ─────────────────────────────────────────────────────────
+
+function PhaseVisual({ index, inView }: { index: number; inView: boolean }) {
+  const visuals = [AuditVisual, BlueprintVisual, BuildVisual, DeployVisual, SupportVisual, ScaleVisual];
+  const V = visuals[index];
+  return <V inView={inView} />;
+}
+
+function AuditVisual({ inView }: { inView: boolean }) {
+  const rows = ["Payables workflow", "Approval routing", "Report generation", "Data entry tasks", "Invoice matching"];
+  return (
+    <div className="p-6 h-full flex flex-col justify-center gap-2.5">
+      {rows.map((r, i) => (
+        <motion.div key={r} className="flex items-center gap-3" initial={{ opacity: 0, x: -12 }} animate={inView ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.4, delay: 0.2 + i * 0.08 }}>
+          <motion.span className="text-[#c9a96e] text-[9px] font-mono" initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} transition={{ duration: 0.3, delay: 0.45 + i * 0.08 }}>{String(i + 1).padStart(2, "0")}</motion.span>
+          <div className="flex-1 h-px bg-white/[.07]" />
+          <span className="text-[10px] font-light text-white/40 font-mono whitespace-nowrap">{r}</span>
+          <motion.span className={cn("w-1.5 h-1.5 rounded-full flex-shrink-0", i < 3 ? "bg-[#c9a96e]" : "bg-white/[.12]")} initial={{ scale: 0 }} animate={inView ? { scale: 1 } : {}} transition={{ duration: 0.3, delay: 0.5 + i * 0.08 }} />
+        </motion.div>
+      ))}
+      <motion.div className="mt-3 font-mono text-[8px] tracking-[.1em] text-[rgba(201,169,110,0.5)]" initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} transition={{ duration: 0.4, delay: 0.9 }}>
+        3 / 5 AUTOMATION CANDIDATES IDENTIFIED
+      </motion.div>
+    </div>
+  );
+}
+
+function BlueprintVisual({ inView }: { inView: boolean }) {
+  const items = [
+    { label: "Opportunity #1", detail: "Invoice matching — 14 hrs/wk", priority: "HIGH" },
+    { label: "Opportunity #2", detail: "Approval routing — 8 hrs/wk", priority: "HIGH" },
+    { label: "Opportunity #3", detail: "Report generation — 6 hrs/wk", priority: "MED" },
+    { label: "Architecture", detail: "3 agents · 2 pipelines", priority: "DESIGN" },
+  ];
+  return (
+    <div className="p-5 h-full flex flex-col justify-center gap-2">
+      {items.map((item, i) => (
+        <motion.div key={item.label} className="flex items-center gap-3 px-3 py-2 border border-white/[.06] bg-white/[.02]"
+          initial={{ opacity: 0, y: 8 }} animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.4, delay: 0.15 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}>
+          <div className="flex-1">
+            <div className="font-mono text-[9px] text-white/50 mb-0.5">{item.label}</div>
+            <div className="font-mono text-[8px] text-white/25">{item.detail}</div>
+          </div>
+          <span className="font-mono text-[7px] tracking-[.1em] px-1.5 py-0.5 border"
+            style={{ color: item.priority === "HIGH" ? "#c9a96e" : item.priority === "DESIGN" ? "rgba(201,169,110,0.5)" : "rgba(255,255,255,0.3)",
+              borderColor: item.priority === "HIGH" ? "rgba(201,169,110,0.35)" : "rgba(255,255,255,0.1)" }}>{item.priority}</span>
+        </motion.div>
+      ))}
+      <motion.div className="mt-2 font-mono text-[8px] tracking-[.1em] text-[rgba(201,169,110,0.45)]" initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} transition={{ duration: 0.4, delay: 0.65 }}>
+        BLUEPRINT COMPLETE — READY TO BUILD
+      </motion.div>
+    </div>
+  );
+}
+
+function BuildVisual({ inView }: { inView: boolean }) {
+  const layers = [
+    { label: "AI Agents", color: "rgba(201,169,110,0.9)" },
+    { label: "Orchestration", color: "rgba(201,169,110,0.65)" },
+    { label: "Integrations", color: "rgba(201,169,110,0.4)" },
+    { label: "Data Layer", color: "rgba(201,169,110,0.2)" },
+  ];
+  return (
+    <div className="p-6 h-full flex flex-col justify-center gap-2">
+      {layers.map(({ label, color }, i) => (
+        <motion.div key={label} className="flex items-center gap-3" initial={{ opacity: 0, scaleX: 0 }}
+          animate={inView ? { opacity: 1, scaleX: 1 } : {}} transition={{ duration: 0.5, delay: 0.2 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+          style={{ transformOrigin: "left" }}>
+          <div className="w-[3px] h-7 flex-shrink-0" style={{ backgroundColor: color }} />
+          <div className="flex-1 h-7 flex items-center px-3 border border-white/[.06] bg-white/[.02]">
+            <span className="font-mono text-[9px] tracking-[.1em] uppercase" style={{ color }}>{label}</span>
+          </div>
+        </motion.div>
+      ))}
+      <motion.div className="mt-2 font-mono text-[8px] tracking-[.1em] text-[rgba(201,169,110,0.4)]" initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} transition={{ duration: 0.4, delay: 0.75 }}>
+        ARCHITECTURE STACK — 4 LAYERS
+      </motion.div>
+    </div>
+  );
+}
+
+function DeployVisual({ inView }: { inView: boolean }) {
+  const events = [
+    { time: "09:14", event: "Deployment triggered", status: "ok" },
+    { time: "09:15", event: "Tests passed (47/47)", status: "ok" },
+    { time: "09:16", event: "Canary release 10%", status: "ok" },
+    { time: "09:18", event: "Full rollout complete", status: "ok" },
+    { time: "09:18", event: "Zero downtime confirmed", status: "pulse" },
+  ];
+  return (
+    <div className="p-5 h-full flex flex-col justify-center gap-1.5 font-mono">
+      {events.map((e, i) => (
+        <motion.div key={e.event} className="flex items-center gap-2.5 text-[10px]" initial={{ opacity: 0 }}
+          animate={inView ? { opacity: 1 } : {}} transition={{ duration: 0.3, delay: 0.25 + i * 0.12 }}>
+          <span className="text-white/25 w-9 flex-shrink-0">{e.time}</span>
+          <span className={cn("w-1.5 h-1.5 rounded-full flex-shrink-0", e.status === "pulse" ? "bg-[#c9a96e] animate-[pulse-dot_2s_ease-in-out_infinite]" : "bg-[#c9a96e] opacity-60")} />
+          <span className="text-white/40">{e.event}</span>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+function SupportVisual({ inView }: { inView: boolean }) {
+  const metrics = [
+    { label: "Uptime", value: "99.97%", trend: "stable" },
+    { label: "Avg. response", value: "1.2s", trend: "stable" },
+    { label: "Tasks/day", value: "3,840", trend: "up" },
+    { label: "Error rate", value: "0.03%", trend: "down" },
+  ];
+  return (
+    <div className="p-6 h-full flex flex-col justify-center gap-3">
+      {metrics.map(({ label, value, trend }, i) => (
+        <motion.div key={label} className="flex items-center gap-4" initial={{ opacity: 0, x: -10 }}
+          animate={inView ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.4, delay: 0.15 + i * 0.1 }}>
+          <span className="font-mono text-[9px] text-white/30 w-28 flex-shrink-0">{label}</span>
+          <div className="flex-1 h-px bg-white/[.05]" />
+          <span className="font-mono text-[10px] text-[#c9a96e]">{value}</span>
+          <span className="font-mono text-[8px] w-10 text-right"
+            style={{ color: trend === "up" ? "rgba(201,169,110,0.6)" : trend === "down" ? "rgba(201,169,110,0.6)" : "rgba(255,255,255,0.2)" }}>
+            {trend === "stable" ? "—" : trend === "up" ? "↑" : "↓"}
+          </span>
+        </motion.div>
+      ))}
+      <motion.div className="mt-3 font-mono text-[8px] tracking-[.1em] text-[rgba(201,169,110,0.4)]" initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} transition={{ duration: 0.4, delay: 0.75 }}>
+        LIVE MONITORING — ALL SYSTEMS NOMINAL
+      </motion.div>
+    </div>
+  );
+}
+
+function ScaleVisual({ inView }: { inView: boolean }) {
+  const bars = [
+    { label: "Wk 1", v: 0.12 },
+    { label: "Wk 4", v: 0.28 },
+    { label: "Wk 8", v: 0.48 },
+    { label: "Wk 12", v: 0.72 },
+    { label: "Wk 16", v: 0.88 },
+    { label: "Wk 20", v: 0.97 },
+  ];
+  return (
+    <div className="p-6 h-full flex flex-col justify-end gap-0">
+      <div className="flex items-end gap-2 flex-1">
+        {bars.map(({ label, v }, i) => (
+          <div key={label} className="flex-1 flex flex-col items-center gap-1.5 justify-end h-full">
+            <motion.div className="w-full bg-gradient-to-t from-[rgba(201,169,110,0.6)] to-[rgba(201,169,110,0.2)] relative"
+              initial={{ scaleY: 0 }} animate={inView ? { scaleY: 1 } : {}} transition={{ duration: 0.55, delay: 0.2 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              style={{ height: `${v * 140}px`, transformOrigin: "bottom" }} />
+          </div>
+        ))}
+      </div>
+      <div className="flex gap-2 mt-2">
+        {bars.map(({ label }) => <div key={label} className="flex-1 text-center font-mono text-[7px] text-white/20">{label}</div>)}
+      </div>
+      <motion.div className="mt-2 font-mono text-[8px] tracking-[.1em] text-[rgba(201,169,110,0.45)]" initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} transition={{ duration: 0.4, delay: 0.9 }}>
+        AUTOMATION COVERAGE — 20 WEEKS
+      </motion.div>
+    </div>
+  );
+}
+
+// ── Sticky Timeline Nav (smaller, smooth progress) ─────────────────────────
+
+function TimelineNav({ activeIndex, sectionRef }: { activeIndex: number; sectionRef: React.RefObject<HTMLDivElement | null> }) {
+  const navRef = useRef<HTMLDivElement>(null);
+  const [progress, setProgress] = useState<number[]>(Array(PHASES.length - 1).fill(0));
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const newProgress = [...progress];
+      for (let i = 0; i < PHASES.length - 1; i++) {
+        const thisPhase = document.getElementById(`phase-${i}`);
+        const nextPhase = document.getElementById(`phase-${i + 1}`);
+        if (!thisPhase || !nextPhase) continue;
+        const thisRect = thisPhase.getBoundingClientRect();
+        const nextRect = nextPhase.getBoundingClientRect();
+        const start = thisRect.bottom;
+        const end = nextRect.top;
+        const range = end - start;
+        if (range <= 0) {
+          newProgress[i] = 1;
+          continue;
+        }
+        const triggerPoint = window.innerHeight * 0.6;
+        const raw = (triggerPoint - nextRect.top) / range;
+        newProgress[i] = Math.min(1, Math.max(0, raw));
+      }
+      setProgress(newProgress);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
-    <section
-      id="capabilities"
-      ref={sectionRef}
-      aria-label="Capabilities and service modules"
-      className="bg-[#0f0e0d] border-t border-white/[.07] relative overflow-hidden"
-    >
-      {/* Subtle background grid */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[.014]"
+    <motion.div ref={navRef} className="flex flex-col items-center">
+      {PHASES.map((phase, i) => {
+        const isPast = i < activeIndex;
+        const isActive = i === activeIndex;
+        const connectorFill = i < activeIndex ? 1 : i === activeIndex ? progress[i] ?? 0 : 0;
+
+        return (
+          <div key={phase.index} className="flex flex-col items-center">
+            <a href={`#phase-${i}`} className="relative z-10 flex flex-col items-center group focus:outline-none"
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById(`phase-${i}`)?.scrollIntoView({ behavior: "smooth" });
+              }}
+              aria-label={`Jump to Phase ${phase.index}: ${phase.navLabel}`}>
+              <motion.div className={cn(
+                "w-6 h-6 rounded-full flex items-center justify-center border transition-all duration-500",
+                isPast ? "bg-[#c9a96e] border-[#c9a96e]" : isActive ? "bg-[rgba(201,169,110,0.12)] border-[#c9a96e]" : "bg-transparent border-white/[.12] group-hover:border-white/25"
+              )}
+                animate={isActive ? { boxShadow: ["0 0 0px rgba(201,169,110,0)", "0 0 10px rgba(201,169,110,0.35)", "0 0 0px rgba(201,169,110,0)"] } : { boxShadow: "0 0 0px rgba(201,169,110,0)" }}
+                transition={isActive ? { duration: 2.4, repeat: Infinity, ease: "easeInOut" } : {}}>
+                {isPast ? (
+                  <motion.span className="text-[9px] text-[#0f0e0d] leading-none" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.25 }}>✓</motion.span>
+                ) : (
+                  <span className={cn("font-mono text-[8px] transition-colors duration-300", isActive ? "text-[#c9a96e]" : "text-white/20 group-hover:text-white/35")}>{phase.index}</span>
+                )}
+              </motion.div>
+              <span className={cn("font-mono text-[7px] tracking-[.12em] uppercase mt-1.5 transition-colors duration-300", isActive || isPast ? "text-[#c9a96e]" : "text-white/20 group-hover:text-white/35")}>
+                {phase.navLabel}
+              </span>
+            </a>
+            {i < PHASES.length - 1 && (
+              <div className="w-px h-16 my-1 bg-white/[.06] relative overflow-hidden">
+                <motion.div className="absolute inset-x-0 bottom-0 bg-[#c9a96e]" style={{ height: `${connectorFill * 100}%` }} />
+                {i === activeIndex && connectorFill > 0 && connectorFill < 1 && (
+                  <motion.div className="absolute inset-x-0 w-px h-1.5 bg-[rgba(201,169,110,0.8)] left-0" style={{ bottom: `${connectorFill * 100}%` }} />
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </motion.div>
+  );
+}
+
+// ── ROI Section ────────────────────────────────────────────────────────────
+
+function ROISection() {
+  const { ref, playKey } = useScrollInView(0.2);
+  return (
+    <div ref={ref} className="mt-28 pt-16 border-t border-white/[.06] pb-20">
+      <motion.div key={playKey} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}>
+        <div className="mb-14">
+          <p className="font-mono text-[9px] tracking-[.18em] uppercase text-[#c9a96e] mb-4">Outcomes</p>
+          <h3 className="text-[clamp(1.6rem,3.2vw,2.4rem)] font-bold tracking-[-0.025em] text-stone-100 leading-[1.1]">Results compound over time.</h3>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/[.06] border border-white/[.06] overflow-hidden">
+          {ROI_STATS.map(({ value, label }, i) => (
+            <motion.div key={label} className="bg-[#121416] py-10 px-6 flex flex-col gap-2" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}>
+              <div className="text-[clamp(1.6rem,3.5vw,2.25rem)] font-bold text-[#c9a96e] tracking-[-0.03em] leading-none">{value}</div>
+              <div className="font-mono text-[9px] tracking-[.12em] uppercase text-white/25 leading-[1.5]">{label}</div>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// ── Scroll‑lock hook (native overflow) ─────────────────────────────────────
+
+function useScrollLockSection(
+  containerRef: React.RefObject<HTMLDivElement | null>,
+  contentRef: React.RefObject<HTMLDivElement | null>
+) {
+  useEffect(() => {
+    const container = containerRef.current;
+    const content = contentRef.current;
+    if (!container || !content) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          document.body.style.overflow = "hidden";
+          container.style.overflowY = "auto";
+          container.style.height = "100vh";
+          container.style.position = "relative";
+        } else {
+          document.body.style.overflow = "";
+          container.style.overflowY = "";
+          container.style.height = "";
+          container.style.position = "";
+        }
+      },
+      { threshold: 0.9 }
+    );
+
+    observer.observe(container);
+
+    // Release body scroll when hitting the boundaries
+    let wheelDelta = 0;
+    const wheelHandler = (e: WheelEvent) => {
+      wheelDelta = e.deltaY;
+    };
+    const scrollHandler = () => {
+      const scrolledToBottom = content.scrollHeight - content.scrollTop - content.clientHeight < 2;
+      const scrolledToTop = content.scrollTop <= 0;
+
+      if (scrolledToBottom && wheelDelta > 0) {
+        document.body.style.overflow = "";
+        container.style.overflowY = "";
+      }
+      if (scrolledToTop && wheelDelta < 0) {
+        document.body.style.overflow = "";
+        container.style.overflowY = "";
+      }
+    };
+
+    window.addEventListener("wheel", wheelHandler, { passive: true });
+    content.addEventListener("scroll", scrollHandler, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      document.body.style.overflow = "";
+      container.style.overflowY = "";
+      container.style.height = "";
+      container.style.position = "";
+      window.removeEventListener("wheel", wheelHandler);
+      content.removeEventListener("scroll", scrollHandler);
+    };
+  }, [containerRef, contentRef]);
+}
+
+// ── Main Component ─────────────────────────────────────────────────────────
+
+export function CapabilitiesSection() {
+  const [activePhase, setActivePhase] = useState(0);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const headerInView = useInView(headerRef, { once: true, amount: 0.2 });
+
+  const handleVisible = useCallback((i: number) => setActivePhase(i), []);
+
+  // Lock body scroll when section is in view
+  useScrollLockSection(sectionRef, contentRef);
+
+  return (
+    <section ref={sectionRef} id="capabilities" className="relative bg-[#0f0e0d] border-t border-white/[.07]">
+      {/* Background grid */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[.016]"
         style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px)",
-          backgroundSize: "48px 48px",
-        }}
-      />
+          backgroundImage: "linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px)",
+          backgroundSize: "52px 52px",
+        }} />
 
-      {/* Section header — full width */}
-      <SectionHeader />
-
-      {/* Desktop: two-panel layout */}
-      <div className="hidden lg:flex h-[780px] relative">
-        {/* Left: module navigator — sticky */}
-        <div className="w-[220px] xl:w-[240px] flex-shrink-0 sticky top-0 h-full overflow-y-auto">
-          <ModuleNavigator
-            modules={MODULES}
-            activeId={activeId}
-            onSelect={handleSelect}
-          />
+      <div className="flex h-full">
+        {/* Static side nav – smaller, always visible */}
+        <div className="hidden xl:flex flex-shrink-0 w-[100px] h-screen sticky top-0 items-start pt-24 px-2">
+          <TimelineNav activeIndex={activePhase} sectionRef={sectionRef} />
         </div>
 
-        {/* Right: module content — scrollable */}
-        <div className="flex-1 min-w-0 overflow-hidden relative">
-          <AnimatePresence mode="wait">
-            <ModuleContent key={activeId} module={activeModule} />
-          </AnimatePresence>
-        </div>
-      </div>
+        {/* Scrollable content area (native overflow) */}
+        <div ref={contentRef} className="flex-1 min-w-0 px-6 md:px-12 pt-28">
+          <div className="max-w-[1280px] mx-auto">
+            <motion.div ref={headerRef}
+              initial={{ opacity: 0, y: 24 }}
+              animate={headerInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+              className="mb-24 max-w-[640px]">
+              <p className="font-mono text-[10px] tracking-[.18em] uppercase text-[#c9a96e] mb-5">How We Work</p>
+              <h2 className="text-[clamp(2rem,4.5vw,3.5rem)] font-bold tracking-[-0.03em] text-stone-100 leading-[1.08] mb-5">
+                From operational chaos<br />to automated clarity.
+              </h2>
+              <p className="text-[15px] font-light text-stone-400 leading-[1.85]">
+                A six-phase process that takes you from discovery to a continuously scaling AI system — delivering measurable ROI within 30–60 days.
+              </p>
+            </motion.div>
 
-      {/* Mobile: accordion layout */}
-      <div className="lg:hidden">
-        <div className="border-b border-white/[.06]">
-          {MODULES.map((mod, i) => (
-            <MobileModuleAccordion key={mod.id} module={mod} index={i} />
-          ))}
-        </div>
-      </div>
-
-      {/* Section footer — outcomes strip */}
-      <div className="px-10 py-10 border-t border-white/[.06] max-md:px-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/[.05] border border-white/[.05] overflow-hidden">
-          {[
-            { value: "5d", label: "Audit to roadmap" },
-            { value: "30d", label: "First operational gains" },
-            { value: "60d", label: "Measurable ROI" },
-            { value: "0", label: "Downtime deployments" },
-          ].map(({ value, label }) => (
-            <div key={label} className="bg-[#0f0e0d] px-7 py-8 flex flex-col gap-2 max-md:px-5 max-md:py-6">
-              <div className="font-serif text-[clamp(1.6rem,3vw,2.25rem)] font-normal text-[#c9a96e] tracking-[-0.03em] leading-none">
-                {value}
+            {PHASES.map((phase, i) => (
+              <div key={phase.index}>
+                <PhaseBlock phase={phase} phaseIndex={i} onVisible={handleVisible} />
+                {i < PHASES.length - 1 && <PhaseDivider index={i} />}
               </div>
-              <div className="font-mono text-[9px] tracking-[0.12em] uppercase text-white/25">
-                {label}
-              </div>
-            </div>
-          ))}
+            ))}
+
+            <ROISection />
+          </div>
         </div>
       </div>
     </section>
