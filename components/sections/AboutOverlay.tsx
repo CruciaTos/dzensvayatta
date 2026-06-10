@@ -177,7 +177,7 @@ function FounderCard({
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.08em] text-stone-500 no-underline"
-            whileHover={{ color: "#f5f5f4", x: 4 }}
+            whileHover={{ color: "#121416", x: 4 }}
             transition={{ duration: 0.2 }}
           >
             LinkedIn ↗
@@ -286,8 +286,8 @@ export function AboutOverlay({ open, onClose }: AboutOverlayProps) {
                 className="font-mono text-[10px] tracking-[0.14em] uppercase text-stone-500 border border-border px-4 py-2"
                 aria-label="Close about overlay"
                 whileHover={{
-                  color: "#f5f5f4",
-                  borderColor: "rgba(216,211,203,0.35)",
+                  color: "#121416",
+                  borderColor: "rgba(18,20,22,0.22)",
                 }}
                 whileTap={{ scale: 0.96 }}
                 transition={{ duration: 0.15 }}

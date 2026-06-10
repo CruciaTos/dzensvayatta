@@ -12,7 +12,7 @@ function Step({ index, title, description, duration }: ProcessStep) {
   return (
     <motion.article
       className="p-10 px-8 pb-12 border-r border-b border-border relative transition-colors duration-300 cursor-default hover:bg-bg-panel"
-      whileHover={{ backgroundColor: "var(--color-bg-panel)" }}
+      whileHover={{ backgroundColor: "#F7F1E8" }}
     >
       <div className="font-mono text-[32px] font-light text-stone-500 leading-none tracking-[-0.02em] mb-10">
         {index}

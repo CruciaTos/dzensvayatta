@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Link from "next/link";
-import { FOOTER_LINKS, COMPLIANCE_BADGES } from "@/lib/data";
+import { FOOTER_LINKS } from "@/lib/data";
 
 // ── Inline sub-components (no extra files needed) ──────────────────────────
 
@@ -31,7 +30,7 @@ function MagLink({ href, children }: { href: string; children: React.ReactNode }
         relative inline-block font-sans text-[12px] font-light text-stone-400 no-underline
         transition-colors duration-200 hover:text-stone-100
         after:content-[''] after:absolute after:left-0 after:bottom-[-2px]
-        after:h-px after:w-0 after:bg-[#c9a96e]
+        after:h-px after:w-0 after:bg-accent
         after:transition-[width] after:duration-300 after:ease-[cubic-bezier(.65,0,.35,1)]
         hover:after:w-full
       "
@@ -99,30 +98,30 @@ export function Footer() {
         ref={orbRef}
         aria-hidden="true"
         className="pointer-events-none fixed z-0 w-[320px] h-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 transition-opacity duration-400"
-        style={{ background: "radial-gradient(circle, rgba(201,169,110,0.08) 0%, transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, rgba(143,120,96,0.10) 0%, transparent 70%)" }}
       />
 
       <footer
         ref={footerRef}
-        className="relative bg-[#0f0e0d] border-t border-white/[.07] overflow-hidden"
+        className="relative bg-bg-tertiary border-t border-border overflow-hidden"
       >
         {/* ── CTA strip ────────────────────────────────────── */}
-        <div className="fade-up text-center px-6 py-20 border-b border-white/[.07]">
-          <p className="font-mono text-[10px] tracking-[.18em] uppercase text-[#c9a96e] mb-6">
+        <div className="fade-up text-center px-6 py-20 border-b border-border">
+          <p className="font-mono text-[10px] tracking-[.18em] uppercase text-accent mb-6">
             Ready to connect your stack?
           </p>
           <h2 className="text-[clamp(2rem,5vw,3.75rem)] font-bold tracking-[-0.025em] text-stone-100 leading-[1.1] mb-8">
             Your systems,<br />working together.
           </h2>
-          <button className="group relative inline-flex items-center gap-2.5 border border-white/[.07] text-stone-400 font-mono text-[11px] tracking-[.1em] uppercase px-7 py-[14px] overflow-hidden transition-[color,border-color] duration-300 hover:text-[#0f0e0d] hover:border-[#c9a96e]">
-            <span className="absolute inset-0 bg-[#c9a96e] scale-x-0 origin-left transition-transform duration-400 ease-[cubic-bezier(.65,0,.35,1)] group-hover:scale-x-100" />
+          <button className="group relative inline-flex items-center gap-2.5 border border-border-strong text-stone-400 font-mono text-[11px] tracking-[.1em] uppercase px-7 py-[14px] overflow-hidden transition-[color,border-color] duration-300 hover:text-offwhite hover:border-accent">
+            <span className="absolute inset-0 bg-accent scale-x-0 origin-left transition-transform duration-400 ease-[cubic-bezier(.65,0,.35,1)] group-hover:scale-x-100" />
             <span className="relative z-10">Start a conversation</span>
             <span className="relative z-10 transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">→</span>
           </button>
         </div>
 
         {/* ── Link grid ────────────────────────────────────── */}
-        <div className="grid grid-cols-4 gap-0 px-12 py-16 border-b border-white/[.07] max-[1100px]:grid-cols-2 max-[1100px]:gap-10 max-[1100px]:px-6 max-[600px]:grid-cols-1">
+        <div className="grid grid-cols-4 gap-0 px-12 py-16 border-b border-border max-[1100px]:grid-cols-2 max-[1100px]:gap-10 max-[1100px]:px-6 max-[600px]:grid-cols-1">
           {Object.entries(FOOTER_LINKS).map(([title, links], colIdx) => (
             <div
               key={title}
@@ -164,14 +163,14 @@ export function Footer() {
         {/* ── Marquee at the very bottom (star removed, lit state at 50% opacity) ───── */}
         <div
           aria-hidden="true"
-          className="border-t border-white/[.07] overflow-hidden py-10 cursor-default select-none"
+          className="border-t border-border overflow-hidden py-10 cursor-default select-none"
         >
           <div className="flex whitespace-nowrap animate-marquee">
             {[...Array(4)].flatMap((_, i) =>
               ["DZen", "Workflow", "Integration", "Enterprise"].map((word) => (
                 <span
                   key={`${i}-${word}`}
-                  className="marquee-item text-[clamp(5rem,10vw,8rem)] font-bold tracking-[-0.03em] text-transparent [-webkit-text-stroke:1px_rgba(255,255,255,0.12)] px-10 transition-all duration-300 [&.lit]:text-stone-100/50 [&.lit]:[-webkit-text-stroke:0px_transparent]"
+                  className="marquee-item text-[clamp(5rem,10vw,8rem)] font-bold tracking-[-0.03em] text-transparent [-webkit-text-stroke:1px_rgba(18,20,22,0.14)] px-10 transition-all duration-300 [&.lit]:text-stone-100/40 [&.lit]:[-webkit-text-stroke:0px_transparent]"
                 >
                   {word}
                 </span>

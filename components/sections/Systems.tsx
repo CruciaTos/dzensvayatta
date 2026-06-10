@@ -32,7 +32,7 @@ function SystemCategoryCard({ icon, name, items }: SystemCategory) {
   return (
     <motion.article
       className="bg-bg-panel border border-border p-10 px-9 transition-colors duration-300 cursor-default"
-      whileHover={{ borderColor: "rgba(216,211,203,0.16)", backgroundColor: "var(--color-bg-tertiary)" }}
+      whileHover={{ borderColor: "rgba(18,20,22,0.18)", backgroundColor: "#E6DAC9" }}
     >
       <div className="w-9 h-9 flex items-center justify-center border border-border-strong text-accent mb-6">
         <Icon />

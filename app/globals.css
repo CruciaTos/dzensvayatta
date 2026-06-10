@@ -5,13 +5,13 @@
 /* ─── Custom Selection ─────────────────────────────────────── */
 ::selection {
   background: #8F7860;
-  color: #121416;
+  color: #FAFAF8;
 }
 
 /* ─── Scrollbar ────────────────────────────────────────────── */
 .scrollbar-thin::-webkit-scrollbar {
   height: 2px;
-  background: rgba(216, 211, 203, 0.08);
+  background: rgba(18, 20, 22, 0.08);
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
@@ -27,7 +27,7 @@
 /* ─── Hero grid background ─────────────────────────────────── */
 .hero-grid-bg {
   background-image:
-    linear-gradient(rgba(191, 184, 174, 1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(191, 184, 174, 1) 1px, transparent 1px);
+    linear-gradient(rgba(18, 20, 22, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 20, 22, 0.08) 1px, transparent 1px);
   background-size: 80px 80px;
 }
