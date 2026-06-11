@@ -1,11 +1,18 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { FOOTER_LINKS } from "@/lib/data";
 
-// ── Inline sub-components (no extra files needed) ──────────────────────────
-
-function MagLink({ href, children }: { href: string; children: React.ReactNode }) {
+// ── Magnetic link sub-component with optional custom click handler ──────────
+function MagLink({
+  href,
+  onClick,
+  children,
+}: {
+  href: string;
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+  children: React.ReactNode;
+}) {
   const ref = useRef<HTMLAnchorElement>(null);
 
   function onMove(e: React.MouseEvent) {
@@ -16,6 +23,7 @@ function MagLink({ href, children }: { href: string; children: React.ReactNode }
     const y = (e.clientY - r.top - r.height / 2) * 0.22;
     el.style.transform = `translate(${x}px,${y}px)`;
   }
+
   function onLeave() {
     if (ref.current) ref.current.style.transform = "";
   }
@@ -24,6 +32,7 @@ function MagLink({ href, children }: { href: string; children: React.ReactNode }
     <a
       ref={ref}
       href={href}
+      onClick={onClick}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
       className="
@@ -40,13 +49,12 @@ function MagLink({ href, children }: { href: string; children: React.ReactNode }
   );
 }
 
-// ── Main footer ─────────────────────────────────────────────────────────────
-
+// ── Main footer component ────────────────────────────────────────────────────
 export function Footer() {
   const footerRef = useRef<HTMLElement>(null);
   const orbRef = useRef<HTMLDivElement>(null);
 
-  // Cursor orb + marquee lighting
+  // ── Cursor orb + marquee lighting effect ───────────────────────────────────
   useEffect(() => {
     const footer = footerRef.current;
     const orb = orbRef.current;
@@ -80,61 +88,120 @@ export function Footer() {
     };
   }, []);
 
-  // Scroll fade-up
+  // ── Scroll‑triggered fade‑up animation ─────────────────────────────────────
   useEffect(() => {
     const els = footerRef.current?.querySelectorAll<HTMLElement>(".fade-up") ?? [];
     const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => { if (e.isIntersecting) { (e.target as HTMLElement).classList.add("visible"); io.unobserve(e.target); } }),
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            (e.target as HTMLElement).classList.add("visible");
+            io.unobserve(e.target);
+          }
+        }),
       { threshold: 0.15 }
     );
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, []);
 
+  // ── Legacy footer‑link click handler (scrolls to relevant sections) ───────
+  const handleFooterLinkClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    label: string
+  ) => {
+    if (
+      label.includes("Configurator") ||
+      label.includes("RFP") ||
+      label.includes("Audit") ||
+      label.includes("Briefing Builder")
+    ) {
+      e.preventDefault();
+      document.getElementById("briefing-builder")?.scrollIntoView({ behavior: "smooth" });
+    } else if (
+      label.includes("Briefing") ||
+      label.includes("Booking") ||
+      label.includes("Call") ||
+      label.includes("Start a conversation")
+    ) {
+      e.preventDefault();
+      document.getElementById("cta")?.scrollIntoView({ behavior: "smooth" });
+    } else if (label.includes("About") || label.includes("Founders")) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      // Default: prevent # link and smooth‑scroll to top
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
   return (
     <>
-      {/* floating glow orb — fixed so it tracks across viewport */}
+      {/* ── Floating gold‑dust orb (fixed, follows cursor) ── */}
       <div
         ref={orbRef}
         aria-hidden="true"
         className="pointer-events-none fixed z-0 w-[320px] h-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 transition-opacity duration-400"
-        style={{ background: "radial-gradient(circle, rgba(143,120,96,0.10) 0%, transparent 70%)" }}
+        style={{
+          background:
+            "radial-gradient(circle, rgba(143,120,96,0.10) 0%, transparent 70%)",
+        }}
       />
 
       <footer
         ref={footerRef}
-        className="relative bg-bg-tertiary border-t border-border overflow-hidden"
+        className="relative bg-bg-secondary border-t border-stone-900 overflow-hidden"
       >
         {/* ── CTA strip ────────────────────────────────────── */}
-        <div className="fade-up text-center px-6 py-20 border-b border-border">
-          <p className="font-mono text-[10px] tracking-[.18em] uppercase text-accent mb-6">
+        <div className="fade-up text-center px-6 py-20 border-b border-stone-900">
+          <p className="font-mono text-[10px] tracking-[0.18em] uppercase text-accent mb-6">
             Ready to connect your stack?
           </p>
-          <h2 className="text-[clamp(2rem,5vw,3.75rem)] font-bold tracking-[-0.025em] text-stone-100 leading-[1.1] mb-8">
-            Your systems,<br />working together.
+          <h2 className="text-[clamp(2rem,5vw,3.75rem)] font-serif font-normal tracking-[-0.025em] text-stone-100 leading-[1.1] mb-8">
+            Your systems,
+            <br />
+            working together.
           </h2>
-          <button className="group relative inline-flex items-center gap-2.5 border border-border-strong text-stone-400 font-mono text-[11px] tracking-[.1em] uppercase px-7 py-[14px] overflow-hidden transition-[color,border-color] duration-300 hover:text-offwhite hover:border-accent">
+          <button
+            onClick={() =>
+              document
+                .getElementById("briefing-builder")
+                ?.scrollIntoView({ behavior: "smooth" })
+            }
+            className="group relative inline-flex items-center gap-2.5 border border-stone-800 text-stone-400 font-mono text-[11px] tracking-[0.1em] uppercase px-7 py-[14px] overflow-hidden transition-[color,border-color] duration-300 hover:text-stone-100 hover:border-accent"
+          >
             <span className="absolute inset-0 bg-accent scale-x-0 origin-left transition-transform duration-400 ease-[cubic-bezier(.65,0,.35,1)] group-hover:scale-x-100" />
-            <span className="relative z-10">Start a conversation</span>
-            <span className="relative z-10 transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">→</span>
+            <span className="relative z-10">Configure Operational RFP</span>
+            <span
+              className="relative z-10 transition-transform duration-300 group-hover:translate-x-1"
+              aria-hidden="true"
+            >
+              →
+            </span>
           </button>
         </div>
 
         {/* ── Link grid ────────────────────────────────────── */}
-        <div className="grid grid-cols-4 gap-0 px-12 py-16 border-b border-border max-[1100px]:grid-cols-2 max-[1100px]:gap-10 max-[1100px]:px-6 max-[600px]:grid-cols-1">
+        <div className="grid grid-cols-4 gap-0 px-12 py-16 border-b border-stone-900 max-[1100px]:grid-cols-2 max-[1100px]:gap-10 max-[1100px]:px-6 max-[600px]:grid-cols-1">
           {Object.entries(FOOTER_LINKS).map(([title, links], colIdx) => (
             <div
               key={title}
               className="fade-up px-6"
               style={{ transitionDelay: `${(colIdx + 1) * 80}ms` }}
             >
-              <div className="font-mono text-[9px] tracking-[.16em] uppercase text-stone-600 mb-5">
+              <div className="font-mono text-[9px] tracking-[0.16em] uppercase text-stone-500 font-bold mb-5">
                 {title}
               </div>
               <ul className="list-none flex flex-col gap-2" role="list">
-                {links.map((link) => (
+                {links.map((link: string) => (
                   <li key={link}>
-                    <MagLink href="#">{link}</MagLink>
+                    <MagLink
+                      href="#"
+                      onClick={(e) => handleFooterLinkClick(e, link)}
+                    >
+                      {link}
+                    </MagLink>
                   </li>
                 ))}
               </ul>
@@ -142,28 +209,31 @@ export function Footer() {
           ))}
         </div>
 
-        {/* ── Bottom bar (moved back inside footer) ────────── */}
+        {/* ── Bottom bar ───────────────────────────────────── */}
         <div className="flex items-center justify-between px-12 py-6 flex-wrap gap-4 max-[600px]:px-6 max-[600px]:flex-col max-[600px]:items-start">
-          <span className="font-mono text-[10px] tracking-[.08em] text-stone-600">
-            © 2025 DZen, Inc. All rights reserved.
+          <span className="font-mono text-[10px] tracking-[0.08em] text-stone-500 select-text">
+            © 2026 DZen Operational Systems. All rights secured.
           </span>
           <div className="flex gap-6">
-            {["Privacy Policy", "Terms of Service", "Security"].map((item) => (
-              <a
-                key={item}
-                href="#"
-                className="font-mono text-[10px] tracking-[.08em] text-stone-600 no-underline transition-colors duration-200 hover:text-stone-400"
-              >
-                {item}
-              </a>
-            ))}
+            {["Privacy Policy", "Terms of Service", "Security Standards"].map(
+              (item) => (
+                <a
+                  key={item}
+                  href="#"
+                  onClick={(e) => e.preventDefault()}
+                  className="font-mono text-[10px] tracking-[0.08em] text-stone-500 no-underline transition-colors duration-200 hover:text-stone-300"
+                >
+                  {item}
+                </a>
+              )
+            )}
           </div>
         </div>
 
-        {/* ── Marquee at the very bottom (star removed, lit state at 50% opacity) ───── */}
+        {/* ── Marquee (no stars, subtle lit state) ─────────── */}
         <div
           aria-hidden="true"
-          className="border-t border-border overflow-hidden py-10 cursor-default select-none"
+          className="border-t border-stone-900 overflow-hidden py-10 cursor-default select-none"
         >
           <div className="flex whitespace-nowrap animate-marquee">
             {[...Array(4)].flatMap((_, i) =>
@@ -180,12 +250,24 @@ export function Footer() {
         </div>
       </footer>
 
-      {/* Global styles for marquee animation + fade-up */}
+      {/* ── Global animations (marquee + fade‑up) ────────────────────────────── */}
       <style>{`
-        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-        .animate-marquee { animation: marquee 22s linear infinite; }
-        .fade-up { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
-        .fade-up.visible { opacity: 1; transform: none; }
+        @keyframes marquee {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+          animation: marquee 22s linear infinite;
+        }
+        .fade-up {
+          opacity: 0;
+          transform: translateY(28px);
+          transition: opacity .7s ease, transform .7s ease;
+        }
+        .fade-up.visible {
+          opacity: 1;
+          transform: none;
+        }
       `}</style>
     </>
   );

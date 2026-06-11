@@ -32,30 +32,30 @@ export const TICKER_ITEMS: string[] = [
   "System Orchestration",
 ];
 
-// ─── Founding principles (replaces fabricated stats) ─────────────────────────
+// ─── Founding principles ─────────────────────────
 export const STATS: Stat[] = [
   {
-    value:"Roburst",
+    value: "Robust",
     accent: "",
-    label: "unified workflows across all your systems with operational stability",
-    description: "System reliability",
+    label: "Unified workflows across all your systems with absolute operational stability.",
+    description: "System Reliability",
   },
   {
     value: "Agentic",
     accent: "",
-    label: "integrated optimisations to remove redundant workflows",
-    description: "Efficiency gain",
+    label: "Autonomous process bridges to remove friction and manual handoffs.",
+    description: "Efficiency Gain",
   },
   {
     value: "Governed",
     accent: "",
-    label: "reactive system to handle criticalities with human oversight",
+    label: "Reactive workflows that guard your business data with strict human-in-the-loop oversight.",
     description: "Human Authority",
   },
   {
     value: "Built to Scale",
     accent: "",
-    label: "for parallel growth with long term support and optimization",
+    label: "Extensible system integrations with long term maintenance and support.",
     description: "Scalability",
   },
 ];
@@ -65,77 +65,77 @@ export const WORKFLOW_SOURCES: WorkflowNode[] = [
   { label: "Source", name: "ERP System"    },
   { label: "Source", name: "CRM Platform"  },
   { label: "Source", name: "Finance Tools" },
-  { label: "Source", name: "HRIS"          },
-  { label: "Source", name: "Email / Comms" },
-  { label: "Source", name: "Knowledge Base"},
+  { label: "Source", name: "HRIS Portal"   },
+  { label: "Source", name: "Comms & Email" },
+  { label: "Source", name: "Internal DBs"  },
 ];
 
-export const WORKFLOW_INTELLIGENCE = [
-  "Workflow Orchestration",
-  "AI Decision Engine",
-  "Anomaly Detection",
+export const WORKFLOW_INTELLIGENCE: string[] = [
+  "Core Orchestrator",
+  "AI Verification",
+  "Exception Assessor",
   "Approval Routing",
-  "Audit & Governance",
+  "Compliance Audit",
 ];
 
 export const WORKFLOW_OUTPUTS: WorkflowNode[] = [
-  { label: "Output", name: "Auto-Approvals"   },
-  { label: "Output", name: "Forecast Reports" },
-  { label: "Output", name: "Exception Alerts" },
-  { label: "Output", name: "Synced Records"   },
-  { label: "Output", name: "Audit Log"        },
-  { label: "Output", name: "Analytics"        },
+  { label: "Output", name: "Clean Records"   },
+  { label: "Output", name: "Auto-Approvals"  },
+  { label: "Output", name: "SLA Alerts"      },
+  { label: "Output", name: "Forecast Decks"  },
+  { label: "Output", name: "Audit Ledger"    },
+  { label: "Output", name: "Activity Feed"   },
 ];
 
 // ─── Services ────────────────────────────────────────────────────────────────
 export const SERVICES: Service[] = [
   {
     num: "01",
-    title: "Discovery & Audit",
+    title: "Operational Discovery",
     description:
-      "We map your existing systems, identify integration points, quantify automation opportunities, and produce a prioritized transformation roadmap with business-case modeling. Delivered in 5 business days.",
-    scope: "Fixed",
-    duration: "5 days",
+      "We trace your active systems, interview key operators, map existing data gaps, and design a custom, high-impact tactical integration roadmap with absolute mathematical clarity.",
+    scope: "Fixed Price",
+    duration: "5 Days",
   },
   {
     num: "02",
-    title: "Architecture Design",
+    title: "Custom AI Agent Dev",
     description:
-      "We design the integration architecture — data models, API contracts, event flows, and system topology — before a single line of code is written. Designed for auditability and future extensibility.",
-    scope: "Fixed",
-    duration: "2–3 weeks",
+      "We design custom business agents reading directly from your active tools. These agents perform data reconciliations, draft reports, route exception queries, and automate repetitive checklists.",
+    scope: "Milestoned",
+    duration: "4–6 Weeks",
   },
   {
     num: "03",
-    title: "Integration & Deployment",
+    title: "System Orchestration",
     description:
-      "We build, test, and deploy the integration layer across your systems. All work follows enterprise change management protocols with rollback capabilities and zero-downtime deployments.",
+      "We assemble direct event pipeline bridges between your silos (ERP to CRM to BI). This acts as a robust network layer that makes legacy systems communicate smoothly.",
     scope: "Milestoned",
-    duration: "4–12 weeks",
+    duration: "3–8 Weeks",
   },
   {
     num: "04",
-    title: "Automation Engineering",
+    title: "Control Panel & UI Engine",
     description:
-      "We automate decision workflows using AI — routing approvals, flagging exceptions, generating reports, and eliminating manual process steps. Every automation is documented, auditable, and human-reviewable.",
-    scope: "Per-workflow",
-    duration: "Variable",
+      "We build customized internal interfaces (via frameworks like Retool or fully custom React pages) allowing your managers to audit, override, and verify all automated decisions in one place.",
+    scope: "Fixed Scope",
+    duration: "2-4 Weeks",
   },
   {
     num: "05",
-    title: "Governance & Controls",
+    title: "Data Pipelines & Sync",
     description:
-      "We implement the access controls, audit trails, approval policies, and compliance reporting frameworks required for AI operating in mission-critical environments. SOC 2, ISO 27001, and custom frameworks supported.",
-    scope: "Retainer",
-    duration: "Ongoing",
+      "We implement robust, secure, real-time data ingestion models utilizing secure warehouses like Snowflake and BigQuery to feed real-time reporting metrics directly to stakeholders.",
+    scope: "Per Pipeline",
+    duration: "2-3 Weeks",
   },
   {
     num: "06",
-    title: "Optimization & Scale",
+    title: "Governance & Hardening",
     description:
-      "Post-deployment, we monitor performance, identify new automation opportunities, tune models, and expand coverage across additional systems and business units. Continuous measurable improvement.",
-    scope: "Retainer",
-    duration: "Ongoing",
+      "We implement audit ledgers, role-based single-sign-on protocols (SSO), data residency safeguards, and system-wide monitoring feeds to adhere perfectly to SOC 2 and ISO 27001 standards.",
+    scope: "Ongoing Service",
+    duration: "Continuous",
   },
 ];
 
@@ -163,23 +163,23 @@ export const SYSTEM_CATEGORIES: SystemCategory[] = [
     name: "CRM & Sales",
     items: [
       "Salesforce",
-      "HubSpot",
+      "HubSpot CRM",
       "Microsoft Dynamics CRM",
-      "Pipedrive",
-      "Zoho CRM",
-      "Custom CRM systems",
+      "Pipedrive Integration",
+      "Zoho CRM Link",
+      "Custom Client Portals",
     ],
   },
   {
     icon: "envelope",
     name: "Communication & Collaboration",
     items: [
-      "Microsoft 365 / Exchange",
-      "Google Workspace",
-      "Slack",
-      "Teams",
-      "Outlook Calendar",
-      "Asana / Monday.com",
+      "Microsoft Exchange / Outlook",
+      "Google Workspace Suite",
+      "Slack Channels",
+      "Microsoft Teams",
+      "Asana Project Boards",
+      "Monday.com Workflows",
     ],
   },
   {
@@ -187,35 +187,35 @@ export const SYSTEM_CATEGORIES: SystemCategory[] = [
     name: "HR & People Operations",
     items: [
       "Workday",
-      "BambooHR",
+      "BambooHR Portal",
       "ADP Workforce Now",
-      "Rippling",
-      "Greenhouse ATS",
-      "Lattice",
+      "Rippling Directory",
+      "Greenhouse Recruiter",
+      "Lattice Performance",
     ],
   },
   {
     icon: "line-chart",
-    name: "Data & Analytics",
+    name: "Data & Data Lakes",
     items: [
-      "Snowflake",
-      "Databricks",
-      "BigQuery",
-      "Tableau / Power BI",
-      "Looker",
-      "PostgreSQL / MySQL",
+      "Snowflake Data Warehouse",
+      "Databricks Engine",
+      "Google BigQuery Engine",
+      "Tableau & Power BI",
+      "Looker BI Connect",
+      "PostgreSQL / MySQL Clusters",
     ],
   },
   {
     icon: "layers",
-    name: "Internal Tools & Infrastructure",
+    name: "Internal Custom Systems",
     items: [
+      "Retool UI Panels",
+      "Legacy database adapters",
+      "REST & Webhook endpoints",
+      "Apache Kafka event buses",
       "Custom internal apps",
-      "Retool / Appsmith",
-      "Notion / Confluence",
-      "REST APIs / Webhooks",
-      "Legacy system connectors",
-      "Custom data pipelines",
+      "Cron-based data jobs",
     ],
   },
 ];
@@ -224,38 +224,38 @@ export const SYSTEM_CATEGORIES: SystemCategory[] = [
 export const PROCESS_STEPS: ProcessStep[] = [
   {
     index: "01",
-    title: "Discover",
+    title: "Discover & Model",
     description:
-      "We audit your existing systems, document current-state workflows, and identify friction points, manual handoffs, and automation opportunities. Structured, time-bound, and non-disruptive.",
+      "We shadow active workflows, build process sequence diagrams, and calculate potential automation return on investments (ROI) under a fixed NDA.",
     duration: "Days 1–5",
   },
   {
     index: "02",
-    title: "Map",
+    title: "System Mapping",
     description:
-      "We translate operational requirements into a technical integration map. Every data flow, decision point, approval chain, and system dependency is documented before architecture begins.",
+      "We construct schema blueprints, document API fields, write data contracts, and design exception flow fallback procedures.",
     duration: "Week 2",
   },
   {
     index: "03",
-    title: "Design",
+    title: "Architect & Verify",
     description:
-      "We design the integration architecture, automation logic, and governance framework. Client-reviewed and signed off before development begins. No scope surprises.",
+      "We specify exact trigger events and data filters. The completed visual integration plan is reviewed and signed off.",
     duration: "Weeks 3–4",
   },
   {
     index: "04",
-    title: "Deploy",
+    title: "Deploy & Harden",
     description:
-      "We deploy in staged environments with comprehensive testing, rollback protocols, and zero-downtime production releases. Full handover documentation provided at each milestone.",
-    duration: "Weeks 5–12+",
+      "We release modules inside secure staging setups, verify failover triggers, run automated tests, and deploy to production with zero downtime.",
+    duration: "Weeks 5–12",
   },
   {
     index: "05",
-    title: "Monitor",
+    title: "Audit & Adapt",
     description:
-      "Post-deployment, we provide SLA-backed monitoring, performance reporting, and continuous optimization. Every automated decision is logged and reviewable by your team at any time.",
-    duration: "Ongoing",
+      "Post-release support begins. We trace model drift, check queue response latency, refine prompt contexts, and continuously optimize data structures.",
+    duration: "Continuous",
   },
 ];
 
@@ -263,45 +263,45 @@ export const PROCESS_STEPS: ProcessStep[] = [
 export const SECURITY_PILLARS: SecurityPillar[] = [
   {
     icon: "shield",
-    title: "Full Audit Trail",
+    title: "Immutable Decision Ledgers",
     description:
-      "Every automated action, decision, data access, and system modification is logged with full attribution. Immutable audit logs available for compliance review at any time.",
-    badge: "Standard",
+      "Every document matched, API triggered, or record synced is recorded with cryptographically signed tracking data for audit transparency.",
+    badge: "Auditable",
   },
   {
     icon: "clock",
-    title: "Granular Access Controls",
+    title: "Granular Active Guards",
     description:
-      "Role-based access controls at the workflow, data, and system level. Integrates with your existing identity provider (Azure AD, Okta, Google SSO).",
+      "Direct authorization tags mapped inside each workflow. Restricts unauthorized agents from triggering operations, with SSO integration.",
     badge: "Standard",
   },
   {
     icon: "arrow",
-    title: "Human-in-the-Loop Controls",
+    title: "Human Authority overrides",
     description:
-      "Configurable approval gates at any point in any workflow. Automation handles the routine; humans review the exceptions. Thresholds are yours to set.",
+      "Thresholds trigger automatic escalation to human administrators. Machinery processes clean events, whilst humans resolve ambiguities.",
     badge: "Configurable",
   },
   {
     icon: "lock",
-    title: "Data Residency & Isolation",
+    title: "Zero Leakage Policy",
     description:
-      "Your data never leaves your environment for training or model improvement. Strict data isolation between client environments. Deployable in your own cloud tenancy.",
+      "Client data is never saved by external LLM models for general training. Your secrets and system keys are encrypted and isolated.",
     badge: "Enterprise",
   },
   {
     icon: "chat",
-    title: "Compliance Reporting",
+    title: "SOC 2 & ISO Compatible",
     description:
-      "Automated compliance reports for SOX, GDPR, and custom regulatory frameworks. Scheduled or on-demand, formatted for your auditors.",
-    badge: "Automated",
+      "Automated access logs, change management records, and threat event warnings generated continuously to keep your compliance auditors satisfied.",
+    badge: "Certified",
   },
   {
     icon: "monitor",
-    title: "24/7 Monitoring & Alerting",
+    title: "24/7 Pipeline Watchdogs",
     description:
-      "Continuous monitoring of all integration health, data quality, and anomalous activity. Proactive alerting to your operations team before issues become incidents.",
-    badge: "Standard",
+      "Active uptime loops and exception alerting. Detects silent API changes, formatting updates, and network disconnects before disasters happen.",
+    badge: "SLA Managed",
   },
 ];
 
@@ -312,33 +312,38 @@ export const TESTIMONIALS: Testimonial[] = [];
 
 // ─── Compliance badges ────────────────────────────────────────────────────────
 export const COMPLIANCE_BADGES = ["SOC 2", "ISO 27001", "GDPR"];
-export const SECURITY_COMPLIANCE_BADGES = ["SOC 2 Type II", "ISO 27001", "GDPR Ready", "HIPAA Compatible"];
+export const SECURITY_COMPLIANCE_BADGES = [
+  "SOC 2 Type II Compatible",
+  "ISO/IEC 27001 Prepared",
+  "GDPR Privacy Protected",
+  "HIPAA Ready Isolation",
+];
 
 // ─── Footer columns ───────────────────────────────────────────────────────────
 export const FOOTER_LINKS = {
   Platform: [
-    "Workflow Intelligence",
-    "Integration Layer",
-    "Automation Engine",
+    "Workflow Orchestrations",
+    "Direct Integrations",
     "Governance Console",
-    "Integration Catalogue",
+    "System Map",
+    "Integration Ticker",
   ],
-  Company: [
-    "About DZen",
-    "Our Methodology",
-    "Careers",
-    "Press",
+  Methodology: [
+    "The DZen Strategy",
+    "Operational Discovery",
+    "RFP Questionnaire",
+    "Founders",
   ],
   Resources: [
-    "Security Overview",
-    "Integration Guides",
-    "ROI Calculator",
-    "Contact",
+    "Uptime Monitors",
+    "Compliance Ledger",
+    "Documentation Guides",
+    "Client Portal",
   ],
   Contact: [
     "hello@DZen.io",
-    "+1 (000) 000-0000",
-    "LinkedIn",
-    "Schedule a Call",
+    "Briefing Booking",
+    "DZen LinkedIn",
+    "Briefing Configurator",
   ],
 };

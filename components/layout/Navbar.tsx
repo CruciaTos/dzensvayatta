@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Sun, Moon } from "lucide-react";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { useScrolled } from "@/hooks/useScrolled";
 import { Button } from "@/components/ui/Button";
@@ -12,8 +13,13 @@ import { cn } from "@/lib/utils";
 
 const SECTION_IDS = ["workflow", "services", "process", "security"];
 
-export function Navbar() {
-  const scrolled      = useScrolled(40);
+interface NavbarProps {
+  theme: "dark" | "light";
+  toggleTheme: () => void;
+}
+
+export function Navbar({ theme, toggleTheme }: NavbarProps) {
+  const scrolled = useScrolled(40);
   const activeSection = useActiveSection(SECTION_IDS);
   const [aboutOpen, setAboutOpen] = useState(false);
 
@@ -51,42 +57,61 @@ export function Navbar() {
         >
           {NAV_LINKS.map(({ label, href }) => {
             const sectionId = href.replace("#", "");
-            const isActive  = activeSection === sectionId;
+            const isActive = activeSection === sectionId;
             return (
               <li key={href}>
                 <a
                   href={href}
                   className={cn(
                     "font-sans text-[13px] font-normal tracking-[0.02em] no-underline",
-                    "transition-colors duration-200",
-                    isActive ? "text-stone-100" : "text-stone-400 hover:text-stone-100"
+                    "transition-colors duration-200 relative py-1",
+                    isActive
+                      ? "text-stone-100"
+                      : "text-stone-400 hover:text-stone-100"
                   )}
                 >
                   {label}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-accent rounded-full" />
+                  )}
                 </a>
               </li>
             );
           })}
 
-          {/* About — opens overlay */}
+          {/* Founders — opens overlay (renamed from About to match AI iteration) */}
           <li>
             <button
               onClick={() => setAboutOpen(true)}
               className={cn(
                 "font-sans text-[13px] font-normal tracking-[0.02em]",
                 "text-stone-400 hover:text-stone-100 transition-colors duration-200",
-                "bg-transparent border-none cursor-pointer p-0"
+                "bg-transparent border-none cursor-pointer p-0 relative py-1"
               )}
               aria-haspopup="dialog"
               aria-expanded={aboutOpen}
             >
-              About
+              Founders
+              <span className="absolute -top-1 -right-2 w-1.5 h-1.5 rounded-full bg-accent/80 opacity-80" />
             </button>
           </li>
         </ul>
 
-        {/* CTA */}
+        {/* CTA & Theme Toggle */}
         <div className="flex items-center gap-3">
+          {/* Theme toggler */}
+          <button
+            onClick={toggleTheme}
+            className="p-2 border border-stone-100/10 bg-stone-950/40 text-stone-400 hover:text-accent hover:border-accent/40 transition-colors flex items-center justify-center cursor-pointer"
+            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+          >
+            {theme === "dark" ? (
+              <Sun className="w-[14px] h-[14px] transition-transform duration-300 hover:rotate-45" />
+            ) : (
+              <Moon className="w-[14px] h-[14px] transition-transform duration-300 hover:-rotate-12" />
+            )}
+          </button>
+
           <Button
             as="a"
             href="#"

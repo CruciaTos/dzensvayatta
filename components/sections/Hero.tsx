@@ -7,19 +7,16 @@ import { Container } from "@/components/ui/Container";
 export function Hero() {
   return (
     <section
-      id="hero"
-      aria-label="DZen hero — Intelligent Workflow Integration"
-      className="min-h-screen flex flex-col justify-end pt-16 relative overflow-hidden"
     >
       {/* Grid background */}
       <div
-        className="absolute inset-0 opacity-[0.04] hero-grid-bg pointer-events-none"
+        className="absolute inset-0 opacity-[0.8] hero-grid-bg pointer-events-none"
         aria-hidden="true"
       />
 
       {/* Noise overlay */}
       <div
-        className="absolute inset-0 opacity-[0.025] noise-overlay pointer-events-none"
+        className="absolute inset-0 opacity-[0.2] noise-overlay pointer-events-none"
         aria-hidden="true"
       />
 

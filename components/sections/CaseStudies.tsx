@@ -150,11 +150,6 @@ export function CaseStudies() {
                 Outcomes, not promises.
               </h2>
             </div>
-            <div className="max-w-[380px] flex-shrink-0">
-              <p className="font-sans text-body font-light text-stone-400 leading-[1.7]">
-                Early engagements. Real systems. Measurable results from day one of deployment.
-              </p>
-            </div>
           </div>
         </FadeIn>
 
