@@ -25,7 +25,7 @@ function WfNode({
     >
       <div
         className={[
-          "font-mono text-[10px] tracking-[0.12em] uppercase mb-2",
+          "font-mono text-[11px] tracking-[0.12em] uppercase mb-2",
           accent ? "text-accent" : "text-stone-500",
         ].join(" ")}
       >
@@ -33,7 +33,7 @@ function WfNode({
       </div>
       <div
         className={[
-          "font-sans text-[14px] font-normal tracking-[-0.01em]",
+          "font-sans text-[15px] font-normal tracking-[-0.01em]",
           accent ? "text-accent-light" : "text-stone-100",
         ].join(" ")}
       >

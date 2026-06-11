@@ -9,22 +9,22 @@ export default function FoundingPrinciples() {
     <section
       id="founding-principles"
       aria-label="Founding principles"
-      className="py-[120px] bg-bg-primary border-t border-border"
+      className="relative py-[120px] bg-bg-primary border-t border-border overflow-hidden"
     >
       <Container>
         <FadeIn>
-          <div className="flex items-start justify-between gap-12 mb-20 max-md:flex-col">
+          <div className="flex items-start justify-between gap-12 mb-24 max-md:flex-col">
             <div>
-              <SectionIndex number="02" tag="Founding Principles" className="mb-6" />
-              <h2 className="font-serif text-display-3 font-normal text-stone-100">
+              <SectionIndex number="02" tag="Founding Principles" className="mb-8" />
+              <h2 className="font-serif text-display-3 font-normal text-stone-100 tracking-[-0.02em]">
                 The operating principles
                 <br />
-                behind <em>every build</em>.
+                behind <em className="text-accent italic">every build</em>.
               </h2>
             </div>
 
-            <div className="max-w-[420px] flex-shrink-0">
-              <p className="font-sans text-body font-light text-stone-400 leading-[1.7]">
+            <div className="max-w-[440px] flex-shrink-0 mt-2">
+              <p className="font-sans text-body font-light text-stone-400 leading-[1.75]">
                 DZen is built around systems that stay reliable under pressure,
                 improve workflows intelligently, preserve human authority, and
                 scale without creating operational debt.
@@ -34,32 +34,36 @@ export default function FoundingPrinciples() {
         </FadeIn>
 
         <StaggerContainer
-          className="grid grid-cols-4 border-t border-l border-border max-[1000px]:grid-cols-2 max-[560px]:grid-cols-1"
+          className="grid grid-cols-4 border-t border-l border-border/60 max-[1000px]:grid-cols-2 max-[560px]:grid-cols-1"
           staggerDelay={0.1}
           aria-label="DZen founding principles"
         >
           {STATS.map((principle, index) => (
             <StaggerItem key={principle.description}>
-              <article className="group relative min-h-[280px] overflow-hidden border-r border-b border-border bg-bg-secondary p-10 transition-colors duration-300 hover:bg-bg-panel">
+              <article className="group relative min-h-[280px] border-r border-b border-border/60 bg-bg-secondary p-10 transition-all duration-500 hover:bg-bg-panel hover:shadow-[0_0_40px_-12px_rgba(143,120,96,0.15)] hover:z-10">
+                {/* Radial gradient overlay */}
                 <div
-                  className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 pointer-events-none"
+                  className="absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100 pointer-events-none"
                   style={{
                     background:
-                      "radial-gradient(ellipse at top left, rgba(143,120,96,0.08) 0%, transparent 62%)",
+                      "radial-gradient(ellipse at top left, rgba(143,120,96,0.12) 0%, transparent 60%)",
                   }}
                   aria-hidden="true"
                 />
 
                 <div className="relative z-10 flex h-full flex-col justify-between gap-12">
                   <div>
-                    <div className="mb-8 flex items-center justify-between gap-6">
-                      <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-500">
+                    <div className="mb-10 flex items-center justify-between gap-6">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-stone-500 group-hover:text-accent/80 transition-colors duration-500">
                         Principle {String(index + 1).padStart(2, "0")}
                       </span>
-                      <span className="h-1.5 w-1.5 bg-accent" aria-hidden="true" />
+                      <span
+                        className="h-2 w-2 rounded-full bg-accent shadow-[0_0_10px_rgba(143,120,96,0.5)] group-hover:shadow-[0_0_18px_rgba(143,120,96,0.7)] transition-shadow duration-500"
+                        aria-hidden="true"
+                      />
                     </div>
 
-                    <h3 className="font-serif text-[clamp(34px,3.5vw,52px)] font-normal leading-none tracking-[-0.03em] text-stone-100">
+                    <h3 className="font-serif text-[clamp(38px,3.8vw,56px)] font-normal leading-[0.95] tracking-[-0.04em] text-stone-100 transition-colors duration-500">
                       {principle.value}
                       {principle.accent && (
                         <span className="text-accent">{principle.accent}</span>
@@ -68,10 +72,10 @@ export default function FoundingPrinciples() {
                   </div>
 
                   <div>
-                    <p className="mb-6 font-sans text-[14px] font-light leading-[1.7] text-stone-400">
+                    <p className="mb-5 font-sans text-[14px] font-light leading-[1.7] text-stone-400 group-hover:text-stone-300 transition-colors duration-500">
                       {principle.label}
                     </p>
-                    <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-accent">
+                    <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-accent/80 group-hover:text-accent transition-colors duration-500">
                       {principle.description}
                     </div>
                   </div>

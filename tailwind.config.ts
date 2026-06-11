@@ -44,14 +44,14 @@ const config: Config = {
         mono:  ["var(--font-mono)",  "monospace"],
       },
       fontSize: {
-        "display-1": ["clamp(56px,7vw,108px)",   { lineHeight: "0.95", letterSpacing: "-0.02em" }],
-        "display-2": ["clamp(40px,5vw,72px)",    { lineHeight: "1.0",  letterSpacing: "-0.02em" }],
-        "display-3": ["clamp(28px,3.5vw,48px)",  { lineHeight: "1.1",  letterSpacing: "-0.015em" }],
-        "headline":  ["clamp(18px,2vw,24px)",    { lineHeight: "1.4",  letterSpacing: "-0.01em" }],
-        "body-lg":   ["18px",                    { lineHeight: "1.7"  }],
-        "body":      ["15px",                    { lineHeight: "1.7"  }],
-        "caption":   ["11px",                    { lineHeight: "1",    letterSpacing: "0.12em"  }],
-        "label":     ["10px",                    { lineHeight: "1",    letterSpacing: "0.14em"  }],
+        "display-1": ["clamp(64px,8vw,120px)",   { lineHeight: "0.93", letterSpacing: "-0.03em" }],
+        "display-2": ["clamp(44px,5.5vw,80px)",  { lineHeight: "0.98", letterSpacing: "-0.025em" }],
+        "display-3": ["clamp(32px,4vw,56px)",    { lineHeight: "1.05", letterSpacing: "-0.02em" }],
+        "headline":  ["clamp(20px,2.2vw,28px)",  { lineHeight: "1.3",  letterSpacing: "-0.01em" }],
+        "body-lg":   ["20px",                    { lineHeight: "1.75" }],
+        "body":      ["16px",                    { lineHeight: "1.75" }],
+        "caption":   ["12px",                    { lineHeight: "1",    letterSpacing: "0.12em"  }],
+        "label":     ["11px",                    { lineHeight: "1",    letterSpacing: "0.14em"  }],
       },
 
       // ─── Spacing ──────────────────────────────────────────────

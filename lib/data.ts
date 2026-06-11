@@ -12,10 +12,10 @@ import type {
 
 // ─── Navigation ──────────────────────────────────────────────────────────────
 export const NAV_LINKS: NavLink[] = [
-  { label: "Platform",  href: "#workflow"  },
-  { label: "Services",  href: "#services"  },
-  { label: "Approach",  href: "#process"   },
-  { label: "Security",  href: "#security"  },
+  { label: "Platform", href: "#workflow" },
+  { label: "Services", href: "#services" },
+  { label: "Approach", href: "#process" },
+  { label: "Security", href: "#security" },
 ];
 
 // ─── Ticker items ─────────────────────────────────────────────────────────────
@@ -47,7 +47,7 @@ export const STATS: Stat[] = [
     description: "Efficiency Gain",
   },
   {
-    value: "Governed",
+    value: "Control",
     accent: "",
     label: "Reactive workflows that guard your business data with strict human-in-the-loop oversight.",
     description: "Human Authority",
@@ -62,12 +62,12 @@ export const STATS: Stat[] = [
 
 // ─── Workflow Nodes ──────────────────────────────────────────────────────────
 export const WORKFLOW_SOURCES: WorkflowNode[] = [
-  { label: "Source", name: "ERP System"    },
-  { label: "Source", name: "CRM Platform"  },
+  { label: "Source", name: "ERP System" },
+  { label: "Source", name: "CRM Platform" },
   { label: "Source", name: "Finance Tools" },
-  { label: "Source", name: "HRIS Portal"   },
+  { label: "Source", name: "HRIS Portal" },
   { label: "Source", name: "Comms & Email" },
-  { label: "Source", name: "Internal DBs"  },
+  { label: "Source", name: "Internal DBs" },
 ];
 
 export const WORKFLOW_INTELLIGENCE: string[] = [
@@ -79,12 +79,12 @@ export const WORKFLOW_INTELLIGENCE: string[] = [
 ];
 
 export const WORKFLOW_OUTPUTS: WorkflowNode[] = [
-  { label: "Output", name: "Clean Records"   },
-  { label: "Output", name: "Auto-Approvals"  },
-  { label: "Output", name: "SLA Alerts"      },
-  { label: "Output", name: "Forecast Decks"  },
-  { label: "Output", name: "Audit Ledger"    },
-  { label: "Output", name: "Activity Feed"   },
+  { label: "Output", name: "Clean Records" },
+  { label: "Output", name: "Auto-Approvals" },
+  { label: "Output", name: "SLA Alerts" },
+  { label: "Output", name: "Forecast Decks" },
+  { label: "Output", name: "Audit Ledger" },
+  { label: "Output", name: "Activity Feed" },
 ];
 
 // ─── Services ────────────────────────────────────────────────────────────────

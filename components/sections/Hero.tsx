@@ -10,19 +10,13 @@ export function Hero() {
     >
       {/* Grid background */}
       <div
-        className="absolute inset-0 opacity-[0.8] hero-grid-bg pointer-events-none"
+        className="absolute inset-1 opacity-[1] hero-grid-bg pointer-events-none"
         aria-hidden="true"
       />
 
       {/* Noise overlay */}
       <div
         className="absolute inset-0 opacity-[0.2] noise-overlay pointer-events-none"
-        aria-hidden="true"
-      />
-
-      {/* Horizontal rule below nav */}
-      <div
-        className="absolute top-[120px] left-0 right-0 h-px bg-border"
         aria-hidden="true"
       />
 
@@ -44,8 +38,7 @@ export function Hero() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="w-12 h-px bg-accent" aria-hidden="true" />
-          <span className="font-mono text-[11px] font-normal tracking-[0.16em] uppercase text-accent">
+          <span className="font-mono text-[13px] font-normal tracking-[0.16em] uppercase text-accent">
             DZen — Workflow Intelligence Platform
           </span>
         </motion.div>
@@ -66,13 +59,13 @@ export function Hero() {
 
         {/* Sub row */}
         <motion.div
-          className="grid grid-cols-[5fr_1fr_4fr] gap-6 items-end border-t border-border pt-10 max-[900px]:grid-cols-1"
+          className="grid grid-cols-[5fr_1fr_4fr] gap-6 items-end pt-10 max-[900px]:grid-cols-1"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
         >
           {/* Description */}
-          <p className="font-sans text-body-lg font-light text-stone-400 leading-[1.7] max-w-[480px]">
+          <p className="font-sans text-[18px] font-light text-stone-400 leading-[1.8] max-w-[520px]">
             We integrate AI into the operational fabric of your business — connecting the systems you already run, automating the decisions you already make, and delivering intelligence where it creates measurable value.
           </p>
 
@@ -97,7 +90,7 @@ export function Hero() {
                 className="w-[6px] h-[6px] bg-accent animate-pulse-dot"
                 aria-hidden="true"
               />
-              <span className="font-mono text-[10px] tracking-[0.14em] uppercase">
+              <span className="font-mono text-[12px] tracking-[0.14em] uppercase">
                 Scroll to explore
               </span>
             </div>
