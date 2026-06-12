@@ -77,12 +77,12 @@ function AuditVisual({ inView }: { inView: boolean }) {
         <div key={r.name} className="flex items-center gap-3">
           <span className="text-[10px] text-stone-600 w-5">{String(i + 1).padStart(2, "0")}</span>
           <div className="flex-1 h-1.5 rounded-full bg-stone-900 overflow-hidden">
-            <motion.div 
+            <motion.div
               className="h-full bg-linear-to-r from-[#8F7860] to-[#c4a882] rounded-full"
               style={{ transformOrigin: "left" }}
-              initial={{ scaleX: 0 }} 
+              initial={{ scaleX: 0 }}
               animate={inView ? { scaleX: r.score } : {}}
-              transition={{ duration: 0.8, delay: i * 0.08 }} 
+              transition={{ duration: 0.8, delay: i * 0.08 }}
             />
           </div>
           <span className="text-[10px] text-stone-400 w-24 text-right truncate font-semibold">{r.name}</span>
@@ -103,9 +103,9 @@ function BlueprintVisual({ inView }: { inView: boolean }) {
     <div className="p-6 h-full flex flex-col justify-center gap-3 select-none font-mono">
       <div className="text-[10px] tracking-wider text-[#8F7860] uppercase font-bold mb-2">Priority Impact Mapping</div>
       {items.map((item, i) => (
-        <motion.div 
-          key={item.label} 
-          initial={{ opacity: 0, y: 10 }} 
+        <motion.div
+          key={item.label}
+          initial={{ opacity: 0, y: 10 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.4, delay: i * 0.1 }}
           className="flex items-center justify-between border-b border-stone-900 pb-1.5"
@@ -134,8 +134,8 @@ function BuildVisual({ inView }: { inView: boolean }) {
     <div className="p-6 h-full flex flex-col justify-center gap-2.5 font-mono select-none">
       <div className="text-[10px] tracking-wider text-[#8F7860] uppercase font-bold mb-2">Architectural Blueprint Stack</div>
       {layers.map((l, i) => (
-        <motion.div 
-          key={l.name} 
+        <motion.div
+          key={l.name}
           className="flex items-center gap-3 p-2 border border-stone-900 bg-stone-950/45 rounded-[2px]"
           initial={{ opacity: 0, x: -10 }}
           animate={inView ? { opacity: 1, x: 0 } : {}}
@@ -164,8 +164,8 @@ function DeployVisual({ inView }: { inView: boolean }) {
     <div className="p-6 h-full flex flex-col justify-center gap-2 font-mono select-none">
       <div className="text-[10px] tracking-wider text-[#8F7860] uppercase font-bold mb-2">Deployment Telemetry</div>
       {entries.map((entry, i) => (
-        <motion.div 
-          key={entry.text} 
+        <motion.div
+          key={entry.text}
           className="flex items-start gap-2.5 text-[10px]"
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
@@ -198,7 +198,7 @@ function SupportVisual({ inView }: { inView: boolean }) {
             <span className="text-[#8F7860]">{g.val}</span>
           </div>
           <div className="w-full h-1 bg-stone-900 rounded-full overflow-hidden">
-            <motion.div 
+            <motion.div
               className="h-full bg-linear-to-r from-[#8F7860]/40 to-[#8F7860]"
               initial={{ scaleX: 0 }}
               animate={inView ? { scaleX: g.pct } : {}}
@@ -220,14 +220,14 @@ function ScaleVisual({ inView }: { inView: boolean }) {
       <div className="flex-1 flex gap-2.5 items-end pb-2">
         {steps.map((step, i) => (
           <div key={i} className="flex-1 flex flex-col items-center">
-            <motion.div 
+            <motion.div
               className="w-full bg-linear-to-t from-stone-900 to-[#8F7860]/30 border border-[#8F7860]/20 rounded-t-[1px]"
               initial={{ scaleY: 0 }}
               animate={inView ? { scaleY: step / 100 } : {}}
               transition={{ duration: 0.7, delay: i * 0.08 }}
               style={{ transformOrigin: "bottom", height: `${(step / 100) * 110}px` }}
             />
-            <span className="text-[8px] text-stone-600 mt-2">M{i+1}</span>
+            <span className="text-[8px] text-stone-600 mt-2">M{i + 1}</span>
           </div>
         ))}
       </div>
@@ -252,7 +252,7 @@ export function CapabilitiesSection() {
 
       const phaseElements = container.querySelectorAll(".phase-block");
       let currentIdx = 0;
-      
+
       phaseElements.forEach((el, idx) => {
         const rect = el.getBoundingClientRect();
         // Check if the block is near the scroll threshold
@@ -287,11 +287,11 @@ export function CapabilitiesSection() {
       <div aria-hidden className="absolute bottom-4 right-6 font-mono text-[7px] text-stone-700 pointer-events-none">REF_BLUEPRINT_9048</div>
 
       <div className="max-w-[1200px] mx-auto px-12 max-md:px-6 flex gap-12 relative">
-        
+
         {/* Sticky side nav navigator (Visible on wide viewports) */}
         <div className="hidden min-[1100px]:flex flex-col w-[120px] shrink-0 sticky top-[180px] h-fit z-25 leading-none">
           <div className="font-mono text-[8px] tracking-[2px] uppercase text-stone-600 font-bold mb-6">Execution Path</div>
-          
+
           <div className="flex flex-col self-start">
             {PHASES.map((p, i) => (
               <button
@@ -299,8 +299,8 @@ export function CapabilitiesSection() {
                 onClick={() => handleNavClick(i)}
                 className={cn(
                   "flex flex-col items-start gap-1 py-4 border-l-2 pl-4 cursor-pointer text-left focus:outline-none transition-all outline-none",
-                  activePhase === i 
-                    ? "border-[#8F7860] text-stone-100 font-bold" 
+                  activePhase === i
+                    ? "border-[#8F7860] text-stone-100 font-bold"
                     : "border-stone-900 text-stone-500 hover:text-stone-300 hover:border-stone-700"
                 )}
               >
@@ -313,7 +313,7 @@ export function CapabilitiesSection() {
 
         {/* Phase content loop blocks */}
         <div className="flex-1 space-y-32">
-          
+
           {/* Main Title Section */}
           <div className="max-w-xl">
             <SectionIndex number="03" tag="Methodology" className="mb-6" />
@@ -339,7 +339,7 @@ export function CapabilitiesSection() {
                   <div className="font-mono text-[10px] tracking-[3px] uppercase text-[#8F7860] font-bold">
                     Phase {p.index} · {p.tag}
                   </div>
-                  
+
                   <h3 className="font-serif text-[clamp(1.6rem,2.8vw,2.4rem)] font-bold tracking-tight text-stone-100 leading-[1.1]">
                     {p.title}
                   </h3>
@@ -367,7 +367,7 @@ export function CapabilitiesSection() {
                     DIAG_PANEL_REF_{p.index}
                   </div>
                   <div aria-hidden className="absolute inset-0 opacity-[0.05] hero-grid-bg" />
-                  
+
                   {/* Direct visual elements */}
                   <PhaseVisual index={i} inView={activePhase === i} />
                 </div>
