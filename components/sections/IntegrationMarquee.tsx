@@ -1,439 +1,186 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Container } from "@/components/ui/Container";
 import { SectionIndex } from "@/components/ui/SectionIndex";
 import { FadeIn } from "@/components/ui/FadeIn";
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   SVG logo definitions — inline, brand-accurate, original aspect ratios
-   Each logo is normalised to a 40px height; width scales from its native ratio.
+   LOGO SOURCES
+   ─────────────────────────────────────────────────────────────────────────────
+   • SI(slug)  → Simple Icons CDN (mono SVGs — coloured via fill injection)
+   • DV(name)  → Devicons CDN    (full-colour SVGs — rendered as-is)
+   • Inline    → SVG string      (for brands missing from both CDNs)
+
+   ✅ TO SWAP IN YOUR OWN FILES
+      Set  src: "/logos/brand.svg"  and  colorize: false  for full-colour images.
+      Set  src: "/logos/brand.svg"  and  monoColor: "#hex"  for mono/black logos.
 ───────────────────────────────────────────────────────────────────────────── */
 
-function SAPLogo() {
-  return (
-    <svg height="28" viewBox="0 0 80 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="SAP">
-      <path d="M0 0h80v28H0z" fill="#0070F2"/>
-      <path d="M8 19.5c0 .83.67 1.5 1.5 1.5h5.17c2.09 0 3.33-1.17 3.33-2.83 0-1.33-.75-2.17-2-2.5l-2.83-.67c-.58-.17-.83-.5-.83-.92 0-.58.5-.92 1.25-.92h4.5v-2.16H9.5c-2 0-3.17 1.08-3.17 2.75 0 1.33.75 2.08 1.83 2.42l2.84.66c.66.17.91.5.91.92 0 .58-.41.92-1.16.92H8.5a.5.5 0 00-.5.5v1.33zm11.5 1.5h2.5v-5.83l3.5 5.83H28V9h-2.5v5.92L22 9h-2.5v12zm10.5 0h2.58l.84-2.33h4.08l.83 2.33H40.5L36.75 9h-3L22 21zm4.42-4.5l1.33-3.75 1.33 3.75h-2.66zm10.08 4.5h2.5v-4.5h2c2.5 0 4-1.5 4-3.75S51 9 48.5 9H44.5v12zm2.5-6.83V11.5h1.83c.92 0 1.5.5 1.5 1.58s-.58 1.59-1.5 1.59H47zm8 6.83h2.5v-5l4.5-7h-2.83L56.5 13.5 54 9h-2.83l4.5 7-4.5 5.83 2.83.17z" fill="white"/>
-    </svg>
-  );
-}
+const SI  = (slug: string) =>
+  `https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/${slug}.svg`;
+const DV  = (name: string) =>
+  `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${name}/${name}-original.svg`;
 
-function OracleLogo() {
-  return (
-    <svg height="22" viewBox="0 0 120 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Oracle NetSuite">
-      <path d="M11 0C4.925 0 0 4.925 0 11s4.925 11 11 11h98c6.075 0 11-4.925 11-11S115.075 0 109 0H11zm0 5.5h98c3.038 0 5.5 2.462 5.5 5.5s-2.462 5.5-5.5 5.5H11c-3.038 0-5.5-2.462-5.5-5.5S7.962 5.5 11 5.5z" fill="#C74634"/>
-    </svg>
-  );
-}
+/* ── Inline SVGs for brands not in SI or DV ─────────────────────────────── */
 
-function MicrosoftDynamicsLogo() {
-  return (
-    <svg height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Microsoft Dynamics 365">
-      <path d="M0 0h14v14H0V0z" fill="#0078D4"/>
-      <path d="M16 0h14v14H16V0z" fill="#50B0F0"/>
-      <path d="M0 16h14v14H0V16z" fill="#50B0F0"/>
-      <path d="M16 16h14v14H16V16z" fill="#0078D4"/>
-    </svg>
-  );
-}
+// LinkedIn — official in-wordmark icon
+const LINKEDIN_SVG = `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="8" fill="#0A66C2"/><path d="M15.5 20h-5v13h5V20zm-2.5-2.3a2.9 2.9 0 110-5.8 2.9 2.9 0 010 5.8zM37 33h-5v-6.5c0-1.6-.6-2.7-2-2.7-1.2 0-1.8.8-2.1 1.6-.1.3-.1.7-.1 1V33h-5s.1-14 0-14h5v2.1a5 5 0 014.5-2.5c3.3 0 5.7 2.1 5.7 6.7V33z" fill="white"/></svg>`;
 
-function SageLogo() {
-  return (
-    <svg height="28" viewBox="0 0 90 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Sage Intacct">
-      <rect width="90" height="28" rx="4" fill="#00DC82"/>
-      <path d="M12 18.5c0 1.1 1.2 2.5 3.8 2.5 2.4 0 4-1.3 4-3.2 0-1.6-1-2.5-2.6-3l-1.4-.4c-.8-.2-1.2-.6-1.2-1.2 0-.7.6-1.2 1.6-1.2h3.3V10h-3.5c-2.3 0-3.8 1.2-3.8 3 0 1.5.9 2.4 2.3 2.8l1.5.4c.8.2 1.3.6 1.3 1.3 0 .7-.5 1.2-1.5 1.2h-3V19a.5.5 0 01-.5-.5H12zm10-1c0 2.3 1.8 3.5 3.8 3.5 1.6 0 2.6-.7 3.2-1.5v1.3h2.5V14c0-2.5-1.6-4-4-4-2.2 0-3.8 1.2-4 3h2.4c.2-.8.8-1.2 1.7-1.2 1 0 1.6.6 1.6 1.7v.5h-1.8c-2.4 0-3.9 1.2-3.9 3zm2.5-.2c0-.9.7-1.5 1.8-1.5H30v.6c0 1.4-.8 2.3-2 2.3-1 0-1.5-.6-1.5-1.4zM36 22.5c0 1.7 1.5 2.5 3.5 2.5 2.3 0 4-1.3 4-3.8V10h-2.5v1.3c-.6-.9-1.6-1.5-2.8-1.5-2.3 0-4 1.8-4 4.8s1.7 4.7 4 4.7c1.2 0 2.2-.5 2.8-1.4v.8c0 1.2-.7 1.8-1.7 1.8-1 0-1.5-.5-1.5-1H36zm1 -8c0-1.7.8-2.7 2-2.7s2 1 2 2.7-.8 2.7-2 2.7-2-1-2-2.7zm10.5 4.7c.6.9 1.7 1.8 3.4 1.8 2.5 0 4.2-1.8 4.2-5s-1.7-5-4.2-5c-1.7 0-2.8.9-3.4 1.8V10H45V25h2.5v-5.8zm.2-3.2c0-1.8.9-2.8 2.2-2.8s2.2 1 2.2 2.8-.9 2.8-2.2 2.8-2.2-1-2.2-2.8z" fill="white"/>
-    </svg>
-  );
-}
+// Slack — official 4-colour hashtag logo
+const SLACK_SVG = `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 30a4 4 0 010-8h4v4a4 4 0 01-4 4z" fill="#E01E5A"/><path d="M26 13a4 4 0 010 8h-4v-4a4 4 0 014-4z" fill="#36C5F0"/><path d="M35 26a4 4 0 010 8h-4v-4a4 4 0 014-4z" fill="#2EB67D"/><path d="M22 35a4 4 0 010 8v-4h-4a4 4 0 010-8h4v4z" fill="#ECB22E"/><path d="M22 22h4v4h-4z" fill="#1D1C1D"/><rect x="18" y="18" width="4" height="4" rx="0" fill="#E01E5A"/><rect x="26" y="18" width="4" height="4" rx="0" fill="#36C5F0"/><rect x="26" y="26" width="4" height="4" rx="0" fill="#2EB67D"/><rect x="18" y="26" width="4" height="4" rx="0" fill="#ECB22E"/></svg>`;
 
-function QuickBooksLogo() {
-  return (
-    <svg height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="QuickBooks">
-      <circle cx="16" cy="16" r="16" fill="#2CA01C"/>
-      <path d="M8 16c0-3.31 2.69-6 6-6h1v2h-1c-2.21 0-4 1.79-4 4s1.79 4 4 4h1v2h-1c-3.31 0-6-2.69-6-6zm16 0c0 3.31-2.69 6-6 6h-1v-2h1c2.21 0 4-1.79 4-4s-1.79-4-4-4h-1V10h1c3.31 0 6 2.69 6 6zm-9 0a1 1 0 112 0 1 1 0 01-2 0z" fill="white"/>
-    </svg>
-  );
-}
+// OpenAI
+const OPENAI_SVG = `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="10" fill="#000"/><path d="M37.5 20.5c.9-2.5.6-5.3-.9-7.6-2.3-3.5-6.5-5.3-10.6-4.4C24.8 6.7 22.3 5 19.5 5c-4.1 0-7.7 2.8-8.8 6.8-2.6.5-4.8 2.1-6.1 4.4-2.3 3.9-1.8 8.9 1.3 12.3-.9 2.5-.6 5.3.9 7.6 2.3 3.5 6.5 5.3 10.6 4.4 1.3 1.8 3.8 3.5 6.6 3.5 4.1 0 7.7-2.8 8.8-6.8 2.6-.5 4.8-2.1 6.1-4.4 2.3-4 1.8-8.9-1.4-12.3zM24 41.5c-1.8 0-3.4-.6-4.7-1.7l.2-.1 7.8-4.5c.4-.2.6-.6.6-1V23.8l3.3 1.9v9.1c0 3.7-3.2 6.7-7.2 6.7zM7.3 34.2c-.9-1.6-1.2-3.4-.9-5.2l.2.1 7.8 4.5c.4.2.8.2 1.2 0l9.4-5.4v3.8L17.4 36c-3.2 1.9-7.3.7-10.1-1.8zm-1.6-14.4c.9-1.5 2.3-2.7 3.9-3.4v9.3c0 .4.2.8.6 1l9.4 5.4-3.3 1.9-7.6-4.4C6 26.6 4.8 22.4 5.7 19.8zm27.8 11.5l-9.4-5.4 3.3-1.9 7.6 4.4c3.2 1.8 4.4 5.8 2.8 9-.9 1.5-2.3 2.7-3.9 3.4v-9.3c0-.5-.2-.9-.4-1.2zm3.2-5.4l-.2-.1-7.8-4.5c-.4-.2-.8-.2-1.2 0L18.1 27v-3.8l7.6-4.4c3.2-1.8 7.3-.7 10.1 1.8.9 1.6 1.2 3.4.9 5.2h-.9zM15.4 25.1l-3.3-1.9v-9.1c0-3.7 3.2-6.7 7.2-6.7 1.8 0 3.4.6 4.7 1.7l-.2.1-7.8 4.5c-.4.2-.6.6-.6 1v10.4zm1.8-3.8l4-2.3 4 2.2v4.4l-4 2.3-4-2.3v-4.3z" fill="white"/></svg>`;
 
-function SalesforceLogo() {
-  return (
-    <svg height="32" viewBox="0 0 60 42" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Salesforce">
-      <path d="M24.8 6.2a12.2 12.2 0 0122 4.1 10 10 0 0112.6 9.6 10 10 0 01-10 10H11.5a11 11 0 01-11-11 11 11 0 0111-11 10.9 10.9 0 0113.3-1.7z" fill="#00A1E0"/>
-    </svg>
-  );
-}
+// Microsoft 365 (4-colour Windows tile style)
+const M365_SVG = `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4"  y="4"  width="18" height="18" fill="#F25022"/><rect x="26" y="4"  width="18" height="18" fill="#7FBA00"/><rect x="4"  y="26" width="18" height="18" fill="#00A4EF"/><rect x="26" y="26" width="18" height="18" fill="#FFB900"/></svg>`;
 
-function HubSpotLogo() {
-  return (
-    <svg height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="HubSpot">
-      <path d="M19.5 11.2V8.5a2 2 0 001.2-1.8V6.6a2 2 0 00-4 0v.1a2 2 0 001.2 1.8v2.7a5.7 5.7 0 00-2.7 1.2L7.6 7.2a2.2 2.2 0 10-.9 1.5l7.4 5.1a5.7 5.7 0 00-.8 2.9 5.7 5.7 0 00.8 2.9l-2.3 2.3a1.8 1.8 0 10.9.9l2.3-2.3a5.7 5.7 0 003.5 1.2 5.7 5.7 0 005.7-5.7 5.7 5.7 0 00-4.7-5.8zm-1 9.8a3.8 3.8 0 110-7.6 3.8 3.8 0 010 7.6z" fill="#FF7A59"/>
-    </svg>
-  );
-}
+// Google Workspace (4-colour G)
+const GOOGLE_WS_SVG = `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M44 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11.3a9.7 9.7 0 01-4.2 6.3v5.3h6.8C41.8 36 44 30.7 44 24.5z" fill="#4285F4"/><path d="M24 45c5.7 0 10.5-1.9 14-5.1l-6.8-5.3c-1.9 1.3-4.3 2-7.2 2-5.5 0-10.2-3.7-11.9-8.7H5.2v5.5C8.7 40.7 15.9 45 24 45z" fill="#34A853"/><path d="M12.1 27.9A13.3 13.3 0 0111.4 24c0-1.4.2-2.7.6-4l-6.8-5.4A22 22 0 002 24c0 3.6.9 7 2.4 10l7.7-6.1z" fill="#FBBC05"/><path d="M24 10.3c3.1 0 5.9 1.1 8.1 3.1l6-6C34.4 4 29.6 2 24 2 15.9 2 8.7 6.3 5.2 13L12 18.3c1.7-5 6.4-8 12-8z" fill="#EA4335"/></svg>`;
 
-function PipedriveLogo() {
-  return (
-    <svg height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Pipedrive">
-      <circle cx="15" cy="15" r="15" fill="#1D9F53"/>
-      <path d="M10.5 8v14M10.5 12a4.5 4.5 0 100 6 4.5 4.5 0 000-6z" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-    </svg>
-  );
-}
+// Monday.com (3 coloured circles)
+const MONDAY_SVG = `<svg viewBox="0 0 80 40" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="18" fill="#FF3750"/><circle cx="40" cy="20" r="18" fill="#FFCB00"/><circle cx="60" cy="20" r="18" fill="#00CA72"/></svg>`;
 
-function ZohoLogo() {
-  return (
-    <svg height="24" viewBox="0 0 80 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Zoho CRM">
-      <path d="M0 20L12 4h8L8 20H0zm14 0V4h6v16h-6zm8 0V4h6l4 8 4-8h6v16h-5.5V10l-4.5 8h-1l-4.5-8V20H22zm24-8a8 8 0 1116 0 8 8 0 01-16 0zm5.5 0a2.5 2.5 0 105 0 2.5 2.5 0 00-5 0z" fill="#E42527"/>
-    </svg>
-  );
-}
-
-function Microsoft365Logo() {
-  return (
-    <svg height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Microsoft 365">
-      <rect width="14" height="14" fill="#F25022"/>
-      <rect x="16" width="14" height="14" fill="#7FBA00"/>
-      <rect y="16" width="14" height="14" fill="#00A4EF"/>
-      <rect x="16" y="16" width="14" height="14" fill="#FFB900"/>
-    </svg>
-  );
-}
-
-function TeamsLogo() {
-  return (
-    <svg height="30" viewBox="0 0 44 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Microsoft Teams">
-      <path d="M29 12h8a3 3 0 013 3v7a3 3 0 01-3 3h-8V12z" fill="#5059C9"/>
-      <circle cx="36" cy="7" r="4" fill="#5059C9"/>
-      <circle cx="20" cy="7" r="5.5" fill="#7B83EB"/>
-      <path d="M4 14h26a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2v-8a2 2 0 012-2z" fill="#7B83EB"/>
-      <path d="M20 14H7v12h13a2 2 0 002-2v-8a2 2 0 00-2-2z" fill="#4B53BC"/>
-    </svg>
-  );
-}
-
-function OutlookLogo() {
-  return (
-    <svg height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Outlook">
-      <path d="M2 8l13-5 13 5v14l-13 5L2 22V8z" fill="#0078D4"/>
-      <path d="M15 3L28 8v14L15 27V3z" fill="#005CA7"/>
-      <rect x="13" y="12" width="11" height="9" rx="1" fill="white"/>
-      <path d="M13 12h11l-5.5 5L13 12z" fill="#0078D4"/>
-      <circle cx="8" cy="16" r="4.5" fill="white"/>
-      <circle cx="8" cy="16" r="2.5" fill="#0078D4"/>
-    </svg>
-  );
-}
-
-function GoogleWorkspaceLogo() {
-  return (
-    <svg height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Google Workspace">
-      <path d="M25 14.3c0-.8-.1-1.5-.2-2.3H14v4.3h6.2a5.3 5.3 0 01-2.3 3.5v2.9h3.7c2.2-2 3.4-5 3.4-8.4z" fill="#4285F4"/>
-      <path d="M14 26c3.2 0 5.8-1 7.7-2.8l-3.7-2.9c-1 .7-2.4 1.1-4 1.1-3 0-5.6-2-6.5-4.8H3.7v3C5.6 23.6 9.5 26 14 26z" fill="#34A853"/>
-      <path d="M7.5 16.6A7.9 7.9 0 017.2 14c0-.9.2-1.8.4-2.6V8.4H3.7A13.9 13.9 0 002 14c0 2.3.5 4.4 1.7 6.4l3.8-3.8z" fill="#FBBC05"/>
-      <path d="M14 6.6c1.7 0 3.2.6 4.4 1.7l3.3-3.3C19.8 3.2 17.2 2 14 2 9.5 2 5.6 4.4 3.7 8l3.8 3c.9-2.8 3.5-4.4 6.5-4.4z" fill="#EA4335"/>
-    </svg>
-  );
-}
-
-function SlackLogo() {
-  return (
-    <svg height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Slack">
-      <path d="M5.8 17.5a2.9 2.9 0 110 5.8 2.9 2.9 0 010-5.8zm0-1.8H15V23h-9.2a2.9 2.9 0 010-5.8H5.8V15.7z" fill="#E01E5A"/>
-      <path d="M17.5 22.2a2.9 2.9 0 015.8 0 2.9 2.9 0 01-5.8 0zm1.8 0V12.8H27v9.4a2.9 2.9 0 01-5.8 0h-1.8z" fill="#ECB22E"/>
-      <path d="M22.2 5.8a2.9 2.9 0 110-5.8 2.9 2.9 0 010 5.8zm0 1.8H13V0h9.2a2.9 2.9 0 010 5.8H22.2V7.6z" fill="#2EB67D"/>
-      <path d="M10.5 5.8a2.9 2.9 0 01-5.8 0 2.9 2.9 0 015.8 0zM8.7 5.8v9.4H0V5.8a2.9 2.9 0 015.8 0v.1H8.7z" fill="#36C5F0"/>
-    </svg>
-  );
-}
-
-function AsanaLogo() {
-  return (
-    <svg height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Asana">
-      <circle cx="14" cy="8" r="5.5" fill="#FF5263"/>
-      <circle cx="5.5" cy="20" r="5.5" fill="#FF5263"/>
-      <circle cx="22.5" cy="20" r="5.5" fill="#FF5263"/>
-    </svg>
-  );
-}
-
-function MondayLogo() {
-  return (
-    <svg height="28" viewBox="0 0 56 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="monday.com">
-      <rect x="0" y="7" width="14" height="14" rx="7" fill="#FF3750"/>
-      <rect x="21" y="7" width="14" height="14" rx="7" fill="#FFCB00"/>
-      <rect x="42" y="7" width="14" height="14" rx="7" fill="#00CA72"/>
-    </svg>
-  );
-}
-
-function WorkdayLogo() {
-  return (
-    <svg height="28" viewBox="0 0 90 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Workday">
-      <path d="M14 0a14 14 0 100 28A14 14 0 0014 0zm0 6.5a7.5 7.5 0 110 15 7.5 7.5 0 010-15z" fill="#F5B700"/>
-      <circle cx="14" cy="14" r="4" fill="#F5B700"/>
-      <path d="M36 21l-4-14h3.5l2.3 9.2L40.3 7h3L45.8 16.2 48 7h3.5l-4 14h-3.5l-2.2-8.5L39.5 21H36zm20 0V7h3.5v14H56zm5.5 0V7h3.3l7 8.8V7h3.5v14H72l-7-8.8V21h-3.5zm16.5 0V7h5.5c4.5 0 7.5 2.8 7.5 7s-3 7-7.5 7H78zm3.5-3.2h2c2.3 0 4-1.5 4-3.8s-1.7-3.8-4-3.8h-2v7.6z" fill="#1F286F"/>
-    </svg>
-  );
-}
-
-function BambooHRLogo() {
-  return (
-    <svg height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="BambooHR">
-      <circle cx="16" cy="16" r="16" fill="#73AC34"/>
-      <path d="M16 6c-1 0-1.5.7-1.5 1.5v4.7c-1-.7-2.5-1.2-4-1.2-1 0-1.5.7-1.5 1.5s.5 1.5 1.5 1.5c2 0 3.5 1.2 4 3H10a1.5 1.5 0 000 3h4.5v4.5a1.5 1.5 0 003 0V20H22a1.5 1.5 0 000-3h-4.5c.5-1.8 2-3 4-3 1 0 1.5-.7 1.5-1.5s-.5-1.5-1.5-1.5c-1.5 0-3 .5-4 1.2V7.5C17.5 6.7 17 6 16 6z" fill="white"/>
-    </svg>
-  );
-}
-
-function ADPLogo() {
-  return (
-    <svg height="24" viewBox="0 0 70 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="ADP">
-      <path d="M8 4L0 20h5l1.5-3.5h7L15 20h5L12 4H8zm2 4.5l2.2 5H7.8L10 8.5zM20 4v16h8c5 0 8-3 8-8s-3-8-8-8h-8zm5 4h3c2 0 3.3 1.5 3.3 4s-1.3 4-3.3 4h-3V8zm15-4v16h5v-5h3c3.8 0 6-2 6-5.5S51.8 4 48 4h-8zm5 4h3c1.3 0 2 .8 2 1.5s-.7 1.5-2 1.5h-3V8z" fill="#D82424"/>
-    </svg>
-  );
-}
-
-function RipplingLogo() {
-  return (
-    <svg height="24" viewBox="0 0 90 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Rippling">
-      <rect y="8" width="8" height="8" rx="1.5" fill="#FF6B35"/>
-      <rect x="10" y="4" width="8" height="16" rx="1.5" fill="#FF6B35"/>
-      <rect x="20" width="8" height="24" rx="1.5" fill="#FF6B35"/>
-      <path d="M36 6h4v12h-4V6zm0-3.5h4V6h-4V2.5zm6 3.5h3.5v1.7c.8-1.2 2-1.9 3.5-1.9 2.8 0 4.5 2 4.5 5v7.2H50v-7c0-1.5-.7-2.3-2-2.3-1.4 0-2.5 1-2.5 2.7V18H42V6zm14 0h4v12h-4V6zm0-3.5h4V6h-4V2.5zm6 0h4V18h-4V2.5zm6 3.5h3.5v1.7c.8-1.2 2-1.9 3.5-1.9 2.8 0 4.5 2 4.5 5v7.2H86v-7c0-1.5-.7-2.3-2-2.3-1.4 0-2.5 1-2.5 2.7V18H78V6z" fill="#1A1A2E"/>
-    </svg>
-  );
-}
-
-function GreenhouseLogo() {
-  return (
-    <svg height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Greenhouse">
-      <circle cx="14" cy="14" r="14" fill="#24A47F"/>
-      <path d="M19 11h-2V9a3 3 0 00-6 0v2H9a1 1 0 00-1 1v8a1 1 0 001 1h10a1 1 0 001-1v-8a1 1 0 00-1-1zm-6-2a1 1 0 012 0v2h-2V9zm3 8h-4v-2h4v2z" fill="white"/>
-    </svg>
-  );
-}
-
-function LatticeLogo() {
-  return (
-    <svg height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Lattice">
-      <path d="M3 3h7v7H3V3zm0 11h7v7H3v-7zm11-11h7v7h-7V3zm0 11h7v7h-7v-7z" fill="#995BFF"/>
-    </svg>
-  );
-}
-
-function SnowflakeLogo() {
-  return (
-    <svg height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Snowflake">
-      <path d="M16 2v28M16 2l-3 5m3-5l3 5M16 30l-3-5m3 5l3-5M2 16h28M2 16l5-3m-5 3l5 3M30 16l-5-3m5 3l-5 3M6.3 6.3l19.4 19.4M6.3 6.3l.6 5.7m-.6-5.7l5.7.6M25.7 25.7l-.6-5.7m.6 5.7l-5.7-.6M25.7 6.3L6.3 25.7M25.7 6.3l-5.7.6m5.7-.6l-.6 5.7M6.3 25.7l.6-5.7m-.6 5.7l5.7-.6" stroke="#29B5E8" strokeWidth="2" strokeLinecap="round"/>
-    </svg>
-  );
-}
-
-function DatabricksLogo() {
-  return (
-    <svg height="28" viewBox="0 0 40 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Databricks">
-      <path d="M20 0L40 11.5v5L20 28 0 16.5v-5L20 0z" fill="#FF3621"/>
-      <path d="M20 3.5L37 13.5v4L20 27.5 3 17.5v-4L20 3.5z" fill="#FF3621"/>
-      <path d="M1 13.5L20 24l19-10.5-19-10L1 13.5z" fill="white" fillOpacity=".2"/>
-      <path d="M20 14l-11-6.5v4L20 18l11-6.5v-4L20 14z" fill="white"/>
-    </svg>
-  );
-}
-
-function BigQueryLogo() {
-  return (
-    <svg height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Google BigQuery">
-      <path d="M15 1L1 8.5v13L15 29l14-7.5v-13L15 1z" fill="#4285F4"/>
-      <path d="M15 1v28L1 21.5v-13L15 1z" fill="#669DF6"/>
-      <circle cx="15" cy="14" r="5" fill="white"/>
-      <path d="M18.5 18.5l3.5 3.5" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-      <circle cx="15" cy="14" r="3" fill="#4285F4"/>
-    </svg>
-  );
-}
-
-function TableauLogo() {
-  return (
-    <svg height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Tableau">
-      <path d="M13 5h2v18h-2V5z" fill="#E8762D"/>
-      <path d="M5 13h18v2H5v-2z" fill="#E8762D"/>
-      <path d="M7.5 9.5h13v1.5h-13V9.5z" fill="#59879B"/>
-      <path d="M7.5 17h13v1.5h-13V17z" fill="#59879B"/>
-      <path d="M9.5 7.5h1.5v13H9.5v-13z" fill="#59879B"/>
-      <path d="M17 7.5h1.5v13H17v-13z" fill="#59879B"/>
-      <rect x="2" y="2" width="5" height="5" fill="#E8762D"/>
-      <rect x="21" y="2" width="5" height="5" fill="#E8762D"/>
-      <rect x="2" y="21" width="5" height="5" fill="#E8762D"/>
-      <rect x="21" y="21" width="5" height="5" fill="#E8762D"/>
-    </svg>
-  );
-}
-
-function PowerBILogo() {
-  return (
-    <svg height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Power BI">
-      <rect x="2" y="12" width="5" height="13" rx="1" fill="#F2C811"/>
-      <rect x="9" y="8" width="5" height="17" rx="1" fill="#F2C811"/>
-      <rect x="16" y="4" width="5" height="21" rx="1" fill="#F2C811"/>
-      <rect x="23" y="16" width="3" height="9" rx="1" fill="#F2C811" opacity=".6"/>
-    </svg>
-  );
-}
-
-function LookerLogo() {
-  return (
-    <svg height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Looker">
-      <circle cx="14" cy="14" r="13" fill="#4285F4"/>
-      <circle cx="14" cy="11" r="5" fill="white"/>
-      <path d="M14 16c-3 0-5 1.5-5 3.5C9 21.5 11.2 23 14 23s5-1.5 5-3.5c0-2-2-3.5-5-3.5z" fill="white"/>
-    </svg>
-  );
-}
-
-function PostgreSQLLogo() {
-  return (
-    <svg height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="PostgreSQL">
-      <path d="M21 2C14 2 8 7.6 8 14.5c0 4.2 2.2 8 5.8 10.4l-.5 4.6h5.4l.3-3a13 13 0 002 .5c7 0 11-5.6 11-12.5S28 2 21 2zM11 14.5c0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10a10 10 0 01-10-10z" fill="#336791"/>
-      <path d="M16 8v9l5-4.5L16 8z" fill="white"/>
-    </svg>
-  );
-}
-
-function MySQLLogo() {
-  return (
-    <svg height="24" viewBox="0 0 80 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="MySQL">
-      <path d="M0 4h4v12l7-12h4v16h-4V8L4 20H0V4zm18 0h4l4 6 4-6h4L26 14v6h-4v-6L18 4zm18 0h4v13h8v3H36V4zm14 0h12v3H56v4h7v3h-7v4h9v3H50V4z" fill="#00618A"/>
-      <path d="M62 4l6 10V4h4v16h-4L62 10v10h-4V4h4z" fill="#00618A"/>
-    </svg>
-  );
-}
-
-function RetoolLogo() {
-  return (
-    <svg height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Retool">
-      <rect width="24" height="24" rx="5" fill="#1C1C1C"/>
-      <path d="M7 7h10v3H7V7zm0 4h6v3H7v-3zm0 4h8v3H7v-3z" fill="#FFB700"/>
-    </svg>
-  );
-}
-
-function AppsmithLogo() {
-  return (
-    <svg height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Appsmith">
-      <rect width="24" height="24" rx="5" fill="#FF6D2A"/>
-      <path d="M12 6L6 9v6l6 3 6-3V9l-6-3z" fill="white"/>
-      <path d="M12 6v12M6 9l6 3 6-3" stroke="#FF6D2A" strokeWidth="1"/>
-    </svg>
-  );
-}
-
-function NotionLogo() {
-  return (
-    <svg height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Notion">
-      <path d="M4 5l1.5-.5L20 3l4.5-.5c1 0 1.5.5 1.5 1.3v19.4c0 .8-.5 1.3-1.5 1.3L8 25.5c-.8 0-1.3-.3-1.7-.8L4.3 7c-.3-.7-.3-1.5-.3-2z" fill="white"/>
-      <path d="M4 5l1.5-.5 4 20-1.5.5L4 5zm16-2L22 3.5c.8.3 1 .8 1 1.5v15.5c0 .8-.4 1.3-1.2 1.3l-2 .2L20 3z" fill="#E8E8E8"/>
-      <path d="M9 9.5h10M9 13h10M9 16.5h6" stroke="#1B1B1B" strokeWidth="1.5" strokeLinecap="round"/>
-    </svg>
-  );
-}
-
-function ConfluenceLogo() {
-  return (
-    <svg height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Confluence">
-      <path d="M2.5 20c-.4.7-.8 1.4-.4 2.2.4.7 1.2.8 2 .8h8c.7 0 1.4-.1 1.8-.8l.6-1.2C10 19.2 5.5 18.2 2.5 20z" fill="#0052CC"/>
-      <path d="M25.5 8c.4-.7.8-1.4.4-2.2-.4-.7-1.2-.8-2-.8h-8c-.7 0-1.4.1-1.8.8l-.6 1.2c4.5 1.8 9 2.8 12 1z" fill="#0052CC"/>
-      <path d="M14 14c-3.5-2-6-3-8-2.5l-3.5 6.5C5.5 19 10 20 14 18l.5-4z" fill="url(#cfl1)"/>
-      <path d="M14 14c3.5 2 6 3 8 2.5l3.5-6.5C22.5 9 18 8 14 10l-.5 4z" fill="url(#cfl2)"/>
-      <defs>
-        <linearGradient id="cfl1" x1="14" y1="11.5" x2="2.5" y2="18" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#0052CC"/>
-          <stop offset="1" stopColor="#2684FF"/>
-        </linearGradient>
-        <linearGradient id="cfl2" x1="14" y1="16.5" x2="25.5" y2="10" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#0052CC"/>
-          <stop offset="1" stopColor="#2684FF"/>
-        </linearGradient>
-      </defs>
-    </svg>
-  );
-}
-
-function AtlassianLogo() {
-  return (
-    <svg height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Atlassian">
-      <path d="M9.5 13.5C8.3 12 7.2 9.2 6.7 7c-.2-.9-1.3-1-1.7-.3L1.5 13.5c-.2.4-.1.9.3 1.2 3 2.3 7 3.8 12.2 3.8 5.2 0 9.2-1.5 12.2-3.8.4-.3.5-.8.3-1.2l-3.5-6.8c-.4-.7-1.5-.6-1.7.3-.5 2.2-1.6 5-2.8 6.5H9.5z" fill="#0052CC"/>
-      <path d="M14 1.5C14 1.5 11 7 11 10a3 3 0 006 0c0-3-3-8.5-3-8.5z" fill="#2684FF"/>
-    </svg>
-  );
-}
+// Workday (sun / arc mark)
+const WORKDAY_SVG = `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="10" fill="#F5B700"/><path d="M24 6v4M24 38v4M6 24h4M38 24h4M10.3 10.3l2.8 2.8M34.9 34.9l2.8 2.8M10.3 37.7l2.8-2.8M34.9 13.1l2.8-2.8" stroke="#F5B700" stroke-width="3" stroke-linecap="round"/></svg>`;
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Logo set — all brands, one row
+   Logo registry
 ───────────────────────────────────────────────────────────────────────────── */
 
 interface LogoEntry {
   id: string;
   label: string;
-  component: React.FC;
+  /** CDN URL (SI / DV) or omit if using inlineSvg */
+  src?: string;
+  /** Raw SVG string for brands not in any CDN */
+  inlineSvg?: string;
+  /** Hex colour to inject as fill into a mono (black) Simple Icons SVG */
+  monoColor?: string;
 }
 
 const LOGOS: LogoEntry[] = [
-  { id: "sap",         label: "SAP",                component: SAPLogo },
-  { id: "oracle",      label: "Oracle NetSuite",     component: OracleLogo },
-  { id: "dynamics",    label: "Microsoft Dynamics",  component: MicrosoftDynamicsLogo },
-  { id: "sage",        label: "Sage Intacct",        component: SageLogo },
-  { id: "quickbooks",  label: "QuickBooks",          component: QuickBooksLogo },
-  { id: "salesforce",  label: "Salesforce",          component: SalesforceLogo },
-  { id: "hubspot",     label: "HubSpot",             component: HubSpotLogo },
-  { id: "pipedrive",   label: "Pipedrive",           component: PipedriveLogo },
-  { id: "zoho",        label: "Zoho CRM",            component: ZohoLogo },
-  { id: "m365",        label: "Microsoft 365",       component: Microsoft365Logo },
-  { id: "teams",       label: "Microsoft Teams",     component: TeamsLogo },
-  { id: "outlook",     label: "Outlook",             component: OutlookLogo },
-  { id: "google",      label: "Google Workspace",    component: GoogleWorkspaceLogo },
-  { id: "slack",       label: "Slack",               component: SlackLogo },
-  { id: "asana",       label: "Asana",               component: AsanaLogo },
-  { id: "monday",      label: "monday.com",          component: MondayLogo },
-  { id: "workday",     label: "Workday",             component: WorkdayLogo },
-  { id: "bamboohr",    label: "BambooHR",            component: BambooHRLogo },
-  { id: "adp",         label: "ADP",                 component: ADPLogo },
-  { id: "rippling",    label: "Rippling",            component: RipplingLogo },
-  { id: "greenhouse",  label: "Greenhouse",          component: GreenhouseLogo },
-  { id: "lattice",     label: "Lattice",             component: LatticeLogo },
-  { id: "snowflake",   label: "Snowflake",           component: SnowflakeLogo },
-  { id: "databricks",  label: "Databricks",          component: DatabricksLogo },
-  { id: "bigquery",    label: "BigQuery",            component: BigQueryLogo },
-  { id: "tableau",     label: "Tableau",             component: TableauLogo },
-  { id: "powerbi",     label: "Power BI",            component: PowerBILogo },
-  { id: "looker",      label: "Looker",              component: LookerLogo },
-  { id: "postgresql",  label: "PostgreSQL",          component: PostgreSQLLogo },
-  { id: "mysql",       label: "MySQL",               component: MySQLLogo },
-  { id: "retool",      label: "Retool",              component: RetoolLogo },
-  { id: "appsmith",    label: "Appsmith",            component: AppsmithLogo },
-  { id: "notion",      label: "Notion",              component: NotionLogo },
-  { id: "confluence",  label: "Confluence",          component: ConfluenceLogo },
-  { id: "atlassian",   label: "Atlassian",           component: AtlassianLogo },
+  // ── Social & messaging ─────────────────────────────────────────────────
+  { id: "instagram",  label: "Instagram",        src: SI("instagram"),    monoColor: "#E1306C" },
+  { id: "whatsapp",   label: "WhatsApp",         src: SI("whatsapp"),     monoColor: "#25D366" },
+  { id: "telegram",   label: "Telegram",         src: SI("telegram"),     monoColor: "#26A5E4" },
+  { id: "x",          label: "X (Twitter)",      src: SI("x"),            monoColor: "#ffffff" },
+  { id: "youtube",    label: "YouTube",          src: SI("youtube"),      monoColor: "#FF0000" },
+  { id: "tiktok",     label: "TikTok",           src: SI("tiktok"),       monoColor: "#ffffff" },
+  { id: "linkedin",   label: "LinkedIn",         inlineSvg: LINKEDIN_SVG },
+  // ── AI & automation ────────────────────────────────────────────────────
+  { id: "openai",     label: "OpenAI",           inlineSvg: OPENAI_SVG },
+  { id: "zapier",     label: "Zapier",           src: SI("zapier"),       monoColor: "#FF4A00" },
+  // ── Productivity ───────────────────────────────────────────────────────
+  { id: "slack",      label: "Slack",            inlineSvg: SLACK_SVG },
+  { id: "teams",      label: "Microsoft Teams",  src: SI("microsoftteams"),  monoColor: "#6264A7" },
+  { id: "notion",     label: "Notion",           src: SI("notion"),       monoColor: "#ffffff" },
+  { id: "gmail",      label: "Gmail",            src: SI("gmail"),        monoColor: "#EA4335" },
+  { id: "google",     label: "Google Workspace", inlineSvg: GOOGLE_WS_SVG },
+  { id: "m365",       label: "Microsoft 365",    inlineSvg: M365_SVG },
+  { id: "asana",      label: "Asana",            src: SI("asana"),        monoColor: "#F06A6A" },
+  { id: "monday",     label: "monday.com",       inlineSvg: MONDAY_SVG },
+  { id: "atlassian",  label: "Atlassian",        src: SI("atlassian"),    monoColor: "#0052CC" },
+  { id: "confluence", label: "Confluence",       src: SI("confluence"),   monoColor: "#0052CC" },
+  // ── CRM & sales ────────────────────────────────────────────────────────
+  { id: "salesforce", label: "Salesforce",       src: SI("salesforce"),   monoColor: "#00A1E0" },
+  { id: "hubspot",    label: "HubSpot",          src: SI("hubspot"),      monoColor: "#FF7A59" },
+  // ── Payments & e-commerce ──────────────────────────────────────────────
+  { id: "stripe",     label: "Stripe",           src: SI("stripe"),       monoColor: "#635BFF" },
+  { id: "shopify",    label: "Shopify",          src: SI("shopify"),      monoColor: "#96BF48" },
+  { id: "quickbooks", label: "QuickBooks",       src: SI("quickbooks"),   monoColor: "#2CA01C" },
+  // ── Data & analytics ───────────────────────────────────────────────────
+  { id: "snowflake",  label: "Snowflake",        src: SI("snowflake"),    monoColor: "#29B5E8" },
+  { id: "databricks", label: "Databricks",       src: SI("databricks"),   monoColor: "#FF3621" },
+  { id: "tableau",    label: "Tableau",          src: SI("tableau"),      monoColor: "#E8762D" },
+  { id: "powerbi",    label: "Power BI",         src: SI("powerbi"),      monoColor: "#F2C811" },
+  { id: "postgresql", label: "PostgreSQL",       src: DV("postgresql") },
+  // ── Enterprise ─────────────────────────────────────────────────────────
+  { id: "sap",        label: "SAP",              src: SI("sap"),          monoColor: "#0070F2" },
+  { id: "workday",    label: "Workday",          inlineSvg: WORKDAY_SVG },
+  { id: "retool",     label: "Retool",           src: SI("retool"),       monoColor: "#3D3D3D" },
 ];
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Logo item — padded slot, vertically centred, hover opacity lift
-   NOTE: `[&>svg]:!h-10` forces all SVGs to 40px height (increase by at least 8px)
+   LogoImg
+   ────────────────────────────────────────────────────────────────────────────
+   Three render paths:
+   1. inlineSvg  → dangerouslySetInnerHTML (full-colour, no fetch)
+   2. src + monoColor → fetch SVG text, inject fill="#hex", render as data-URI
+   3. src only   → plain <img> (Devicons full-colour)
 ───────────────────────────────────────────────────────────────────────────── */
 
-function LogoItem({ label, component: Logo }: Omit<LogoEntry, "id">) {
-  return (
-    <div
-      className="flex-shrink-0 flex items-center justify-center px-10 opacity-40 hover:opacity-90 transition-opacity duration-800 [&>svg]:!h-16"
-      aria-label={label}
-      title={label}
-    >
-      <Logo />
-    </div>
-  );
+function LogoImg({ logo }: { logo: LogoEntry }) {
+  const [coloured, setColoured] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!logo.src || !logo.monoColor) return;
+    let cancelled = false;
+
+    fetch(logo.src)
+      .then((r) => r.text())
+      .then((text) => {
+        if (cancelled) return;
+        const filled = text.replace(/<svg /, `<svg fill="${logo.monoColor}" `);
+        setColoured(
+          "data:image/svg+xml;charset=utf-8," + encodeURIComponent(filled)
+        );
+      })
+      .catch(() => {
+        if (!cancelled) setColoured(logo.src ?? null);
+      });
+
+    return () => { cancelled = true; };
+  }, [logo.src, logo.monoColor]);
+
+  const imgStyle: React.CSSProperties = {
+    width: "100%",
+    height: "100%",
+    objectFit: "contain",
+    display: "block",
+    userSelect: "none",
+  };
+
+  // Path 1 — inline SVG (no fetch needed, full-colour)
+  if (logo.inlineSvg) {
+    return (
+      <div
+        aria-label={logo.label}
+        style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}
+        dangerouslySetInnerHTML={{ __html: logo.inlineSvg }}
+      />
+    );
+  }
+
+  // Path 2 — mono SVG with injected colour
+  if (logo.monoColor) {
+    const src = coloured ?? logo.src;
+    return src ? <img src={src} alt={logo.label} draggable={false} style={imgStyle} /> : null;
+  }
+
+  // Path 3 — full-colour CDN image
+  return logo.src ? (
+    <img src={logo.src} alt={logo.label} draggable={false} style={imgStyle} />
+  ) : null;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Marquee track — CSS animation, pause-on-hover via group
+   Marquee animation
+───────────────────────────────────────────────────────────────────────────── */
+
+const MARQUEE_STYLES = `
+  @keyframes dzen-marquee {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(calc(-100% / 3)); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dzen-marquee-track { animation: none !important; }
+  }
+`;
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MarqueeTrack
 ───────────────────────────────────────────────────────────────────────────── */
 
 function MarqueeTrack() {
@@ -442,14 +189,41 @@ function MarqueeTrack() {
   return (
     <div className="group overflow-hidden">
       <div
-        className="dzen-marquee-track flex w-max group-hover:[animation-play-state:paused]"
-        style={{
-          animation: "dzen-marquee 100s linear infinite",
-          willChange: "transform",
-        }}
+        className="dzen-marquee-track flex w-max items-center group-hover:[animation-play-state:paused]"
+        style={{ animation: "dzen-marquee 80s linear infinite", willChange: "transform" }}
       >
         {set.map((logo, i) => (
-          <LogoItem key={`${logo.id}-${i}`} label={logo.label} component={logo.component} />
+          <div
+            key={`${logo.id}-${i}`}
+            className="flex-shrink-0 flex flex-col items-center justify-center gap-2"
+            style={{ padding: "0 28px", minWidth: "88px" }}
+            title={logo.label}
+            aria-label={logo.label}
+          >
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <LogoImg logo={logo} />
+            </div>
+            <span
+              style={{
+                fontSize: "11px",
+                fontWeight: 500,
+                color: "var(--color-text-secondary, #9ca3af)",
+                whiteSpace: "nowrap",
+                letterSpacing: "0.01em",
+              }}
+            >
+              {logo.label}
+            </span>
+          </div>
         ))}
       </div>
     </div>
@@ -457,48 +231,30 @@ function MarqueeTrack() {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   IntegrationLogoMarquee — constrained to the same width as the content by
-   default. Use `maxWidth` to make the marquee horizontally smaller and centered,
-   `bleed` to extend it equally left/right, and `fade` to adjust edge crop.
+   IntegrationLogoMarquee — public API unchanged
 ───────────────────────────────────────────────────────────────────────────── */
 
 interface IntegrationLogoMarqueeProps {
-  /** Max width of the visible marquee viewport. Use this to make it smaller. */
   maxWidth?: number | string;
-  /** Pixels to extend the marquee beyond the container on both left and right. */
   bleed?: number;
-  /** Percentage used for the left/right CSS mask fade. */
   fade?: number;
 }
 
 export function IntegrationLogoMarquee({
   maxWidth = "100%",
   bleed = 0,
-  fade = 15,
+  fade = 12,
 }: IntegrationLogoMarqueeProps) {
   const safeBleed = Math.max(0, bleed);
-  const safeFade = Math.min(Math.max(fade, 0), 49);
+  const safeFade  = Math.min(Math.max(fade, 0), 49);
   const resolvedMaxWidth = typeof maxWidth === "number" ? `${maxWidth}px` : maxWidth;
 
   return (
     <>
-      {/* Keyframe injection */}
-      <style>{`
-        @keyframes dzen-marquee {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(calc(-100% / 3)); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .dzen-marquee-track {
-            animation: none !important;
-          }
-        }
-      `}</style>
-
-      {/* Container width matches content; inner viewport can be narrowed or bled outward. */}
+      <style>{MARQUEE_STYLES}</style>
       <Container className="overflow-visible !px-0">
         <div
-          className="relative overflow-hidden"
+          className="relative overflow-hidden py-4"
           style={{
             width: `calc(100% + ${safeBleed * 2}px)`,
             maxWidth: `calc(${resolvedMaxWidth} + ${safeBleed * 2}px)`,
@@ -516,19 +272,22 @@ export function IntegrationLogoMarquee({
   );
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   Page section — unchanged
+───────────────────────────────────────────────────────────────────────────── */
+
 export function IntegrationMarquee() {
   return (
     <section
       id="integrations"
       aria-label="Systems we connect"
-      className="py-[80px] bg-bg-secondary border-t border-border overflow-hidden"
+      className="py-[100px] bg-bg-secondary border-t border-border overflow-hidden"
     >
-      {/* Heading still uses the regular Container with padding */}
-      <Container className="mb-12">
+      <Container className="mb-14">
         <FadeIn>
           <SectionIndex number="05" tag="Integration Catalogue" className="mb-4" />
           <p className="font-sans text-body font-light text-stone-400 leading-[1.7] max-w-[440px]">
-            Pre-built connectors across every major enterprise platform.
+            Pre-built connectors across every major platform — from social and AI tools to enterprise data.
           </p>
         </FadeIn>
       </Container>
