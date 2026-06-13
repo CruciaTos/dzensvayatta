@@ -90,9 +90,9 @@ export function OptimisationComparison() {
             <div>
               <SectionIndex number="06" tag="Optimisation Impact" className="mb-6" />
               <h2 className="font-serif text-display-3 font-normal text-stone-100 max-w-[620px]">
-                Before DZen.
+                Svayatta Impact !!
                 <br />
-                After DZen.
+
               </h2>
             </div>
             <div className="max-w-[380px] flex-shrink-0">

@@ -28,3 +28,77 @@
     linear-gradient(90deg, rgba(216, 211, 203, 0.08) 1px, transparent 1px);
   background-size: 80px 80px;
 }
+
+/* ─── Hero "noir fabric" background ───────────────────────── */
+.hero-noir-bg {
+  background-color: #0c0a08;
+  background-image:
+    radial-gradient(ellipse 65% 55% at 80% 20%, rgba(184, 138, 86, 0.22) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 50% at 10% 85%, rgba(120, 86, 52, 0.18) 0%, transparent 55%),
+    linear-gradient(165deg, #15110d 0%, #0c0a08 45%, #050403 100%);
+}
+
+.hero-noir-folds {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hero-noir-fold {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  mix-blend-mode: screen;
+  will-change: transform;
+}
+
+.hero-noir-fold-a {
+  width: 55%;
+  height: 150%;
+  top: -25%;
+  right: -8%;
+  background: linear-gradient(140deg, rgba(201, 160, 106, 0.30), rgba(120, 86, 52, 0.08) 55%, transparent 75%);
+  transform: rotate(-14deg);
+}
+
+.hero-noir-fold-b {
+  width: 42%;
+  height: 120%;
+  top: 5%;
+  right: 18%;
+  background: linear-gradient(140deg, rgba(168, 124, 72, 0.22), transparent 65%);
+  transform: rotate(-22deg);
+}
+
+.hero-noir-fold-c {
+  width: 50%;
+  height: 110%;
+  bottom: -25%;
+  left: -8%;
+  background: linear-gradient(140deg, rgba(90, 62, 38, 0.28), transparent 60%);
+  transform: rotate(10deg);
+}
+
+.hero-noir-fold-d {
+  width: 32%;
+  height: 90%;
+  top: 35%;
+  left: 18%;
+  background: linear-gradient(140deg, rgba(64, 44, 28, 0.30), transparent 60%);
+  transform: rotate(-26deg);
+}
+
+.hero-noir-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 90% 75% at 50% 38%, transparent 45%, rgba(0,0,0,0.6) 100%);
+}
+
+.hero-noir-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
