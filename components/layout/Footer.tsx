@@ -36,10 +36,10 @@ function MagLink({
       onMouseMove={onMove}
       onMouseLeave={onLeave}
       className="
-        relative inline-block font-sans text-[12px] font-light text-stone-400 no-underline
-        transition-colors duration-200 hover:text-stone-100
+        relative inline-block font-sans text-[12px] font-light text-white/60 no-underline
+        transition-colors duration-200 hover:text-white
         after:content-[''] after:absolute after:left-0 after:bottom-[-2px]
-        after:h-px after:w-0 after:bg-accent
+        after:h-px after:w-0 after:bg-[#7ec3e2ff]
         after:transition-[width] after:duration-300 after:ease-[cubic-bezier(.65,0,.35,1)]
         hover:after:w-full
       "
@@ -130,7 +130,6 @@ export function Footer() {
       e.preventDefault();
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
-      // Default: prevent # link and smooth‑scroll to top
       e.preventDefault();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -138,27 +137,27 @@ export function Footer() {
 
   return (
     <>
-      {/* ── Floating gold‑dust orb (fixed, follows cursor) ── */}
+      {/* ── Floating light‑blue orb (fixed, follows cursor) ── */}
       <div
         ref={orbRef}
         aria-hidden="true"
         className="pointer-events-none fixed z-0 w-[320px] h-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 transition-opacity duration-400"
         style={{
           background:
-            "radial-gradient(circle, rgba(143,120,96,0.10) 0%, transparent 70%)",
+            "radial-gradient(circle, rgba(178,213,229,0.10) 0%, transparent 70%)",
         }}
       />
 
       <footer
         ref={footerRef}
-        className="relative bg-bg-secondary border-t border-stone-900 overflow-hidden"
+        className="relative bg-[#010b13] border-t border-[rgba(178,213,229,0.1)] overflow-hidden"
       >
         {/* ── CTA strip ────────────────────────────────────── */}
-        <div className="fade-up text-center px-6 py-20 border-b border-stone-900">
-          <p className="font-mono text-[10px] tracking-[0.18em] uppercase text-accent mb-6">
+        <div className="fade-up text-center px-6 py-20 border-b border-[rgba(178,213,229,0.1)]">
+          <p className="font-mono text-[10px] tracking-[0.18em] uppercase text-white mb-6">
             Ready to connect your stack?
           </p>
-          <h2 className="text-[clamp(2rem,5vw,3.75rem)] font-serif font-normal tracking-[-0.025em] text-stone-100 leading-[1.1] mb-8">
+          <h2 className="text-[clamp(2rem,5vw,3.75rem)] font-serif font-normal tracking-[-0.025em] text-white leading-[1.1] mb-8">
             Your systems,
             <br />
             working together.
@@ -169,9 +168,9 @@ export function Footer() {
                 .getElementById("briefing-builder")
                 ?.scrollIntoView({ behavior: "smooth" })
             }
-            className="group relative inline-flex items-center gap-2.5 border border-stone-800 text-stone-400 font-mono text-[11px] tracking-[0.1em] uppercase px-7 py-[14px] overflow-hidden transition-[color,border-color] duration-300 hover:text-stone-100 hover:border-accent"
+            className="group relative inline-flex items-center gap-2.5 border border-[rgba(178,213,229,0.25)] text-white/60 font-mono text-[11px] tracking-[0.1em] uppercase px-7 py-[14px] overflow-hidden transition-[color,border-color] duration-300 hover:text-white hover:border-[#7ec3e2ff]"
           >
-            <span className="absolute inset-0 bg-accent scale-x-0 origin-left transition-transform duration-400 ease-[cubic-bezier(.65,0,.35,1)] group-hover:scale-x-100" />
+            <span className="absolute inset-0 bg-[#7ec3e2ff] scale-x-0 origin-left transition-transform duration-400 ease-[cubic-bezier(.65,0,.35,1)] group-hover:scale-x-100" />
             <span className="relative z-10">Configure Operational RFP</span>
             <span
               className="relative z-10 transition-transform duration-300 group-hover:translate-x-1"
@@ -183,14 +182,14 @@ export function Footer() {
         </div>
 
         {/* ── Link grid ────────────────────────────────────── */}
-        <div className="grid grid-cols-4 gap-0 px-12 py-16 border-b border-stone-900 max-[1100px]:grid-cols-2 max-[1100px]:gap-10 max-[1100px]:px-6 max-[600px]:grid-cols-1">
+        <div className="grid grid-cols-4 gap-0 px-12 py-16 border-b border-[rgba(178,213,229,0.1)] max-[1100px]:grid-cols-2 max-[1100px]:gap-10 max-[1100px]:px-6 max-[600px]:grid-cols-1">
           {Object.entries(FOOTER_LINKS).map(([title, links], colIdx) => (
             <div
               key={title}
               className="fade-up px-6"
               style={{ transitionDelay: `${(colIdx + 1) * 80}ms` }}
             >
-              <div className="font-mono text-[9px] tracking-[0.16em] uppercase text-stone-500 font-bold mb-5">
+              <div className="font-mono text-[9px] tracking-[0.16em] uppercase text-white/60 font-bold mb-5">
                 {title}
               </div>
               <ul className="list-none flex flex-col gap-2" role="list">
@@ -211,7 +210,7 @@ export function Footer() {
 
         {/* ── Bottom bar ───────────────────────────────────── */}
         <div className="flex items-center justify-between px-12 py-6 flex-wrap gap-4 max-[600px]:px-6 max-[600px]:flex-col max-[600px]:items-start">
-          <span className="font-mono text-[10px] tracking-[0.08em] text-stone-500 select-text">
+          <span className="font-mono text-[10px] tracking-[0.08em] text-white/60 select-text">
             © 2026 DZen Operational Systems. All rights secured.
           </span>
           <div className="flex gap-6">
@@ -221,7 +220,7 @@ export function Footer() {
                   key={item}
                   href="#"
                   onClick={(e) => e.preventDefault()}
-                  className="font-mono text-[10px] tracking-[0.08em] text-stone-500 no-underline transition-colors duration-200 hover:text-stone-300"
+                  className="font-mono text-[10px] tracking-[0.08em] text-white/60 no-underline transition-colors duration-200 hover:text-white"
                 >
                   {item}
                 </a>
@@ -230,17 +229,18 @@ export function Footer() {
           </div>
         </div>
 
-        {/* ── Marquee (no stars, subtle lit state) ─────────── */}
+        {/* ── Marquee (subtle lit state now white) ─────────── */}
         <div
           aria-hidden="true"
-          className="border-t border-stone-900 overflow-hidden py-10 cursor-default select-none"
+          className="border-t border-[rgba(178,213,229,0.1)] overflow-hidden py-10 cursor-default select-none"
         >
           <div className="flex whitespace-nowrap animate-marquee">
             {[...Array(4)].flatMap((_, i) =>
               ["DZen", "Workflow", "Integration", "Enterprise"].map((word) => (
                 <span
                   key={`${i}-${word}`}
-                  className="marquee-item text-[clamp(5rem,10vw,8rem)] font-bold tracking-[-0.03em] text-transparent [-webkit-text-stroke:1px_rgba(216,211,203,0.14)] px-10 transition-all duration-300 [&.lit]:text-stone-100/40 [&.lit]:[-webkit-text-stroke:0px_transparent]"  >
+                  className="marquee-item text-[clamp(5rem,10vw,8rem)] font-bold tracking-[-0.03em] text-transparent [-webkit-text-stroke:1px_rgba(178,213,229,0.14)] px-10 transition-all duration-300 [&.lit]:text-white/40 [&.lit]:[-webkit-text-stroke:0px_transparent]"
+                >
                   {word}
                 </span>
               ))

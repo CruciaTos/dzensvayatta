@@ -75,7 +75,7 @@ export function Hero({ textPosition = { preset: "center" }, className }: HeroPro
         {/* Eyebrow */}
         <motion.p
           className="font-mono uppercase tracking-[0.22em] text-[11px] mb-10"
-          style={{ color: "rgba(178, 213, 229, 0.55)", letterSpacing: "0.22em" }}
+          style={{ color: "white", letterSpacing: "0.22em" }}
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
@@ -139,7 +139,7 @@ export function Hero({ textPosition = { preset: "center" }, className }: HeroPro
           style={{
             fontSize: "17px",
             fontWeight: 300,
-            color: "rgba(178, 213, 229, 0.55)",
+            color: "white",
           }}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -161,14 +161,14 @@ export function Hero({ textPosition = { preset: "center" }, className }: HeroPro
             href="#cta"
             className="font-sans text-[13px] tracking-[0.08em] uppercase px-6 py-3 border transition-colors duration-200"
             style={{
-              color: "#B2D5E5",
-              borderColor: "rgba(178, 213, 229, 0.25)",
+              color: "white",
+              borderColor: "rgba(255, 255, 255, 0.25)",
               backgroundColor: "transparent",
               fontWeight: 400,
             }}
             onMouseEnter={(e) => {
               (e.currentTarget as HTMLAnchorElement).style.backgroundColor =
-                "rgba(178, 213, 229, 0.08)";
+                "rgba(255, 255, 255, 0.08)";
             }}
             onMouseLeave={(e) => {
               (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "transparent";
@@ -180,15 +180,9 @@ export function Hero({ textPosition = { preset: "center" }, className }: HeroPro
             href="#services"
             className="font-sans text-[13px] tracking-[0.08em] uppercase px-6 py-3 transition-colors duration-200"
             style={{
-              color: "rgba(178, 213, 229, 0.55)",
+              color: "white",
               backgroundColor: "transparent",
               fontWeight: 400,
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.color = "#B2D5E5";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.color = "rgba(178, 213, 229, 0.55)";
             }}
           >
             See What We Build →
@@ -216,12 +210,12 @@ export function Hero({ textPosition = { preset: "center" }, className }: HeroPro
       >
         <div
           className="w-[5px] h-[5px] rounded-full animate-pulse"
-          style={{ backgroundColor: "rgba(178, 213, 229, 0.3)" }}
+          style={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}
           aria-hidden="true"
         />
         <span
           className="font-mono text-[10px] tracking-[0.16em] uppercase"
-          style={{ color: "rgba(178, 213, 229, 0.4)" }}
+          style={{ color: "rgba(255, 255, 255, 0.4)" }}
         >
           Scroll to explore
         </span>
