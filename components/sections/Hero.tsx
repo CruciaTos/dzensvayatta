@@ -3,50 +3,19 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
+import { HeroNoirBackground } from "@/components/ui/HeroNoirBackground";
 
 export function Hero() {
   return (
     <section
       id="hero"
       aria-label="DZen hero — Intelligent Workflow Integration"
-      className="min-h-screen flex flex-col justify-end pt-16 relative overflow-hidden hero-noir-bg"
+      className="relative"
     >
-      {/* Fabric / leather fold highlights */}
-      <div className="hero-noir-folds" aria-hidden="true">
-        <div className="hero-noir-fold hero-noir-fold-a" />
-        <div className="hero-noir-fold hero-noir-fold-b" />
-        <div className="hero-noir-fold hero-noir-fold-c" />
-        <div className="hero-noir-fold hero-noir-fold-d" />
-      </div>
-
-      {/* Grid background */}
-      <div
-        className="absolute inset-0 opacity-[0.03] hero-noir-grid pointer-events-none"
-        aria-hidden="true"
-      />
-
-      {/* Noise / grain overlay */}
-      <div
-        className="absolute inset-0 opacity-[0.05] noise-overlay mix-blend-overlay pointer-events-none"
-        aria-hidden="true"
-      />
-
-      {/* Vignette */}
-      <div className="hero-noir-vignette" aria-hidden="true" />
-
+    <HeroNoirBackground className="min-h-screen flex flex-col justify-end pt-16">
       {/* Horizontal rule below nav */}
       <div
         className="absolute top-[120px] left-0 right-0 h-px bg-white/[0.06]"
-        aria-hidden="true"
-      />
-
-      {/* Warm glow */}
-      <div
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[900px] h-[450px] rounded-full pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse at center bottom, rgba(201,169,110,0.16) 0%, transparent 70%)",
-        }}
         aria-hidden="true"
       />
 
@@ -98,9 +67,10 @@ export function Hero() {
           {/* CTA column */}
           <div className="flex flex-col gap-6 items-start">
             <div className="flex gap-3 flex-wrap">
-              <Button as="a" href="#cta" variant="primary" size="md">
+              <Button as="a" href="/discovery" variant="primary" size="md">
                 Request a Discovery Call
               </Button>
+
               <Button
                 as="a"
                 href="#services"
@@ -124,6 +94,7 @@ export function Hero() {
           </div>
         </motion.div>
       </Container>
+    </HeroNoirBackground>
     </section>
   );
 }
