@@ -150,7 +150,7 @@ export function Footer() {
 
       <footer
         ref={footerRef}
-        className="relative bg-[#010b13] border-t border-[rgba(178,213,229,0.1)] overflow-hidden"
+        className="relative bg-[#00080eff] border-t border-[rgba(178,213,229,0.1)] overflow-hidden"
       >
         {/* ── CTA strip ────────────────────────────────────── */}
         <div className="fade-up text-center px-6 py-20 border-b border-[rgba(178,213,229,0.1)]">

@@ -8,10 +8,10 @@ import { FadeIn } from "@/components/ui/FadeIn";
 
 /* ─────────────────────────────────────────────────────────────────────────
    Hero-exact colour tokens
-   #010b13  onyx bg  ·  #B2D5E5 candy blue  ·  #7ec3e2 headline blue
+   #00080eff  onyx bg  ·  #B2D5E5 candy blue  ·  #7ec3e2 headline blue
 ───────────────────────────────────────────────────────────────────────── */
 const C = {
-  bg: "#010b13",
+  bg: "#00080eff",
   bgCard: "#06111a",
   blue: "#B2D5E5",
   blueMid: "#7ec3e2",
@@ -634,10 +634,10 @@ export function CaseStudies() {
             <div>
               <SectionIndex number="04" tag="AI in the Real World" className="mb-6" />
               <h2 className="font-serif text-display-3 font-normal" style={{ color: C.blue }}>
-                AI Integrated systems
+                Think AI is still far away?
                 <br />
                 <em className="not-italic" style={{ color: C.dim }}>
-                  are already at work around you.
+                  Think again.
                 </em>
               </h2>
             </div>

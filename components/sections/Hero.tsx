@@ -40,7 +40,7 @@ export function Hero({ textPosition = { preset: "center" }, className }: HeroPro
       id="hero"
       aria-label="DZen hero — Intelligent Workflow Integration"
       className={`min-h-screen flex flex-col items-start justify-center relative overflow-hidden ${className ?? ""}`}
-      style={{ backgroundColor: "#010b13" }}
+      style={{ backgroundColor: "#00080eff" }}
     >
       {/* DotField interactive background — candy blue dots on onyx */}
       <DotField

@@ -64,7 +64,7 @@ export function Workflow() {
             </div>
             <div className="max-w-[360px] flex-shrink-0">
               <p className="font-sans text-body font-light text-stone-400 leading-[1.7]">
-                
+
               </p>
             </div>
           </div>
@@ -153,7 +153,7 @@ export function Workflow() {
         <FadeIn delay={0.1} className="flex gap-8 mt-16 pt-10 border-t border-border flex-wrap">
           {[
             { accent: false, label: "Existing systems — unchanged" },
-            { accent: true,  label: "DZen intelligence layer"   },
+            { accent: true, label: "DZen intelligence layer" },
             { accent: false, label: "Automated outputs — measurable outcomes" },
           ].map(({ accent, label }) => (
             <div key={label} className="flex items-center gap-[10px]">
