@@ -1,29 +1,35 @@
+/* ─── Third-party imports ──────────────────────────────── */
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+
+/* ─── Tailwind directives ──────────────────────────────── */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Custom Selection ─────────────────────────────────────── */
+/* ─── Custom Selection ─────────────────────────────────── */
 ::selection {
-  background: #8F7860;
-  color: #FAFAF8;
+  background: #8f7860;
+  color: #fafaf8;
 }
 
+/* ─── Scrollbar (thin) ────────────────────────────────── */
 .scrollbar-thin::-webkit-scrollbar {
   height: 2px;
   background: rgba(216, 211, 203, 0.08);
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: #8F7860;
+  background: #8f7860;
 }
 
+/* ─── Noise texture overlay ───────────────────────────── */
 .noise-overlay {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
   background-size: 256px;
 }
 
+/* ─── Hero grid background ────────────────────────────── */
 .hero-grid-bg {
   background-image:
     linear-gradient(rgba(216, 211, 203, 0.08) 1px, transparent 1px),
@@ -31,7 +37,7 @@
   background-size: 80px 80px;
 }
 
-/* ─── Hero "noir fabric" background ───────────────────────── */
+/* ─── Hero "noir fabric" background ───────────────────── */
 .hero-noir-bg {
   background-color: #0c0a08;
   background-image:
@@ -60,7 +66,7 @@
   height: 150%;
   top: -25%;
   right: -8%;
-  background: linear-gradient(140deg, rgba(201, 160, 106, 0.30), rgba(120, 86, 52, 0.08) 55%, transparent 75%);
+  background: linear-gradient(140deg, rgba(201, 160, 106, 0.3), rgba(120, 86, 52, 0.08) 55%, transparent 75%);
   transform: rotate(-14deg);
 }
 
@@ -87,7 +93,7 @@
   height: 90%;
   top: 35%;
   left: 18%;
-  background: linear-gradient(140deg, rgba(64, 44, 28, 0.30), transparent 60%);
+  background: linear-gradient(140deg, rgba(64, 44, 28, 0.3), transparent 60%);
   transform: rotate(-26deg);
 }
 
@@ -105,6 +111,29 @@
   background-size: 80px 80px;
 }
 
+/* ─── Lenis Smooth Scroll ─────────────────────────────── */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* ─── Shadcn / Theme Layer ────────────────────────────── */
 @layer base {
   .theme {
     --font-heading: var(--font-sans);

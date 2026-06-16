@@ -1,12 +1,16 @@
 import type { ReactNode } from "react";
-import { DM_Sans, DM_Serif_Display, IBM_Plex_Mono, Noto_Sans_Devanagari, Geist } from "next/font/google";
+import { Geist, DM_Serif_Display, IBM_Plex_Mono, Noto_Sans_Devanagari } from "next/font/google";
 import localFont from "next/font/local";
 import { siteMetadata, structuredData } from "@/lib/metadata";
-import "@/app/globals.css";
+import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import { cn } from "@/lib/utils";
+import "@/app/globals.css";
 
 // ─── Font loading ─────────────────────────────────────────────────────────────
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
 
 const dmSerifDisplay = DM_Serif_Display({
   subsets: ["latin"],
@@ -44,7 +48,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className={cn(dmSerifDisplay.variable, ibmPlexMono.variable, zaslia.variable, devanagariFont.variable, "font-sans", geist.variable)}
+      className={cn(
+        geist.variable,
+        dmSerifDisplay.variable,
+        ibmPlexMono.variable,
+        zaslia.variable,
+        devanagariFont.variable,
+        "font-sans"
+      )}
     >
       <head>
         <script
@@ -57,7 +68,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body className="bg-bg-primary text-stone-100 font-sans font-light leading-relaxed overflow-x-hidden antialiased">
-        {children}
+        <SmoothScroll>
+          {children}
+        </SmoothScroll>
       </body>
     </html>
   );

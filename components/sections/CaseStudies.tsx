@@ -20,14 +20,14 @@ const C = {
   borderHi: "rgba(178,213,229,0.22)",
   dim: "rgba(178,213,229,0.55)",
   faint: "rgba(178,213,229,0.32)",
-  ghost: "rgba(178,213,229,0.017)",
+  ghost: "rgba(178,213,229,0.018)",
 } as const;
 
 const SPRING = "cubic-bezier(0.22,1,0.36,1)";
 const EASE_FM = [0.22, 1, 0.36, 1] as const;
 
 /* ─────────────────────────────────────────────────────────────────────────
-   Data — unchanged
+   Data
 ───────────────────────────────────────────────────────────────────────── */
 interface CaseMetric { value: string; label: string }
 interface RealCase {
@@ -42,8 +42,8 @@ const CASES: RealCase[] = [
     org: "BMC Mumbai",
     tag: "Municipal AI Enforcement",
     domain: "Infrastructure · Governance",
-    headline: "₹19.25 Cr in contractor penalties recovered via AI-based site monitoring.",
-    body: "Mumbai's Brihanmumbai Municipal Corporation deployed an AI monitoring system to oversee pre-monsoon drain-cleaning works citywide. The system detected reuse of uploaded images, missing unloading videos, vehicle-code mismatches, and irregularities in silt disposal — violations that previously went unnoticed. Physical inspections confirmed inadequate manpower, absent safety gear, and delayed completions. Penalties of ₹19.25 crore were recovered directly from contractors' pending bills.",
+    headline: "₹19.25 Cr in contractor penalties recovered via AI site monitoring.",
+    body: "AI detected image reuse, missing videos, and code mismatches — violations that previously went unnoticed. Penalties were deducted directly from contractor bills.",
     metrics: [
       { value: "₹19.25Cr", label: "Penalties enforced" },
       { value: "Real-time", label: "AI site monitoring" },
@@ -58,7 +58,7 @@ const CASES: RealCase[] = [
     tag: "Law Enforcement AI",
     domain: "Public Safety · Child Protection",
     headline: "India's first AI system tracks CSAM perpetrators across the dark web.",
-    body: "Kerala Police became the first law enforcement agency in India to deploy AI specifically against child sexual abuse material online. The tool — Katalyst — sifts through vast digital evidence, cross-references victim signatures across platforms, and tracks perpetrators across social media. Evidence review that previously took weeks now takes hours, enabling faster victim identification and timely intervention.",
+    body: "Katalyst cross‑references victim signatures in hours, not weeks, enabling faster identification and intervention.",
     metrics: [
       { value: "#1", label: "First in India" },
       { value: "Hours", label: "vs. Weeks (manual)" },
@@ -73,7 +73,7 @@ const CASES: RealCase[] = [
     tag: "Biometric AI Systems",
     domain: "Border Control · Government",
     headline: "Airport immigration: 30 minutes down to 15 seconds with AI biometrics.",
-    body: "Fast Track Immigration programs at major Indian airports deploy AI-driven facial recognition and fingerprint scanners to automate border crossings entirely. Travelers bypass human officers — scanning passport, stepping through a biometric gate, and receiving automated clearance against government databases in real-time. No queues. No manual stamps. No intervention required. Fifteen seconds.",
+    body: "Travellers bypass officers — facial recognition and fingerprint scanners clear them in 15 seconds against government databases.",
     metrics: [
       { value: "15s", label: "Clearance time" },
       { value: "120×", label: "Faster than manual" },
@@ -115,7 +115,8 @@ function CaseCard({
     <div
       onMouseEnter={onEnter}
       style={{
-        flex: isActive ? 2.65 : isCompressed ? 0.62 : 1,
+        /* ── Flex ratio: active wider, compressed tighter ── */
+        flex: isActive ? 2.9 : isCompressed ? 0.55 : 1,
         transition: `flex 0.60s ${SPRING}, border-color 0.35s ease`,
         position: "relative",
         overflow: "hidden",
@@ -139,13 +140,13 @@ function CaseCard({
         }}
       />
 
-      {/* Ghost number */}
+      {/* Ghost number — larger, pushed further off-edge for drama */}
       <div
         aria-hidden
         style={{
           position: "absolute",
-          bottom: "-28px", right: "-6px",
-          fontSize: "clamp(100px,13vw,200px)",
+          bottom: "-44px", right: "-10px",
+          fontSize: "clamp(130px,15vw,240px)",
           color: C.ghost,
           fontFamily: "serif",
           lineHeight: 1,
@@ -157,10 +158,10 @@ function CaseCard({
         {c.id}
       </div>
 
-      {/* Left accent bar */}
+      {/* Left accent bar — 3px for more presence */}
       <div
         style={{
-          position: "absolute", left: 0, top: 0, bottom: 0, width: "2px",
+          position: "absolute", left: 0, top: 0, bottom: 0, width: "3px",
           backgroundColor: isActive ? c.accent : `${c.accent}40`,
           transition: "background-color 0.42s ease",
         }}
@@ -172,7 +173,7 @@ function CaseCard({
           position: "absolute", inset: 0, pointerEvents: "none",
           opacity: isActive ? 1 : 0,
           transition: "opacity 0.5s ease",
-          background: `radial-gradient(ellipse at top left, ${c.accent}0C 0%, transparent 58%)`,
+          background: `radial-gradient(ellipse at top left, ${c.accent}0D 0%, transparent 58%)`,
         }}
       />
 
@@ -180,24 +181,26 @@ function CaseCard({
       <div
         style={{
           position: "absolute", inset: 0,
-          padding: "36px 30px 36px 36px",
+          /* ── Padding on 8px grid: 48 top/bottom, 40 right, 48 left ── */
+          padding: "48px 40px 48px 48px",
           display: "flex", flexDirection: "column",
           opacity: isCompressed ? 0 : 1,
           transition: "opacity 0.28s ease",
           pointerEvents: isCompressed ? "none" : "auto",
           zIndex: 1,
-          overflowY: isActive ? "auto" : "hidden",
+          overflow: "hidden",
         }}
       >
         {/* Tag row */}
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "24px", flexWrap: "wrap" }}>
           <span
             className="font-mono"
             style={{
-              fontSize: "9px",
+              fontSize: "9.5px",
               letterSpacing: "0.18em",
               textTransform: "uppercase",
-              padding: "4px 10px",
+              /* ── Tag badge: slightly more generous padding ── */
+              padding: "5px 12px",
               border: `1px solid ${c.accent}38`,
               backgroundColor: `${c.accent}0D`,
               color: c.accent,
@@ -208,7 +211,7 @@ function CaseCard({
           <span
             className="font-mono"
             style={{
-              fontSize: "9px",
+              fontSize: "9.5px",
               letterSpacing: "0.12em",
               textTransform: "uppercase",
               color: C.faint,
@@ -218,7 +221,7 @@ function CaseCard({
           </span>
         </div>
 
-        {/* Org */}
+        {/* Org label */}
         <div
           className="font-mono"
           style={{
@@ -226,22 +229,22 @@ function CaseCard({
             letterSpacing: "0.22em",
             textTransform: "uppercase",
             color: C.dim,
-            marginBottom: "10px",
+            marginBottom: "12px",
           }}
         >
           {c.org}
         </div>
 
-        {/* Headline — always visible */}
+        {/* Headline — larger clamp for more impact */}
         <h3
           className="font-serif"
           style={{
-            fontSize: "clamp(15px, 1.65vw, 22px)",
+            fontSize: "clamp(20px, 2.5vw, 36px)",
             fontWeight: 400,
             color: C.blue,
-            lineHeight: 1.22,
-            letterSpacing: "-0.02em",
-            maxWidth: "480px",
+            lineHeight: 1.2,
+            letterSpacing: "-0.025em",
+            maxWidth: "520px",
             margin: 0,
           }}
         >
@@ -256,32 +259,32 @@ function CaseCard({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
               transition={{ duration: 0.42, ease: EASE_FM }}
-              style={{ marginTop: "22px", flex: 1, display: "flex", flexDirection: "column" } as CSSProperties}
+              style={{ marginTop: "28px", flex: 1, display: "flex", flexDirection: "column" } as CSSProperties}
             >
               {/* Rule */}
-              <div style={{ height: "1px", backgroundColor: C.border, marginBottom: "18px" }} />
+              <div style={{ height: "1px", backgroundColor: C.border, marginBottom: "24px" }} />
 
-              {/* Body */}
+              {/* Body text — 14px for better readability */}
               <p
                 className="font-sans"
                 style={{
-                  fontSize: "13.5px",
+                  fontSize: "14px",
                   fontWeight: 300,
                   color: C.dim,
-                  lineHeight: 1.82,
-                  marginBottom: "24px",
-                  maxWidth: "500px",
+                  lineHeight: 1.75,
+                  marginBottom: "28px",
+                  maxWidth: "520px",
                 }}
               >
                 {c.body}
               </p>
 
-              {/* Metrics strip */}
+              {/* Metrics strip — hero-sized numbers */}
               <div
                 style={{
                   display: "flex",
                   border: `1px solid ${C.border}`,
-                  marginBottom: "20px",
+                  marginBottom: "24px",
                 }}
               >
                 {c.metrics.map((m, i) => (
@@ -289,19 +292,21 @@ function CaseCard({
                     key={i}
                     style={{
                       flex: 1,
-                      padding: "14px 16px",
+                      /* ── More generous metric cell: 20px top/bottom, 22px sides ── */
+                      padding: "20px 22px",
                       borderLeft: i > 0 ? `1px solid ${C.border}` : "none",
                     }}
                   >
+                    {/* ── Metric value: display-scale numbers, like Linear/Vercel ── */}
                     <div
                       className="font-serif"
                       style={{
-                        fontSize: "clamp(13px, 1.5vw, 20px)",
+                        fontSize: "clamp(24px, 2.8vw, 36px)",
                         fontWeight: 400,
                         color: c.accent,
                         lineHeight: 1,
-                        letterSpacing: "-0.025em",
-                        marginBottom: "5px",
+                        letterSpacing: "-0.03em",
+                        marginBottom: "8px",
                       }}
                     >
                       {m.value}
@@ -309,7 +314,7 @@ function CaseCard({
                     <div
                       className="font-mono"
                       style={{
-                        fontSize: "8px",
+                        fontSize: "9px",
                         letterSpacing: "0.14em",
                         textTransform: "uppercase",
                         color: C.faint,
@@ -323,9 +328,9 @@ function CaseCard({
               </div>
 
               {/* Source citation */}
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "auto" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "auto" }}>
                 <div
-                  style={{ width: "18px", height: "1px", backgroundColor: c.accent, flexShrink: 0 }}
+                  style={{ width: "20px", height: "1px", backgroundColor: c.accent, flexShrink: 0 }}
                 />
                 <span
                   className="font-mono"
@@ -405,10 +410,10 @@ function MobileCard({ c }: { c: RealCase }) {
         cursor: "pointer",
       }}
     >
-      {/* Left accent bar */}
+      {/* Left accent bar — 3px to match desktop */}
       <div
         style={{
-          position: "absolute", left: 0, top: 0, bottom: 0, width: "2px",
+          position: "absolute", left: 0, top: 0, bottom: 0, width: "3px",
           backgroundColor: open ? c.accent : `${c.accent}40`,
           transition: "background-color 0.4s ease",
         }}
@@ -418,8 +423,8 @@ function MobileCard({ c }: { c: RealCase }) {
       <div
         aria-hidden
         style={{
-          position: "absolute", bottom: "-12px", right: "-4px",
-          fontSize: "clamp(80px,22vw,130px)",
+          position: "absolute", bottom: "-16px", right: "-6px",
+          fontSize: "clamp(90px,24vw,140px)",
           color: C.ghost, fontFamily: "serif", lineHeight: 1,
           letterSpacing: "-0.05em", pointerEvents: "none", userSelect: "none",
         }}
@@ -433,18 +438,19 @@ function MobileCard({ c }: { c: RealCase }) {
           position: "absolute", inset: 0, pointerEvents: "none",
           opacity: open ? 1 : 0,
           transition: "opacity 0.45s ease",
-          background: `radial-gradient(ellipse at top left, ${c.accent}0C 0%, transparent 55%)`,
+          background: `radial-gradient(ellipse at top left, ${c.accent}0D 0%, transparent 55%)`,
         }}
       />
 
-      <div style={{ padding: "26px 22px 26px 28px", position: "relative", zIndex: 1 }}>
+      {/* ── Mobile card content: 8px-grid padding ── */}
+      <div style={{ padding: "32px 24px 32px 32px", position: "relative", zIndex: 1 }}>
         {/* Tag row */}
-        <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "14px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "16px", flexWrap: "wrap" }}>
           <span
             className="font-mono"
             style={{
-              fontSize: "9px", letterSpacing: "0.18em", textTransform: "uppercase",
-              padding: "4px 10px",
+              fontSize: "9.5px", letterSpacing: "0.18em", textTransform: "uppercase",
+              padding: "5px 12px",
               border: `1px solid ${c.accent}38`,
               backgroundColor: `${c.accent}0D`,
               color: c.accent,
@@ -455,7 +461,7 @@ function MobileCard({ c }: { c: RealCase }) {
           <span
             className="font-mono"
             style={{
-              fontSize: "9px", letterSpacing: "0.12em",
+              fontSize: "9.5px", letterSpacing: "0.12em",
               textTransform: "uppercase", color: C.faint,
             }}
           >
@@ -468,31 +474,33 @@ function MobileCard({ c }: { c: RealCase }) {
           className="font-mono"
           style={{
             fontSize: "10px", letterSpacing: "0.22em",
-            textTransform: "uppercase", color: C.dim, marginBottom: "8px",
+            textTransform: "uppercase", color: C.dim, marginBottom: "10px",
           }}
         >
           {c.org}
         </div>
 
-        {/* Headline + toggle button */}
+        {/* Headline — slightly larger clamp */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
           <h3
             className="font-serif"
             style={{
-              fontSize: "clamp(16px, 4.5vw, 21px)",
+              fontSize: "clamp(20px, 5.5vw, 28px)",
               fontWeight: 400, color: C.blue,
-              lineHeight: 1.22, letterSpacing: "-0.02em",
+              lineHeight: 1.2, letterSpacing: "-0.025em",
               flex: 1, margin: 0,
             }}
           >
             {c.headline}
           </h3>
+
+          {/* Toggle button — 28px for better touch target */}
           <div
             style={{
-              flexShrink: 0, width: 24, height: 24,
+              flexShrink: 0, width: 28, height: 28,
               border: `1px solid ${open ? C.borderHi : C.border}`,
               display: "flex", alignItems: "center", justifyContent: "center",
-              marginTop: "2px",
+              marginTop: "3px",
               transition: `transform 0.38s ${SPRING}, border-color 0.3s ease`,
               transform: open ? "rotate(45deg)" : "none",
             }}
@@ -501,7 +509,7 @@ function MobileCard({ c }: { c: RealCase }) {
               className="font-mono"
               style={{
                 color: open ? C.blue : C.faint,
-                fontSize: "16px", lineHeight: 1,
+                fontSize: "17px", lineHeight: 1,
                 transition: "color 0.3s ease",
               }}
             >
@@ -520,37 +528,38 @@ function MobileCard({ c }: { c: RealCase }) {
               transition={{ duration: 0.42, ease: EASE_FM }}
               style={{ overflow: "hidden" } as CSSProperties}
             >
-              <div style={{ paddingTop: "18px" }}>
-                <div style={{ height: "1px", backgroundColor: C.border, marginBottom: "16px" }} />
+              <div style={{ paddingTop: "20px" }}>
+                <div style={{ height: "1px", backgroundColor: C.border, marginBottom: "20px" }} />
 
+                {/* Body */}
                 <p
                   className="font-sans"
                   style={{
-                    fontSize: "13.5px", fontWeight: 300,
-                    color: C.dim, lineHeight: 1.8,
-                    marginBottom: "18px",
+                    fontSize: "14px", fontWeight: 300,
+                    color: C.dim, lineHeight: 1.75,
+                    marginBottom: "20px",
                   }}
                 >
                   {c.body}
                 </p>
 
-                {/* Metrics */}
-                <div style={{ display: "flex", border: `1px solid ${C.border}`, marginBottom: "16px" }}>
+                {/* Metrics — hero numbers on mobile too */}
+                <div style={{ display: "flex", border: `1px solid ${C.border}`, marginBottom: "20px" }}>
                   {c.metrics.map((m, i) => (
                     <div
                       key={i}
                       style={{
-                        flex: 1, padding: "12px 12px",
+                        flex: 1, padding: "16px 14px",
                         borderLeft: i > 0 ? `1px solid ${C.border}` : "none",
                       }}
                     >
                       <div
                         className="font-serif"
                         style={{
-                          fontSize: "clamp(12px,4vw,18px)",
+                          fontSize: "clamp(20px, 5vw, 28px)",
                           fontWeight: 400, color: c.accent,
-                          lineHeight: 1, letterSpacing: "-0.025em",
-                          marginBottom: "4px",
+                          lineHeight: 1, letterSpacing: "-0.03em",
+                          marginBottom: "6px",
                         }}
                       >
                         {m.value}
@@ -558,7 +567,7 @@ function MobileCard({ c }: { c: RealCase }) {
                       <div
                         className="font-mono"
                         style={{
-                          fontSize: "7.5px", letterSpacing: "0.12em",
+                          fontSize: "8px", letterSpacing: "0.12em",
                           textTransform: "uppercase", color: C.faint, lineHeight: 1.5,
                         }}
                       >
@@ -569,8 +578,8 @@ function MobileCard({ c }: { c: RealCase }) {
                 </div>
 
                 {/* Source */}
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <div style={{ width: "18px", height: "1px", backgroundColor: c.accent, flexShrink: 0 }} />
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <div style={{ width: "20px", height: "1px", backgroundColor: c.accent, flexShrink: 0 }} />
                   <span
                     className="font-mono"
                     style={{
@@ -621,14 +630,14 @@ export function CaseStudies() {
       <Container>
         {/* ── Section header ── */}
         <FadeIn>
-          <div className="flex items-end justify-between mb-6 gap-12 max-md:flex-col max-md:items-start">
+          <div className="flex items-end justify-between mb-8 gap-12 max-md:flex-col max-md:items-start">
             <div>
               <SectionIndex number="04" tag="AI in the Real World" className="mb-6" />
               <h2 className="font-serif text-display-3 font-normal" style={{ color: C.blue }}>
-                AI Integration
+                AI Integrated systems
                 <br />
                 <em className="not-italic" style={{ color: C.dim }}>
-                  is closer than you think
+                  are already at work around you.
                 </em>
               </h2>
             </div>
@@ -637,9 +646,6 @@ export function CaseStudies() {
                 className="font-sans text-body font-light leading-[1.7]"
                 style={{ color: C.dim }}
               >
-                AI integration is moving faster than most organisations realise.
-                These are production systems — built on real data, deployed in
-                critical workflows, delivering measurable outcomes today.
               </p>
             </div>
           </div>
@@ -647,7 +653,7 @@ export function CaseStudies() {
 
         {/* ── Animated separator ── */}
         <FadeIn delay={0.15}>
-          <div className="flex items-center gap-3 mb-12">
+          <div className="flex items-center gap-3 mb-14">
             <div className="flex items-center gap-1.5">
               <PulseDot delay={0} />
               <PulseDot delay={0.4} />
@@ -663,11 +669,11 @@ export function CaseStudies() {
           </div>
         </FadeIn>
 
-        {/* ── Desktop: horizontal expandable cards ── */}
+        {/* ── Desktop: horizontal expandable cards — taller ── */}
         <FadeIn delay={0.2}>
           <div
             className="hidden md:flex gap-[1px]"
-            style={{ height: "clamp(520px,56vh,640px)" }}
+            style={{ height: "clamp(620px,64vh,760px)" }}
             onMouseLeave={() => setActiveId(null)}
           >
             {CASES.map((c) => (
@@ -692,7 +698,7 @@ export function CaseStudies() {
         {/* ── Footer provenance ── */}
         <FadeIn delay={0.25}>
           <div
-            className="flex items-center gap-6 mt-14 pt-10 flex-wrap"
+            className="flex items-center gap-6 mt-16 pt-12 flex-wrap"
             style={{ borderTop: `1px solid ${C.border}` }}
           >
             <div className="flex items-center gap-[10px]">

@@ -1,20 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Container } from "@/components/ui/Container";
 import { SectionIndex } from "@/components/ui/SectionIndex";
 import { FadeIn } from "@/components/ui/FadeIn";
+import { LogoLoop, type LogoItem } from "@/components/LogoLoop";
+
+
+
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   LOGO SOURCES
-   ─────────────────────────────────────────────────────────────────────────────
-   • SI(slug)  → Simple Icons CDN (mono SVGs — coloured via fill injection)
-   • DV(name)  → Devicons CDN    (full-colour SVGs — rendered as-is)
-   • Inline    → SVG string      (for brands missing from both CDNs)
-
-   ✅ TO SWAP IN YOUR OWN FILES
-      Set  src: "/logos/brand.svg"  and  colorize: false  for full-colour images.
-      Set  src: "/logos/brand.svg"  and  monoColor: "#hex"  for mono/black logos.
+   SVG logo definitions — inline, brand-accurate, original aspect ratios
 ───────────────────────────────────────────────────────────────────────────── */
 
 function SAPLogo() {
@@ -376,20 +371,13 @@ function AtlassianLogo() {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Logo registry
+   Logo set
 ───────────────────────────────────────────────────────────────────────────── */
 
 interface LogoEntry {
   id: string;
   label: string;
-  /** CDN URL (SI / DV) or omit if using inlineSvg */
-  src?: string;
-  /** Raw SVG string for brands not in any CDN */
-  inlineSvg?: string;
-  /** Hex colour to inject as fill into a mono (black) Simple Icons SVG */
-  monoColor?: string;
-  /** Inline React component for the logo (optional, for future use) */
-  component?: React.ComponentType;
+  component: React.FC;
 }
 
 const LOGOS: LogoEntry[] = [
@@ -431,177 +419,91 @@ const LOGOS: LogoEntry[] = [
 ];
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   LogoImg
-   ────────────────────────────────────────────────────────────────────────────
-   Three render paths:
-   1. inlineSvg  → dangerouslySetInnerHTML (full-colour, no fetch)
-   2. src + monoColor → fetch SVG text, inject fill="#hex", render as data-URI
-   3. src only   → plain <img> (Devicons full-colour)
+   Build LogoItem array once at module level — avoids re-creating React
+   elements on every render. Each logo is wrapped in a styled div that
+   preserves the existing opacity-40 / hover:opacity-90 treatment.
 ───────────────────────────────────────────────────────────────────────────── */
 
-function LogoImg({ logo }: { logo: LogoEntry }) {
-  const [coloured, setColoured] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!logo.src || !logo.monoColor) return;
-    let cancelled = false;
-
-    fetch(logo.src)
-      .then((r) => r.text())
-      .then((text) => {
-        if (cancelled) return;
-        const filled = text.replace(/<svg /, `<svg fill="${logo.monoColor}" `);
-        setColoured(
-          "data:image/svg+xml;charset=utf-8," + encodeURIComponent(filled)
-        );
-      })
-      .catch(() => {
-        if (!cancelled) setColoured(logo.src ?? null);
-      });
-
-    return () => { cancelled = true; };
-  }, [logo.src, logo.monoColor]);
-
-  const imgStyle: React.CSSProperties = {
-    width: "100%",
-    height: "100%",
-    objectFit: "contain",
-    display: "block",
-    userSelect: "none",
-  };
-
-  // Path 1 — inline SVG (no fetch needed, full-colour)
-  if (logo.inlineSvg) {
-    return (
+const LOGO_ITEMS: LogoItem[] = LOGOS.map((logo) => {
+  const Logo = logo.component;
+  return {
+    node: (
       <div
-        aria-label={logo.label}
-        style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}
-        dangerouslySetInnerHTML={{ __html: logo.inlineSvg }}
-      />
-    );
-  }
-
-  // Path 2 — mono SVG with injected colour
-  if (logo.monoColor) {
-    const src = coloured ?? logo.src;
-    return src ? <img src={src} alt={logo.label} draggable={false} style={imgStyle} /> : null;
-  }
-
-  // Path 3 — full-colour CDN image
-  return logo.src ? (
-    <img src={logo.src} alt={logo.label} draggable={false} style={imgStyle} />
-  ) : null;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   Marquee animation
-───────────────────────────────────────────────────────────────────────────── */
-
-const MARQUEE_STYLES = `
-  @keyframes dzen-marquee {
-    0%   { transform: translateX(0); }
-    100% { transform: translateX(calc(-100% / 3)); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .dzen-marquee-track { animation: none !important; }
-  }
-`;
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   MarqueeTrack
-───────────────────────────────────────────────────────────────────────────── */
-
-function MarqueeTrack() {
-  const set = [...LOGOS, ...LOGOS, ...LOGOS];
-
-  return (
-    <div className="group overflow-hidden">
-      <div
-        className="dzen-marquee-track flex w-max items-center group-hover:[animation-play-state:paused]"
-        style={{ animation: "dzen-marquee 80s linear infinite", willChange: "transform" }}
+        className="flex-shrink-0 flex items-center justify-center px-11 opacity-40 hover:opacity-90 transition-opacity duration-300 [&>svg]:h-20 [&>svg]:w-auto"
+        title={logo.label}
       >
-        {set.map((logo, i) => (
-          <div
-            key={`${logo.id}-${i}`}
-            className="flex-shrink-0 flex flex-col items-center justify-center gap-2"
-            style={{ padding: "0 28px", minWidth: "88px" }}
-            title={logo.label}
-            aria-label={logo.label}
-          >
-            <div
-              style={{
-                width: 44,
-                height: 44,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-              }}
-            >
-              <LogoImg logo={logo} />
-            </div>
-            <span
-              style={{
-                fontSize: "11px",
-                fontWeight: 500,
-                color: "var(--color-text-secondary, #9ca3af)",
-                whiteSpace: "nowrap",
-                letterSpacing: "0.01em",
-              }}
-            >
-              {logo.label}
-            </span>
-          </div>
-        ))}
+        <Logo />
       </div>
-    </div>
-  );
-}
+    ),
+    title: logo.label,
+    ariaLabel: logo.label,
+  };
+});
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   IntegrationLogoMarquee — public API unchanged
+   IntegrationLogoMarquee — drop-in replacement for the old CSS-animation
+   version. Accepts the same maxWidth / bleed / fade props; edge fade is
+   handled by the outer CSS mask (background-agnostic), while LogoLoop
+   drives the RAF animation with smooth velocity easing + pause-on-hover.
 ───────────────────────────────────────────────────────────────────────────── */
 
 interface IntegrationLogoMarqueeProps {
+  /** Max width of the visible marquee viewport. */
   maxWidth?: number | string;
+  /** Pixels to extend the marquee beyond the container on both sides. */
   bleed?: number;
+  /** Percentage used for the left/right CSS mask fade. */
   fade?: number;
+  /** Scroll speed in px/s. Default 80. */
+  speed?: number;
 }
 
 export function IntegrationLogoMarquee({
   maxWidth = "100%",
   bleed = 0,
-  fade = 12,
+  fade = 15,
+  speed = 80,
 }: IntegrationLogoMarqueeProps) {
   const safeBleed = Math.max(0, bleed);
   const safeFade = Math.min(Math.max(fade, 0), 49);
-  const resolvedMaxWidth = typeof maxWidth === "number" ? `${maxWidth}px` : maxWidth;
+  const resolvedMaxWidth =
+    typeof maxWidth === "number" ? `${maxWidth}px` : maxWidth;
 
   return (
-    <>
-      <style>{MARQUEE_STYLES}</style>
-      <Container className="overflow-visible !px-0">
-        <div
-          className="relative overflow-hidden py-4"
-          style={{
-            width: `calc(100% + ${safeBleed * 2}px)`,
-            maxWidth: `calc(${resolvedMaxWidth} + ${safeBleed * 2}px)`,
-            marginLeft: `-${safeBleed}px`,
-            marginRight: `-${safeBleed}px`,
-            marginInline: safeBleed === 0 ? "auto" : undefined,
-            WebkitMaskImage: `linear-gradient(to right, transparent, black ${safeFade}%, black ${100 - safeFade}%, transparent)`,
-            maskImage: `linear-gradient(to right, transparent, black ${safeFade}%, black ${100 - safeFade}%, transparent)`,
-          }}
-        >
-          <MarqueeTrack />
-        </div>
-      </Container>
-    </>
+    <Container className="overflow-visible !px-0">
+      <div
+        className="relative overflow-hidden py-5"
+        style={{
+          width: `calc(100% + ${safeBleed * 2}px)`,
+          maxWidth: `calc(${resolvedMaxWidth} + ${safeBleed * 2}px)`,
+          marginLeft: `-${safeBleed}px`,
+          marginRight: `-${safeBleed}px`,
+          marginInline: safeBleed === 0 ? "auto" : undefined,
+          /* CSS mask for edge fade — background-colour agnostic */
+          WebkitMaskImage: `linear-gradient(to right, transparent, black ${safeFade}%, black ${100 - safeFade}%, transparent)`,
+          maskImage: `linear-gradient(to right, transparent, black ${safeFade}%, black ${100 - safeFade}%, transparent)`,
+        }}
+      >
+        <LogoLoop
+          logos={LOGO_ITEMS}
+          speed={speed}
+          direction="left"
+          pauseOnHover
+          /* gap=0 because horizontal spacing lives inside each node's px-8 */
+          gap={0}
+          /* logoHeight only affects font-size on the li; actual SVG size
+             is controlled by [&>svg]:h-20 inside each node */
+          logoHeight={80}
+          width="100%"
+          ariaLabel="Integration partner logos"
+        />
+      </div>
+    </Container>
   );
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Page section — unchanged
+   IntegrationMarquee section — unchanged public API
 ───────────────────────────────────────────────────────────────────────────── */
 
 export function IntegrationMarquee() {
@@ -609,13 +511,13 @@ export function IntegrationMarquee() {
     <section
       id="integrations"
       aria-label="Systems we connect"
-      className="py-[100px] bg-bg-secondary border-t border-border overflow-hidden"
+      className="py-[80px] bg-bg-secondary border-t border-border overflow-hidden"
     >
-      <Container className="mb-14">
+      <Container className="mb-12">
         <FadeIn>
           <SectionIndex number="05" tag="Integration Catalogue" className="mb-4" />
           <p className="font-sans text-body font-light text-stone-400 leading-[1.7] max-w-[440px]">
-            Pre-built connectors across every major platform — from social and AI tools to enterprise data.
+            Pre-built connectors across every major enterprise platform.
           </p>
         </FadeIn>
       </Container>

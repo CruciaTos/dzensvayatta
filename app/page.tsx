@@ -2,32 +2,40 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/components/sections/Hero";
 import { Ticker } from "@/components/sections/Ticker";
-import { TargetAreas } from "@/components/sections/TargetAreas";
+import { Credibility } from "@/components/sections/Credibility";
+import { TargetMarkets } from "@/components/sections/TargetMarkets";
+import { Workflow } from "@/components/sections/Workflow";
 import { CapabilitiesSection } from "@/components/sections/CapabilitiesSection";
-import { Systems } from "@/components/sections/Systems";
 import { CaseStudies } from "@/components/sections/CaseStudies";
-import { GrowthImpact } from "@/components/sections/GrowthImpact";
-import { OptimisationComparison } from "@/components/sections/OptimisationComparison";
-import { Contact } from "@/components/sections/Contact";
+import { Systems } from "@/components/sections/Systems";
+import { Process } from "@/components/sections/Process";
+import { Testimonials } from "@/components/sections/Testimonials";
+import { Security } from "@/components/sections/Security";
+import { CTA } from "@/components/sections/CTA";
+
 
 export default function HomePage() {
+
   return (
     <>
       <Navbar />
 
       <main id="main-content">
-        <Hero />                    {/* 1. Hero Page */}
+        <Hero />
         <Ticker />
-        <TargetAreas />             {/* 2. Areas we can target */}
-        <CapabilitiesSection />     {/* 3. Methodology (6 Phase) */}
-        <Systems />                 {/* 4. Connected Systems */}
-        <CaseStudies />             {/* 5. Case Studies / Project Demos */}
-        <GrowthImpact />
-        <OptimisationComparison />  {/* 6. Optimisation Comparison Chart */}
-        <Contact />                 {/* 7. Contact Info */}
+        <Credibility />
+        <TargetMarkets />
+        <Systems />
+        <CapabilitiesSection />
+        <CaseStudies />
+        <Workflow />
+        <Process />
+        <Testimonials />
+        <Security />
+        <CTA />
       </main>
 
-      <Footer />                    {/* 8. Footer */}
+      <Footer />
     </>
   );
 }

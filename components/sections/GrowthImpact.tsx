@@ -300,7 +300,7 @@ function ComparisonChart() {
       <Eyebrow>Side-by-Side Impact</Eyebrow>
       <h3 style={{
         color: C.white,
-        fontSize: "clamp(18px,2vw,26px)",
+        fontSize: "clamp(22px, 2.8vw, 50px)",
         fontFamily: "var(--font-serif)",
         fontWeight: 400,
         letterSpacing: "-0.02em",

@@ -80,7 +80,7 @@ export function Hero({ textPosition = { preset: "center" }, className }: HeroPro
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
         >
-          One of India's First Agentic Integration Company
+
         </motion.p>
 
         {/* Headline — no longer shifted right */}
