@@ -1,8 +1,6 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { Hero } from "@/components/sections/Hero";
-import { Ticker } from "@/components/sections/Ticker";
-import { TargetMarkets } from "@/components/sections/TargetMarkets";
+import { HeroSlideTransition } from "@/components/sections/HeroSlideTransition";
 import { CapabilitiesSection } from "@/components/sections/CapabilitiesSection";
 import { Systems } from "@/components/sections/Systems";
 import { CaseStudies } from "@/components/sections/CaseStudies";
@@ -16,10 +14,10 @@ export default function HomePage() {
       <Navbar />
 
       <main id="main-content">
-        <Hero />                    {/* 1. Hero Page */}
-        <Ticker />
+        {/* Hero + PPT-slide transition into TargetMarkets — Ticker removed */}
+        <HeroSlideTransition />
+
         <CaseStudies />             {/* 5. Case Studies / Project Demos */}
-        <TargetMarkets />             {/* 2. Areas we can target */}
         <CapabilitiesSection />     {/* 3. Methodology (6 Phase) */}
         <Systems />                 {/* 4. Connected Systems */}
 

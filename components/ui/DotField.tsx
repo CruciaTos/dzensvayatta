@@ -36,7 +36,7 @@ interface Dot {
 export function DotField({
     dotColor = "rgba(18, 20, 22, 0.16)",
     activeColor = "rgba(18, 20, 22, 0.65)",
-    gap = 30,
+    gap = 10,
     radius = 1.3,
     maxRadius = 3.4,
     proximity = 130,

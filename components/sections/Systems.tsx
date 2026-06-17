@@ -1,64 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { SectionIndex } from "@/components/ui/SectionIndex";
 import { FadeIn } from "@/components/ui/FadeIn";
-import { StaggerContainer, StaggerItem } from "@/components/ui/StaggerContainer";
 import { IntegrationLogoMarquee } from "@/components/sections/IntegrationMarquee";
-import {
-  RectGridIcon,
-  ClockCircleIcon,
-  EnvelopeIcon,
-  BarChartIcon,
-  LineChartIcon,
-  LayersIcon,
-} from "@/components/ui/Icons";
-import { SYSTEM_CATEGORIES } from "@/lib/data";
-import type { SystemCategory } from "@/types";
-
-const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
-  "rect-grid": RectGridIcon,
-  "clock-circle": ClockCircleIcon,
-  "envelope": EnvelopeIcon,
-  "bar-chart": BarChartIcon,
-  "line-chart": LineChartIcon,
-  "layers": LayersIcon,
-};
-
-function SystemCategoryCard({ icon, name, items }: SystemCategory) {
-  const Icon = ICON_MAP[icon] ?? RectGridIcon;
-
-  return (
-    <motion.article
-      className="bg-bg-panel border border-border p-10 px-9 transition-colors duration-300 cursor-default"
-      whileHover={{ borderColor: "rgba(216,211,203,0.16)", backgroundColor: "var(--color-bg-tertiary)" }}
-    >
-      <div className="w-9 h-9 flex items-center justify-center border border-border-strong text-accent mb-6">
-        <Icon />
-      </div>
-
-      <h3 className="font-sans text-[16px] font-normal text-stone-100 mb-4 tracking-[-0.01em]">
-        {name}
-      </h3>
-
-      <ul className="flex flex-col gap-2 list-none" role="list">
-        {items.map((item) => (
-          <li
-            key={item}
-            className="font-sans text-[13px] font-light text-stone-400 flex items-center gap-[10px]"
-          >
-            <span
-              className="w-[3px] h-[3px] bg-stone-500 flex-shrink-0 inline-block"
-              aria-hidden="true"
-            />
-            {item}
-          </li>
-        ))}
-      </ul>
-    </motion.article>
-  );
-}
 
 export function Systems() {
   return (
@@ -76,25 +21,11 @@ export function Systems() {
               Systems we connect.
             </h2>
           </div>
-
         </FadeIn>
 
         <div className="mb-20">
           <IntegrationLogoMarquee maxWidth={1200} />
         </div>
-
-        {/* Systems grid */}
-        <StaggerContainer
-          className="grid grid-cols-3 gap-[2px] max-[900px]:grid-cols-2 max-[480px]:grid-cols-1"
-          staggerDelay={0.08}
-        >
-          {SYSTEM_CATEGORIES.map((cat) => (
-            <StaggerItem key={cat.name}>
-              <SystemCategoryCard {...cat} />
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
-
       </Container>
     </section>
   );
