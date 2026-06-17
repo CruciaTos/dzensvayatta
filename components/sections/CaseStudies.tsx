@@ -1,15 +1,14 @@
 "use client";
 
+import dynamic from 'next/dynamic';
 import { useState, type CSSProperties } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { SectionIndex } from "@/components/ui/SectionIndex";
 import { FadeIn } from "@/components/ui/FadeIn";
 
-/* ─────────────────────────────────────────────────────────────────────────
-   Hero-exact colour tokens
-   #00080eff  onyx bg  ·  #B2D5E5 candy blue  ·  #7ec3e2 headline blue
-───────────────────────────────────────────────────────────────────────── */
+const Dither = dynamic(() => import('@/components/ui/Dither'), { ssr: false });
+
 const C = {
   bg: "#00080eff",
   bgCard: "#06111a",
@@ -26,9 +25,6 @@ const C = {
 const SPRING = "cubic-bezier(0.22,1,0.36,1)";
 const EASE_FM = [0.22, 1, 0.36, 1] as const;
 
-/* ─────────────────────────────────────────────────────────────────────────
-   Data
-───────────────────────────────────────────────────────────────────────── */
 interface CaseMetric { value: string; label: string }
 interface RealCase {
   id: string; org: string; tag: string; domain: string;
@@ -84,9 +80,6 @@ const CASES: RealCase[] = [
   },
 ];
 
-/* ─────────────────────────────────────────────────────────────────────────
-   Pulsing dot
-───────────────────────────────────────────────────────────────────────── */
 function PulseDot({ delay }: { delay: number }) {
   return (
     <motion.div
@@ -97,9 +90,6 @@ function PulseDot({ delay }: { delay: number }) {
   );
 }
 
-/* ─────────────────────────────────────────────────────────────────────────
-   Desktop horizontal expandable card
-───────────────────────────────────────────────────────────────────────── */
 function CaseCard({
   c,
   isActive,
@@ -115,7 +105,6 @@ function CaseCard({
     <div
       onMouseEnter={onEnter}
       style={{
-        /* ── Flex ratio: active wider, compressed tighter ── */
         flex: isActive ? 2.9 : isCompressed ? 0.55 : 1,
         transition: `flex 0.60s ${SPRING}, border-color 0.35s ease`,
         position: "relative",
@@ -128,7 +117,6 @@ function CaseCard({
         flexDirection: "column",
       }}
     >
-      {/* Dot-grid texture */}
       <div
         aria-hidden
         style={{
@@ -140,7 +128,6 @@ function CaseCard({
         }}
       />
 
-      {/* Ghost number — larger, pushed further off-edge for drama */}
       <div
         aria-hidden
         style={{
@@ -158,7 +145,6 @@ function CaseCard({
         {c.id}
       </div>
 
-      {/* Left accent bar — 3px for more presence */}
       <div
         style={{
           position: "absolute", left: 0, top: 0, bottom: 0, width: "3px",
@@ -167,7 +153,6 @@ function CaseCard({
         }}
       />
 
-      {/* Radial glow */}
       <div
         style={{
           position: "absolute", inset: 0, pointerEvents: "none",
@@ -177,11 +162,9 @@ function CaseCard({
         }}
       />
 
-      {/* ── Full content: default + active ── */}
       <div
         style={{
           position: "absolute", inset: 0,
-          /* ── Padding on 8px grid: 48 top/bottom, 40 right, 48 left ── */
           padding: "48px 40px 48px 48px",
           display: "flex", flexDirection: "column",
           opacity: isCompressed ? 0 : 1,
@@ -191,7 +174,6 @@ function CaseCard({
           overflow: "hidden",
         }}
       >
-        {/* Tag row */}
         <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "24px", flexWrap: "wrap" }}>
           <span
             className="font-mono"
@@ -199,7 +181,6 @@ function CaseCard({
               fontSize: "9.5px",
               letterSpacing: "0.18em",
               textTransform: "uppercase",
-              /* ── Tag badge: slightly more generous padding ── */
               padding: "5px 12px",
               border: `1px solid ${c.accent}38`,
               backgroundColor: `${c.accent}0D`,
@@ -221,7 +202,6 @@ function CaseCard({
           </span>
         </div>
 
-        {/* Org label */}
         <div
           className="font-mono"
           style={{
@@ -235,7 +215,6 @@ function CaseCard({
           {c.org}
         </div>
 
-        {/* Headline — larger clamp for more impact */}
         <h3
           className="font-serif"
           style={{
@@ -251,7 +230,6 @@ function CaseCard({
           {c.headline}
         </h3>
 
-        {/* ── Expanded content (AnimatePresence) ── */}
         <AnimatePresence>
           {isActive && (
             <motion.div
@@ -261,10 +239,8 @@ function CaseCard({
               transition={{ duration: 0.42, ease: EASE_FM }}
               style={{ marginTop: "28px", flex: 1, display: "flex", flexDirection: "column" } as CSSProperties}
             >
-              {/* Rule */}
               <div style={{ height: "1px", backgroundColor: C.border, marginBottom: "24px" }} />
 
-              {/* Body text — 14px for better readability */}
               <p
                 className="font-sans"
                 style={{
@@ -279,7 +255,6 @@ function CaseCard({
                 {c.body}
               </p>
 
-              {/* Metrics strip — hero-sized numbers */}
               <div
                 style={{
                   display: "flex",
@@ -292,12 +267,10 @@ function CaseCard({
                     key={i}
                     style={{
                       flex: 1,
-                      /* ── More generous metric cell: 20px top/bottom, 22px sides ── */
                       padding: "20px 22px",
                       borderLeft: i > 0 ? `1px solid ${C.border}` : "none",
                     }}
                   >
-                    {/* ── Metric value: display-scale numbers, like Linear/Vercel ── */}
                     <div
                       className="font-serif"
                       style={{
@@ -327,7 +300,6 @@ function CaseCard({
                 ))}
               </div>
 
-              {/* Source citation */}
               <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "auto" }}>
                 <div
                   style={{ width: "20px", height: "1px", backgroundColor: c.accent, flexShrink: 0 }}
@@ -349,7 +321,6 @@ function CaseCard({
         </AnimatePresence>
       </div>
 
-      {/* ── Compressed strip: rotated label ── */}
       <div
         style={{
           position: "absolute", inset: 0,
@@ -375,7 +346,6 @@ function CaseCard({
         </span>
       </div>
 
-      {/* Bottom accent line */}
       <div
         style={{
           position: "absolute",
@@ -392,9 +362,6 @@ function CaseCard({
   );
 }
 
-/* ─────────────────────────────────────────────────────────────────────────
-   Mobile card — click to expand
-───────────────────────────────────────────────────────────────────────── */
 function MobileCard({ c }: { c: RealCase }) {
   const [open, setOpen] = useState(false);
 
@@ -410,7 +377,6 @@ function MobileCard({ c }: { c: RealCase }) {
         cursor: "pointer",
       }}
     >
-      {/* Left accent bar — 3px to match desktop */}
       <div
         style={{
           position: "absolute", left: 0, top: 0, bottom: 0, width: "3px",
@@ -419,7 +385,6 @@ function MobileCard({ c }: { c: RealCase }) {
         }}
       />
 
-      {/* Ghost number */}
       <div
         aria-hidden
         style={{
@@ -432,7 +397,6 @@ function MobileCard({ c }: { c: RealCase }) {
         {c.id}
       </div>
 
-      {/* Glow */}
       <div
         style={{
           position: "absolute", inset: 0, pointerEvents: "none",
@@ -442,9 +406,7 @@ function MobileCard({ c }: { c: RealCase }) {
         }}
       />
 
-      {/* ── Mobile card content: 8px-grid padding ── */}
       <div style={{ padding: "32px 24px 32px 32px", position: "relative", zIndex: 1 }}>
-        {/* Tag row */}
         <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "16px", flexWrap: "wrap" }}>
           <span
             className="font-mono"
@@ -469,7 +431,6 @@ function MobileCard({ c }: { c: RealCase }) {
           </span>
         </div>
 
-        {/* Org */}
         <div
           className="font-mono"
           style={{
@@ -480,7 +441,6 @@ function MobileCard({ c }: { c: RealCase }) {
           {c.org}
         </div>
 
-        {/* Headline — slightly larger clamp */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
           <h3
             className="font-serif"
@@ -494,7 +454,6 @@ function MobileCard({ c }: { c: RealCase }) {
             {c.headline}
           </h3>
 
-          {/* Toggle button — 28px for better touch target */}
           <div
             style={{
               flexShrink: 0, width: 28, height: 28,
@@ -518,7 +477,6 @@ function MobileCard({ c }: { c: RealCase }) {
           </div>
         </div>
 
-        {/* Expanded body */}
         <AnimatePresence>
           {open && (
             <motion.div
@@ -531,7 +489,6 @@ function MobileCard({ c }: { c: RealCase }) {
               <div style={{ paddingTop: "20px" }}>
                 <div style={{ height: "1px", backgroundColor: C.border, marginBottom: "20px" }} />
 
-                {/* Body */}
                 <p
                   className="font-sans"
                   style={{
@@ -543,7 +500,6 @@ function MobileCard({ c }: { c: RealCase }) {
                   {c.body}
                 </p>
 
-                {/* Metrics — hero numbers on mobile too */}
                 <div style={{ display: "flex", border: `1px solid ${C.border}`, marginBottom: "20px" }}>
                   {c.metrics.map((m, i) => (
                     <div
@@ -577,7 +533,6 @@ function MobileCard({ c }: { c: RealCase }) {
                   ))}
                 </div>
 
-                {/* Source */}
                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                   <div style={{ width: "20px", height: "1px", backgroundColor: c.accent, flexShrink: 0 }} />
                   <span
@@ -596,7 +551,6 @@ function MobileCard({ c }: { c: RealCase }) {
         </AnimatePresence>
       </div>
 
-      {/* Bottom accent */}
       <div
         style={{
           height: "2px",
@@ -611,9 +565,6 @@ function MobileCard({ c }: { c: RealCase }) {
   );
 }
 
-/* ─────────────────────────────────────────────────────────────────────────
-   Main export
-───────────────────────────────────────────────────────────────────────── */
 export function CaseStudies() {
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -625,10 +576,33 @@ export function CaseStudies() {
         padding: "120px 0",
         backgroundColor: C.bg,
         borderTop: `1px solid ${C.border}`,
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
-      <Container>
-        {/* ── Section header ── */}
+      {/* ── Dither animated background ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          pointerEvents: 'none',
+          zIndex: 0,
+          opacity: 0.14,
+        }}
+      >
+        <Dither
+          waveColor={[0.04, 0.14, 0.22]}
+          waveSpeed={0.025}
+          waveFrequency={2.2}
+          waveAmplitude={0.25}
+          colorNum={4}
+          pixelSize={3}
+          enableMouseInteraction={false}
+        />
+      </div>
+
+      <Container className="relative z-10">
         <FadeIn>
           <div className="flex items-end justify-between mb-8 gap-12 max-md:flex-col max-md:items-start">
             <div>
@@ -651,7 +625,6 @@ export function CaseStudies() {
           </div>
         </FadeIn>
 
-        {/* ── Animated separator ── */}
         <FadeIn delay={0.15}>
           <div className="flex items-center gap-3 mb-14">
             <div className="flex items-center gap-1.5">
@@ -669,7 +642,6 @@ export function CaseStudies() {
           </div>
         </FadeIn>
 
-        {/* ── Desktop: horizontal expandable cards — taller ── */}
         <FadeIn delay={0.2}>
           <div
             className="hidden md:flex gap-[1px]"
@@ -687,7 +659,6 @@ export function CaseStudies() {
             ))}
           </div>
 
-          {/* ── Mobile: vertical click-to-expand cards ── */}
           <div className="flex md:hidden flex-col gap-[1px]">
             {CASES.map((c) => (
               <MobileCard key={c.id} c={c} />
@@ -695,7 +666,6 @@ export function CaseStudies() {
           </div>
         </FadeIn>
 
-        {/* ── Footer provenance ── */}
         <FadeIn delay={0.25}>
           <div
             className="flex items-center gap-6 mt-16 pt-12 flex-wrap"

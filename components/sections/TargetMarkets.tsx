@@ -1,7 +1,10 @@
 "use client";
 
+import dynamic from 'next/dynamic';
 import { useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
+
+const Dither = dynamic(() => import('@/components/ui/Dither'), { ssr: false });
 
 // ── Design tokens ────────────────────────────────────────────────────────────
 const C = {
@@ -19,7 +22,6 @@ const C = {
 } as const;
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-// Duration for the card height/flex transitions
 const TRANSITION = `0.42s cubic-bezier(0.22,1,0.36,1)`;
 
 // ── Data ─────────────────────────────────────────────────────────────────────
@@ -75,10 +77,6 @@ const MARKET_CARDS: MarketCard[] = [
   },
 ];
 
-// Layout: 3 columns × 2 rows
-// Col 0: finance (top), hr (bottom)
-// Col 1: sales   (top), ops (bottom)
-// Col 2: support (top), data (bottom)
 function getColumnSiblingId(id: string): string | null {
   const pairs: Record<string, string> = {
     finance: "hr",
@@ -129,10 +127,8 @@ function SpotlightCard({ card, index, isExpanded, isCompressed, onEnter, onLeave
       onMouseLeave={handleMouseLeave}
       initial={{ opacity: 0, y: 24 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      // ── Slower entrance ──
       transition={{ duration: 1.0, delay: index * 0.35, ease: EASE }}
       style={{
-        // Half the previous expansion: 1.36 / 0.64 instead of 1.72 / 0.28
         flexGrow: isExpanded ? 1.36 : isCompressed ? 0.64 : 1,
         flexShrink: 0,
         flexBasis: 0,
@@ -149,7 +145,6 @@ function SpotlightCard({ card, index, isExpanded, isCompressed, onEnter, onLeave
         flexDirection: "column",
       }}
     >
-      {/* Spotlight overlay — position updated via DOM ref, no re-renders */}
       <div
         ref={spotRef}
         aria-hidden="true"
@@ -162,7 +157,6 @@ function SpotlightCard({ card, index, isExpanded, isCompressed, onEnter, onLeave
         }}
       />
 
-      {/* Top accent glow line */}
       <div
         aria-hidden="true"
         style={{
@@ -177,7 +171,6 @@ function SpotlightCard({ card, index, isExpanded, isCompressed, onEnter, onLeave
         }}
       />
 
-      {/* Card body */}
       <div
         style={{
           position: "relative",
@@ -189,7 +182,6 @@ function SpotlightCard({ card, index, isExpanded, isCompressed, onEnter, onLeave
           overflow: "hidden",
         }}
       >
-        {/* Title — always visible */}
         <h3
           style={{
             fontFamily: "var(--font-sans)",
@@ -205,7 +197,6 @@ function SpotlightCard({ card, index, isExpanded, isCompressed, onEnter, onLeave
           {card.title}
         </h3>
 
-        {/* Description — always visible */}
         <p
           style={{
             fontFamily: "var(--font-sans)",
@@ -220,7 +211,6 @@ function SpotlightCard({ card, index, isExpanded, isCompressed, onEnter, onLeave
           {card.description}
         </p>
 
-        {/* ── Expanded content: capability list ── */}
         <AnimatePresence>
           {isExpanded && (
             <motion.div
@@ -237,7 +227,6 @@ function SpotlightCard({ card, index, isExpanded, isCompressed, onEnter, onLeave
                 flexDirection: "column",
               }}
             >
-              {/* Divider */}
               <div
                 style={{
                   height: "1px",
@@ -247,7 +236,6 @@ function SpotlightCard({ card, index, isExpanded, isCompressed, onEnter, onLeave
                 }}
               />
 
-              {/* Staggered capability items */}
               <div style={{ flex: 1, overflow: "hidden" }}>
                 {card.hoverItems.map((item, i) => (
                   <motion.div
@@ -289,7 +277,6 @@ function SpotlightCard({ card, index, isExpanded, isCompressed, onEnter, onLeave
                 ))}
               </div>
 
-              {/* Bottom capability count */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -326,7 +313,6 @@ function SpotlightCard({ card, index, isExpanded, isCompressed, onEnter, onLeave
           )}
         </AnimatePresence>
 
-        {/* Compressed state: minimal indicator */}
         <AnimatePresence>
           {isCompressed && (
             <motion.div
@@ -364,7 +350,7 @@ function SpotlightCard({ card, index, isExpanded, isCompressed, onEnter, onLeave
   );
 }
 
-// ── CardColumn: independent vertical space-sharing system ─────────────────────
+// ── CardColumn ────────────────────────────────────────────────────────────────
 interface ColumnProps {
   cards: MarketCard[];
   indices: number[];
@@ -413,9 +399,9 @@ export function TargetMarkets() {
   const handleLeave = useCallback(() => setHoveredId(null), []);
 
   const columns = [
-    { cards: [MARKET_CARDS[0], MARKET_CARDS[3]], indices: [0, 3] }, // finance | hr
-    { cards: [MARKET_CARDS[1], MARKET_CARDS[4]], indices: [1, 4] }, // sales   | ops
-    { cards: [MARKET_CARDS[2], MARKET_CARDS[5]], indices: [2, 5] }, // support | data
+    { cards: [MARKET_CARDS[0], MARKET_CARDS[3]], indices: [0, 3] },
+    { cards: [MARKET_CARDS[1], MARKET_CARDS[4]], indices: [1, 4] },
+    { cards: [MARKET_CARDS[2], MARKET_CARDS[5]], indices: [2, 5] },
   ];
 
   return (
@@ -429,6 +415,28 @@ export function TargetMarkets() {
         overflow: "hidden",
       }}
     >
+      {/* ── Dither animated background ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          zIndex: 0,
+          opacity: 0.18,
+        }}
+      >
+        <Dither
+          waveColor={[0.05, 0.18, 0.28]}
+          waveSpeed={0.03}
+          waveFrequency={2.5}
+          waveAmplitude={0.28}
+          colorNum={4}
+          pixelSize={3}
+          enableMouseInteraction={false}
+        />
+      </div>
+
       {/* Ambient glow */}
       <div
         aria-hidden="true"
@@ -542,7 +550,6 @@ export function TargetMarkets() {
         </div>
       </div>
 
-      {/* Responsive: on tablet/mobile, collapse to stacked layout */}
       <style>{`
         @media (max-width: 900px) {
           .tm-grid {
