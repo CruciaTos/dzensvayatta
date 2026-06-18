@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { FOOTER_LINKS } from "@/lib/data";
 
 // ── Magnetic link sub-component with optional custom click handler ──────────
@@ -53,6 +54,7 @@ function MagLink({
 export function Footer() {
   const footerRef = useRef<HTMLElement>(null);
   const orbRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   // ── Cursor orb + marquee lighting effect ───────────────────────────────────
   useEffect(() => {
@@ -163,11 +165,7 @@ export function Footer() {
             working together.
           </h2>
           <button
-            onClick={() =>
-              document
-                .getElementById("briefing-builder")
-                ?.scrollIntoView({ behavior: "smooth" })
-            }
+            onClick={() => router.push("/discovery")}
             className="group relative inline-flex items-center gap-2.5 border border-[rgba(178,213,229,0.25)] text-white/60 font-mono text-[11px] tracking-[0.1em] uppercase px-7 py-[14px] overflow-hidden transition-[color,border-color] duration-300 hover:text-white hover:border-[#7ec3e2ff]"
           >
             <span className="absolute inset-0 bg-[#7ec3e2ff] scale-x-0 origin-left transition-transform duration-400 ease-[cubic-bezier(.65,0,.35,1)] group-hover:scale-x-100" />

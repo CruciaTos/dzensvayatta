@@ -193,7 +193,7 @@ export function Hero({ textPosition = { preset: "center" }, className }: HeroPro
             transition={{ duration: 0.8, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
           >
             <a
-              href="#cta"
+              href="/discovery"
               className="font-sans tracking-[0.08em] uppercase border transition-colors duration-200 pointer-events-auto"
               style={{
                 color: "white",

@@ -228,6 +228,14 @@ export function CapabilitiesSection() {
     document.getElementById(`phase-${idx}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
+  // ── Scroll-driven section background opacity ──
+  const { scrollYProgress } = useScroll({ target: containerRef });
+  const overlayOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.15, 0.85, 1],
+    [0, 1, 1, 0]
+  );
+
   return (
     <section
       ref={containerRef}
@@ -235,6 +243,17 @@ export function CapabilitiesSection() {
       aria-label="How We Operate"
       className="relative border-t border-stone-900 py-24 select-none"
     >
+      {/* Scroll-driven background overlay — fades in/out with section progress */}
+      <motion.div
+        className="absolute inset-0 z-0 pointer-events-none"
+        style={{
+          opacity: overlayOpacity,
+          background:
+            "radial-gradient(ellipse at center, rgba(200,180,160,0.12) 0%, transparent 70%)",
+        }}
+        aria-hidden
+      />
+
       {/* Corner watermarks */}
       <div aria-hidden className="absolute top-4 left-6 font-mono text-[7px] text-stone-800 pointer-events-none">
         + SEQUENCE_FLOW_TERMINAL

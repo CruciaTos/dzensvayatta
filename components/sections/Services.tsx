@@ -69,7 +69,7 @@ export function Services() {
             <p className="font-sans text-body font-light text-stone-400 leading-[1.7] mb-12">
               Six structured practice areas. Each one a discrete engagement model with defined scope, deliverables, and success criteria. No open-ended retainers. No ambiguous project scope.
             </p>
-            <Button as="a" href="#cta" variant="primary" size="md">
+            <Button as="a" href="/discovery" variant="primary" size="md">
               Discuss your requirements →
             </Button>
           </FadeIn>

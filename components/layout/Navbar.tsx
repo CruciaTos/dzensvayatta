@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -10,7 +11,7 @@ import {
   MobileNavHeader,
   MobileNavToggle,
   MobileNavMenu,
-  NavbarButton, // new import from the demo
+  NavbarButton,
 } from "../ui/resizable-navbar";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { useScrolled } from "@/hooks/useScrolled";
@@ -25,9 +26,10 @@ export function Navbar() {
   const activeSection = useActiveSection(SECTION_IDS);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const router = useRouter();
 
   const scrollToCta = () => {
-    document.getElementById("cta")?.scrollIntoView({ behavior: "smooth" });
+    router.push("/discovery");
   };
 
   return (

@@ -22,7 +22,7 @@ export default function HomePage() {
         <IntegrationMarquee />       {/* 4. Connected Systems */}
         <TargetMarkets />
 
-        <Contact />                {/* 7. Contact Info */}
+
       </main>
 
       <Footer />                   {/* 8. Footer */}

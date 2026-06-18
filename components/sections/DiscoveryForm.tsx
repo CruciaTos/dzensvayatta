@@ -141,7 +141,7 @@ After creating, reply with just: CREATED`,
         <div className="flex flex-col items-center text-center py-12 gap-5">
           <div
             className="w-14 h-14 rounded-full flex items-center justify-center"
-            style={{ background: "rgba(201,169,110,0.15)", border: "1px solid rgba(201,169,110,0.35)" }}
+            style={{ border: "1px solid rgba(201,169,110,0.35)" }}
           >
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
               <path d="M5 13l4 4L19 7" stroke="#C9A96E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -164,7 +164,7 @@ After creating, reply with just: CREATED`,
         <div className="flex flex-col items-center text-center py-12 gap-5">
           <div
             className="w-14 h-14 rounded-full flex items-center justify-center"
-            style={{ background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.3)" }}
+            style={{ border: "1px solid rgba(220,38,38,0.3)" }}
           >
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
               <path d="M12 8v4m0 4h.01" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" />
@@ -297,9 +297,9 @@ After creating, reply with just: CREATED`,
               onClick={handleSubmit}
               className="w-full mt-1 py-3.5 rounded-xl font-sans text-sm font-medium tracking-wide transition-all duration-200 active:scale-[0.98] cursor-pointer"
               style={{
-                background: "linear-gradient(135deg, #C9A96E 0%, #a8833a 100%)",
-                color: "#1A1208",
-                boxShadow: "0 4px 20px rgba(201,169,110,0.25)",
+                background: "transparent",
+                border: "1px solid #C9A96E",
+                color: "#C9A96E",
               }}
             >
               Schedule Discovery Call →
