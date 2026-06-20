@@ -18,11 +18,12 @@ export default function HomePage() {
         {/* Hero + PPT-slide transition into CaseStudies */}
         <HeroSlideTransition />
         <FoundingPrinciples />
+        <TargetMarkets />
 
         {/* 2. Target Markets — now follows Case Studies */}
         <CapabilitiesSection />    {/* 3. Methodology (6 Phase) */}
         <IntegrationMarquee />       {/* 4. Connected Systems */}
-        <TargetMarkets />
+
 
 
       </main>

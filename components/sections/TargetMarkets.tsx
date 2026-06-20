@@ -8,10 +8,10 @@ const C = {
   bg: "#000b12ff",
   accent: "#7EC3E2",
   accentSoft: "#B2D5E5",
-  textPrimary: "#FFFFFF",
-  textMuted: "rgba(255,255,255,0.65)",
-  cardBg: "rgba(255,255,255,0.02)",
-  cardBgHover: "rgba(255,255,255,0.038)",
+  textPrimary: "#e5f3e5ff",
+  textMuted: "rgba(229,243,229,0.65)",
+  cardBg: "#0d0d0cff",
+  cardBgHover: "#141413ff",
   cardBorder: "rgba(178,213,229,0.10)",
   cardBorderHover: "rgba(126,195,226,0.28)",
   divider: "rgba(178,213,229,0.10)",
@@ -407,7 +407,7 @@ export function TargetMarkets() {
       aria-label="Target markets — operational functions DZen optimizes"
       style={{
         position: "relative",
-        backgroundColor: "transparent", // ← transparent background
+        backgroundColor: "transparent",
         padding: "clamp(88px, 11vw, 144px) 0",
         overflow: "hidden",
       }}

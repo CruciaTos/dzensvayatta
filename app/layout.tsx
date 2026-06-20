@@ -3,6 +3,7 @@ import { Geist, DM_Serif_Display, IBM_Plex_Mono, Noto_Sans_Devanagari } from "ne
 import localFont from "next/font/local";
 import { siteMetadata, structuredData } from "@/lib/metadata";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
+import { SectionFlowProvider } from "@/components/providers/SectionFlow";
 import { GlobalVideoBackground } from "@/components/ui/GlobalVideoBackground";
 import { cn } from "@/lib/utils";
 import "@/app/globals.css";
@@ -71,13 +72,18 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="text-stone-100 font-sans font-light leading-relaxed overflow-x-hidden antialiased">
         <SmoothScroll>
           {/* Relative wrapper – height grows with total page content.
-              The video background inside it stretches to match. */}
+              The video background inside it stretches to match.
+              SectionFlowProvider mounts the persistent orb overlay
+              inside this same wrapper so its document-relative
+              coordinates line up with actual section positions. */}
           <div className="relative min-h-screen">
             {/* Persistent video background (now absolute, scrolls with content) */}
             <GlobalVideoBackground />
 
-            {/* Actual page content – must be above the glass overlay */}
-            <div className="relative z-10">{children}</div>
+            <SectionFlowProvider>
+              {/* Actual page content – must be above the glass overlay */}
+              <div className="relative z-10">{children}</div>
+            </SectionFlowProvider>
           </div>
         </SmoothScroll>
       </body>
