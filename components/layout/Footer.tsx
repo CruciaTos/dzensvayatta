@@ -3,25 +3,37 @@
 import React, { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { FOOTER_LINKS } from "@/lib/data";
+import { siInstagram } from "simple-icons";
 
-// ── Magnetic link sub-component with optional custom click handler ──────────
+// LinkedIn was removed from simple-icons v16 — inline path used as placeholder
+const siLinkedin = {
+  path: "M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z",
+};
+
+const ACCENT = "#7ec3e2ff";
+
+function BrandIcon({ path, className }: { path: string; className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className={className} aria-hidden="true">
+      <path d={path} />
+    </svg>
+  );
+}
+
 function MagLink({
-  href,
-  onClick,
+  strength = 0.18,
+  className,
   children,
-}: {
-  href: string;
-  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
-  children: React.ReactNode;
-}) {
+  ...rest
+}: React.AnchorHTMLAttributes<HTMLAnchorElement> & { strength?: number }) {
   const ref = useRef<HTMLAnchorElement>(null);
 
   function onMove(e: React.MouseEvent) {
     const el = ref.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
-    const x = (e.clientX - r.left - r.width / 2) * 0.22;
-    const y = (e.clientY - r.top - r.height / 2) * 0.22;
+    const x = (e.clientX - r.left - r.width / 2) * strength;
+    const y = (e.clientY - r.top - r.height / 2) * strength;
     el.style.transform = `translate(${x}px,${y}px)`;
   }
 
@@ -30,56 +42,324 @@ function MagLink({
   }
 
   return (
-    <a
-      ref={ref}
-      href={href}
-      onClick={onClick}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      className="
-        relative inline-block font-sans text-[12px] font-light text-white/60 no-underline
-        transition-colors duration-200 hover:text-white
-        after:content-[''] after:absolute after:left-0 after:bottom-[-2px]
-        after:h-px after:w-0 after:bg-[#7ec3e2ff]
-        after:transition-[width] after:duration-300 after:ease-[cubic-bezier(.65,0,.35,1)]
-        hover:after:w-full
-      "
-    >
+    <a ref={ref} onMouseMove={onMove} onMouseLeave={onLeave} className={className} {...rest}>
       {children}
     </a>
   );
 }
 
-// ── Main footer component ────────────────────────────────────────────────────
+function MagButton({
+  strength = 0.18,
+  className,
+  children,
+  ...rest
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & { strength?: number }) {
+  const ref = useRef<HTMLButtonElement>(null);
+
+  function onMove(e: React.MouseEvent) {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const x = (e.clientX - r.left - r.width / 2) * strength;
+    const y = (e.clientY - r.top - r.height / 2) * strength;
+    el.style.transform = `translate(${x}px,${y}px)`;
+  }
+
+  function onLeave() {
+    if (ref.current) ref.current.style.transform = "";
+  }
+
+  return (
+    <button ref={ref} onMouseMove={onMove} onMouseLeave={onLeave} className={className} {...rest}>
+      {children}
+    </button>
+  );
+}
+
+function Reveal({
+  children,
+  className,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("is-visible");
+          io.disconnect();
+        }
+      },
+      { threshold: 0.12 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className={`footer-reveal ${className ?? ""}`} style={{ transitionDelay: `${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
+
+function ContactRow({
+  label,
+  value,
+  href,
+  external,
+}: {
+  label: string;
+  value: string;
+  href: string;
+  external?: boolean;
+}) {
+  return (
+    <MagLink
+      href={href}
+      strength={0.05}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noopener noreferrer" : undefined}
+      className="group flex items-baseline justify-between gap-6 py-6 border-b border-[rgba(178,213,229,0.10)] no-underline transition-colors duration-300 hover:border-[rgba(126,195,226,0.32)]"
+    >
+      <span className="[font-family:var(--font-mono)] text-[10px] tracking-[0.16em] uppercase text-white/35 flex-shrink-0 transition-colors duration-300 group-hover:text-[#7ec3e2ff]">
+        {label}
+      </span>
+      <span className="flex items-center gap-3 min-w-0">
+        <span className="[font-family:var(--font-sans)] text-[clamp(1.25rem,3vw,2.25rem)] font-normal text-white/90 leading-tight tracking-[-0.01em] truncate transition-colors duration-300 group-hover:text-white">
+          {value}
+        </span>
+        <span aria-hidden="true" className="flex-shrink-0 text-[#7ec3e2ff] opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">
+          ↗
+        </span>
+      </span>
+    </MagLink>
+  );
+}
+
+// ─── Watermark layers ────────────────────────────────────────────────────────
+
+/** Always-visible outline watermark (behind everything, no blend). */
+function GhostWatermark() {
+  const textStyle: React.CSSProperties = {
+    fontSize: "clamp(6rem, 50vw, 60rem)",
+    letterSpacing: "-0.02em",
+    lineHeight: 0.86,
+    fontWeight: 500,
+  };
+
+  return (
+    <span
+      aria-hidden="true"
+      className="block w-full text-center font-zaslia text-transparent [-webkit-text-stroke:0px_rgba(178,213,229,0.08)]"
+      style={textStyle}
+    >
+      DZEN
+    </span>
+  );
+}
+
+/** Accent DZEN placed BELOW the content — bright cyan, only visible under the cursor via radial mask. */
+function SpotlightAccent() {
+  const textStyle: React.CSSProperties = {
+    fontSize: "clamp(6rem, 50vw, 60rem)",
+    letterSpacing: "-0.02em",
+    lineHeight: 0.86,
+    fontWeight: 500,
+  };
+
+  return (
+    <div
+      aria-hidden="true"
+      className="absolute inset-0 z-10 pointer-events-none overflow-hidden flex items-center justify-center"
+    >
+      <span
+        className="block w-full text-center font-zaslia"
+        style={{
+          ...textStyle,
+          color: ACCENT,
+          WebkitMaskImage:
+            "radial-gradient(circle 380px at var(--mx) var(--my), black 0%, black 55%, transparent 78%)",
+          maskImage:
+            "radial-gradient(circle 380px at var(--mx) var(--my), black 0%, black 55%, transparent 78%)",
+        }}
+      >
+        DZEN
+      </span>
+    </div>
+  );
+}
+
+// ─── Footer sections ─────────────────────────────────────────────────────────
+
+function FooterCTA({ onStart }: { onStart: () => void }) {
+  return (
+    <Reveal className="grid grid-cols-[1.1fr_1fr] gap-20 pt-28 pb-20 max-[900px]:grid-cols-1 max-[900px]:gap-14 max-[900px]:pt-20">
+      <div>
+        <div className="flex items-center gap-3 mb-7">
+          <span className="w-[5px] h-[5px] rounded-full bg-[#7ec3e2ff]" aria-hidden="true" />
+          <span className="[font-family:var(--font-mono)] text-[10px] tracking-[0.2em] uppercase text-[#7ec3e2ff]">Let&apos;s talk</span>
+        </div>
+        <h2 className="[font-family:var(--font-sans)] text-[clamp(2.1rem,4.6vw,3.6rem)] font-normal text-white leading-[1.06] tracking-[-0.02em] mb-10 max-w-[460px]">
+          Your systems,
+          <br />
+          working <em className="not-italic text-white/45">together.</em>
+        </h2>
+        <MagButton
+          strength={0.14}
+          onClick={onStart}
+          className="group relative inline-flex items-center gap-3 border border-[rgba(178,213,229,0.25)] text-white/70 [font-family:var(--font-mono)] text-[11px] tracking-[0.12em] uppercase px-7 py-[15px] overflow-hidden transition-colors duration-300 hover:text-[#00080e]"
+        >
+          <span className="absolute inset-0 bg-[#7ec3e2ff] scale-x-0 origin-left transition-transform duration-[420ms] ease-[cubic-bezier(.65,0,.35,1)] group-hover:scale-x-100" />
+          <span className="relative z-10">Start a discovery call</span>
+          <span className="relative z-10 transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">
+            →
+          </span>
+        </MagButton>
+      </div>
+
+      <div className="flex flex-col">
+        <ContactRow label="Soham" value="sohamboridkar@gmail.com" href="mailto:sohamboridkar@gmail.com" />
+        <ContactRow label="Smit" value="smit2004mhatre@gmail.com" href="mailto:smit2004mhatre@gmail.com" />
+        <ContactRow label="WhatsApp" value="+91 93215 59182" href="https://wa.me/919321559182" external />
+      </div>
+    </Reveal>
+  );
+}
+
+function FooterLinks({
+  onLinkClick,
+}: {
+  onLinkClick: (e: React.MouseEvent<HTMLAnchorElement>, label: string) => void;
+}) {
+  return (
+    <Reveal delay={80} className="flex flex-wrap items-start justify-between gap-12 py-16 border-t border-[rgba(178,213,229,0.08)]">
+      <div className="flex flex-wrap gap-x-16 gap-y-10 flex-1 min-w-0">
+        {Object.entries(FOOTER_LINKS).map(([title, links]) => (
+          <div key={title} className="min-w-[140px]">
+            <div className="[font-family:var(--font-mono)] text-[9px] tracking-[0.18em] uppercase text-white/30 mb-5">{title}</div>
+            <ul className="list-none flex flex-col gap-[10px]" role="list">
+              {links.map((link: string) => (
+                <li key={link}>
+                  <a
+                    href="#"
+                    onClick={(e) => onLinkClick(e, link)}
+                    className="[font-family:var(--font-sans)] text-[13px] font-light text-white/55 no-underline transition-colors duration-200 hover:text-white"
+                  >
+                    {link}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex flex-col gap-3 flex-shrink-0">
+        <MagLink
+          strength={0.1}
+          href="https://linkedin.com/company/wearedzen"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group inline-flex items-center gap-2 no-underline"
+        >
+          <BrandIcon path={siLinkedin.path} className="w-3 h-3 text-white/35 transition-colors duration-200 group-hover:text-[#7ec3e2ff]" />
+          <span className="[font-family:var(--font-mono)] text-[10px] tracking-[0.1em] uppercase text-white/55 transition-colors duration-200 group-hover:text-white">
+            LinkedIn
+          </span>
+        </MagLink>
+        <MagLink
+          strength={0.1}
+          href="https://instagram.com/wearedzen"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group inline-flex items-center gap-2 no-underline"
+        >
+          <BrandIcon path={siInstagram.path} className="w-3 h-3 text-white/35 transition-colors duration-200 group-hover:text-[#7ec3e2ff]" />
+          <span className="[font-family:var(--font-mono)] text-[10px] tracking-[0.1em] uppercase text-white/55 transition-colors duration-200 group-hover:text-white">
+            @wearedzen
+          </span>
+        </MagLink>
+        <MagLink
+          strength={0.1}
+          href="https://instagram.com/dzensvayatta"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group inline-flex items-center gap-2 no-underline"
+        >
+          <BrandIcon path={siInstagram.path} className="w-3 h-3 text-white/35 transition-colors duration-200 group-hover:text-[#7ec3e2ff]" />
+          <span className="[font-family:var(--font-mono)] text-[10px] tracking-[0.1em] uppercase text-white/55 transition-colors duration-200 group-hover:text-white">
+            @dzensvayatta
+          </span>
+        </MagLink>
+      </div>
+    </Reveal>
+  );
+}
+
+function FooterBottomBar({ onBackToTop }: { onBackToTop: () => void }) {
+  return (
+    <div className="flex items-center justify-between gap-6 py-7 border-t border-[rgba(178,213,229,0.08)] flex-wrap max-[600px]:flex-col max-[600px]:items-start">
+      <span className="[font-family:var(--font-mono)] text-[10px] tracking-[0.06em] text-white/30">© 2026 DZen Operational Systems</span>
+      <div className="flex items-center gap-7">
+        {["Privacy", "Terms", "Security"].map((item) => (
+          <a
+            key={item}
+            href="#"
+            onClick={(e) => e.preventDefault()}
+            className="[font-family:var(--font-mono)] text-[10px] tracking-[0.06em] text-white/30 no-underline transition-colors duration-200 hover:text-white/70"
+          >
+            {item}
+          </a>
+        ))}
+        <MagButton
+          strength={0.1}
+          onClick={onBackToTop}
+          className="[font-family:var(--font-mono)] text-[10px] tracking-[0.06em] text-white/30 transition-colors duration-200 hover:text-[#7ec3e2ff] bg-transparent border-none cursor-pointer p-0"
+        >
+          Back to top ↑
+        </MagButton>
+      </div>
+    </div>
+  );
+}
+
+// ─── Root export ─────────────────────────────────────────────────────────────
+
 export function Footer() {
-  const footerRef = useRef<HTMLElement>(null);
-  const orbRef = useRef<HTMLDivElement>(null);
+  const footerRef = useRef<HTMLElement>(null); // using HTMLElement for footer
+  const glowRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  // ── Cursor orb + marquee lighting effect ───────────────────────────────────
+  // Mouse tracking → sets CSS variables for the spotlight mask + positions glow
   useEffect(() => {
     const footer = footerRef.current;
-    const orb = orbRef.current;
-    if (!footer || !orb) return;
+    const glow = glowRef.current;
+    if (!footer || !glow) return;
 
     function onMove(e: MouseEvent) {
-      orb!.style.left = `${e.clientX}px`;
-      orb!.style.top = `${e.clientY}px`;
-      orb!.style.opacity = "1";
-
-      const items = footer!.querySelectorAll<HTMLElement>(".marquee-item");
-      items.forEach((el) => {
-        const b = el.getBoundingClientRect();
-        const cx = b.left + b.width / 2;
-        const cy = b.top + b.height / 2;
-        const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
-        el.classList.toggle("lit", dist < 260);
-      });
+      const r = footer!.getBoundingClientRect();
+      const x = e.clientX - r.left;
+      const y = e.clientY - r.top;
+      glow!.style.left = `${x}px`;
+      glow!.style.top = `${y}px`;
+      glow!.style.opacity = "1";
+      footer!.style.setProperty("--mx", `${x}px`);
+      footer!.style.setProperty("--my", `${y}px`);
     }
 
     function onLeave() {
-      orb!.style.opacity = "0";
-      footer!.querySelectorAll(".marquee-item").forEach((el) => el.classList.remove("lit"));
+      glow!.style.opacity = "0";
+      // Move mask off‑screen – removes the bright accent layer → content blend resets
+      footer!.style.setProperty("--mx", "-9999px");
+      footer!.style.setProperty("--my", "-9999px");
     }
 
     footer.addEventListener("mousemove", onMove);
@@ -90,35 +370,14 @@ export function Footer() {
     };
   }, []);
 
-  // ── Scroll‑triggered fade‑up animation ─────────────────────────────────────
-  useEffect(() => {
-    const els = footerRef.current?.querySelectorAll<HTMLElement>(".fade-up") ?? [];
-    const io = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            (e.target as HTMLElement).classList.add("visible");
-            io.unobserve(e.target);
-          }
-        }),
-      { threshold: 0.15 }
-    );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, []);
-
-  // ── Legacy footer‑link click handler (scrolls to relevant sections) ───────
-  const handleFooterLinkClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    label: string
-  ) => {
+  const handleFooterLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, label: string) => {
+    e.preventDefault();
     if (
       label.includes("Configurator") ||
       label.includes("RFP") ||
       label.includes("Audit") ||
       label.includes("Briefing Builder")
     ) {
-      e.preventDefault();
       document.getElementById("briefing-builder")?.scrollIntoView({ behavior: "smooth" });
     } else if (
       label.includes("Briefing") ||
@@ -126,146 +385,63 @@ export function Footer() {
       label.includes("Call") ||
       label.includes("Start a conversation")
     ) {
-      e.preventDefault();
       document.getElementById("cta")?.scrollIntoView({ behavior: "smooth" });
-    } else if (label.includes("About") || label.includes("Founders")) {
-      e.preventDefault();
-      window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
-      e.preventDefault();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
   return (
-    <>
-      {/* ── Floating light‑blue orb (fixed, follows cursor) ── */}
+    <footer
+      ref={footerRef}
+      className="relative bg-[#00080eff] border-t border-[rgba(178,213,229,0.10)] overflow-hidden"
+      style={{ "--mx": "-9999px", "--my": "-9999px" } as React.CSSProperties}
+    >
+      {/* ── LAYER 0 : ghost DZEN outline (behind everything, no blend) ──── */}
       <div
-        ref={orbRef}
         aria-hidden="true"
-        className="pointer-events-none fixed z-0 w-[320px] h-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 transition-opacity duration-400"
+        className="absolute inset-0 z-0 pointer-events-none overflow-hidden flex items-center justify-center"
         style={{
-          background:
-            "radial-gradient(circle, rgba(178,213,229,0.10) 0%, transparent 70%)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)",
+          maskImage:
+            "linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)",
         }}
+      >
+        <GhostWatermark />
+      </div>
+
+      {/* ── LAYER 1 : accent DZEN (under content, bright cyan, masked) ──── */}
+      <SpotlightAccent />
+
+      {/* ── LAYER 2 : diffuse mouse glow ────────────────────────────────── */}
+      <div
+        ref={glowRef}
+        aria-hidden="true"
+        className="pointer-events-none absolute z-[2] w-[480px] h-[480px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 transition-opacity duration-500"
+        style={{ background: "radial-gradient(circle, rgba(126,195,226,0.049) 0%, transparent 70%)" }}
       />
 
-      <footer
-        ref={footerRef}
-        className="relative bg-[#00080eff] border-t border-[rgba(178,213,229,0.1)] overflow-hidden"
-      >
-        {/* ── CTA strip ────────────────────────────────────── */}
-        <div className="fade-up text-center px-6 py-20 border-b border-[rgba(178,213,229,0.1)]">
-          <p className="font-mono text-[10px] tracking-[0.18em] uppercase text-white mb-6">
-            Ready to connect your stack?
-          </p>
-          <h2 className="text-[clamp(2rem,5vw,3.75rem)] font-serif font-normal tracking-[-0.025em] text-white leading-[1.1] mb-8">
-            Your systems,
-            <br />
-            working together.
-          </h2>
-          <button
-            onClick={() => router.push("/discovery")}
-            className="group relative inline-flex items-center gap-2.5 border border-[rgba(178,213,229,0.25)] text-white/60 font-mono text-[11px] tracking-[0.1em] uppercase px-7 py-[14px] overflow-hidden transition-[color,border-color] duration-300 hover:text-white hover:border-[#7ec3e2ff]"
-          >
-            <span className="absolute inset-0 bg-[#7ec3e2ff] scale-x-0 origin-left transition-transform duration-400 ease-[cubic-bezier(.65,0,.35,1)] group-hover:scale-x-100" />
-            <span className="relative z-10">Configure Operational RFP</span>
-            <span
-              className="relative z-10 transition-transform duration-300 group-hover:translate-x-1"
-              aria-hidden="true"
-            >
-              →
-            </span>
-          </button>
-        </div>
+      {/* ── LAYER 3 : all footer content (difference blend on the container) ── */}
+      <div className="relative z-20 mix-blend-difference max-w-[1320px] mx-auto px-12 max-md:px-6">
+        <FooterCTA onStart={() => router.push("/discovery")} />
+        <FooterLinks onLinkClick={handleFooterLinkClick} />
+        <FooterBottomBar onBackToTop={scrollToTop} />
+      </div>
 
-        {/* ── Link grid ────────────────────────────────────── */}
-        <div className="grid grid-cols-4 gap-0 px-12 py-16 border-b border-[rgba(178,213,229,0.1)] max-[1100px]:grid-cols-2 max-[1100px]:gap-10 max-[1100px]:px-6 max-[600px]:grid-cols-1">
-          {Object.entries(FOOTER_LINKS).map(([title, links], colIdx) => (
-            <div
-              key={title}
-              className="fade-up px-6"
-              style={{ transitionDelay: `${(colIdx + 1) * 80}ms` }}
-            >
-              <div className="font-mono text-[9px] tracking-[0.16em] uppercase text-white/60 font-bold mb-5">
-                {title}
-              </div>
-              <ul className="list-none flex flex-col gap-2" role="list">
-                {links.map((link: string) => (
-                  <li key={link}>
-                    <MagLink
-                      href="#"
-                      onClick={(e) => handleFooterLinkClick(e, link)}
-                    >
-                      {link}
-                    </MagLink>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        {/* ── Bottom bar ───────────────────────────────────── */}
-        <div className="flex items-center justify-between px-12 py-6 flex-wrap gap-4 max-[600px]:px-6 max-[600px]:flex-col max-[600px]:items-start">
-          <span className="font-mono text-[10px] tracking-[0.08em] text-white/60 select-text">
-            © 2026 DZen Operational Systems. All rights secured.
-          </span>
-          <div className="flex gap-6">
-            {["Privacy Policy", "Terms of Service", "Security Standards"].map(
-              (item) => (
-                <a
-                  key={item}
-                  href="#"
-                  onClick={(e) => e.preventDefault()}
-                  className="font-mono text-[10px] tracking-[0.08em] text-white/60 no-underline transition-colors duration-200 hover:text-white"
-                >
-                  {item}
-                </a>
-              )
-            )}
-          </div>
-        </div>
-
-        {/* ── Marquee (subtle lit state now white) ─────────── */}
-        <div
-          aria-hidden="true"
-          className="border-t border-[rgba(178,213,229,0.1)] overflow-hidden py-10 cursor-default select-none"
-        >
-          <div className="flex whitespace-nowrap animate-marquee">
-            {[...Array(4)].flatMap((_, i) =>
-              ["DZen", "Workflow", "Integration", "Enterprise"].map((word) => (
-                <span
-                  key={`${i}-${word}`}
-                  className="marquee-item text-[clamp(5rem,10vw,8rem)] font-bold tracking-[-0.03em] text-transparent [-webkit-text-stroke:1px_rgba(178,213,229,0.14)] px-10 transition-all duration-300 [&.lit]:text-white/40 [&.lit]:[-webkit-text-stroke:0px_transparent]"
-                >
-                  {word}
-                </span>
-              ))
-            )}
-          </div>
-        </div>
-      </footer>
-
-      {/* ── Global animations (marquee + fade‑up) ────────────────────────────── */}
       <style>{`
-        @keyframes marquee {
-          from { transform: translateX(0); }
-          to { transform: translateX(-50%); }
-        }
-        .animate-marquee {
-          animation: marquee 22s linear infinite;
-        }
-        .fade-up {
+        .footer-reveal {
           opacity: 0;
-          transform: translateY(28px);
-          transition: opacity .7s ease, transform .7s ease;
+          transform: translateY(24px);
+          transition: opacity 0.85s ease, transform 0.85s ease;
         }
-        .fade-up.visible {
+        .footer-reveal.is-visible {
           opacity: 1;
           transform: none;
         }
       `}</style>
-    </>
+    </footer>
   );
 }

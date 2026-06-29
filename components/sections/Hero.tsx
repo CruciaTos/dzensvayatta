@@ -44,7 +44,7 @@ export function Hero({ textPosition = { preset: "center" }, className }: HeroPro
     if (!section || !h1) return;
 
     const updateSize = () => {
-      const size = window.getComputedStyle(h1).fontSize; // e.g. "148.5px"
+      const size = window.getComputedStyle(h1).fontSize;
       section.style.setProperty("--h1-size", size);
     };
 
@@ -90,7 +90,7 @@ export function Hero({ textPosition = { preset: "center" }, className }: HeroPro
         }}
       >
         <div className="flex flex-col items-center text-center w-full">
-          {/* Eyebrow */}
+          {/* Eyebrow – now contains ". WE BUILD. YOU SCALE" */}
           <motion.p
             className="font-mono uppercase tracking-[0.22em]"
             style={{
@@ -101,7 +101,9 @@ export function Hero({ textPosition = { preset: "center" }, className }: HeroPro
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
-          />
+          >
+            WE BUILD.YOU SCALE
+          </motion.p>
 
           {/* Headline */}
           <motion.div
@@ -113,11 +115,11 @@ export function Hero({ textPosition = { preset: "center" }, className }: HeroPro
               ref={headlineRef}
               className="font-zaslia m-0 p-0 select-none inline-flex items-center justify-center"
               style={{
-                fontSize: "clamp(100px, 25vw, 250px)", // Increased size
+                fontSize: "clamp(100px, 25vw, 250px)",
                 fontWeight: 500,
                 color: "#7ec3e2ff",
                 letterSpacing: "-0.025em",
-                lineHeight: 1, // Perfect vertical centering
+                lineHeight: 1,
               }}
               aria-label="DZ Svayatta"
             >
@@ -133,12 +135,14 @@ export function Hero({ textPosition = { preset: "center" }, className }: HeroPro
                 <AnimatePresence mode="wait">
                   <motion.span
                     key={isDevanagari ? "svayatta-dev" : "svayatta-en"}
-                    className={isDevanagari ? "font-devanagari" : "font-zaslia"}
                     style={{
                       display: "inline-block",
                       verticalAlign: "baseline",
                       fontSize: isDevanagari ? "0.9em" : "1em",
                       fontWeight: isDevanagari ? 300 : 500,
+                      fontFamily: isDevanagari
+                        ? "var(--font-devanagari)"
+                        : "var(--font-zaslia), sans-serif",
                     }}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -166,12 +170,12 @@ export function Hero({ textPosition = { preset: "center" }, className }: HeroPro
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
           >
-            We integrate AI into the operational fabric of your business — connecting the systems you
-            already run, automating the decisions you already make, and delivering intelligence where
-            it creates measurable value.
+            We integrate AI into the operational fabric of your business. <br />Connect the systems you
+            already run, automate the decisions you already make, and deliver intelligence where
+            it creates actual value.
           </motion.p>
 
-          {/* CTA buttons – re‑enable pointer events so they remain clickable */}
+          {/* CTA buttons */}
           <motion.div
             className="flex gap-3 flex-wrap justify-center"
             style={{
@@ -219,21 +223,21 @@ export function Hero({ textPosition = { preset: "center" }, className }: HeroPro
         </div>
       </div>
 
-      {/* ── 3. Subtle noise grain (above everything, very low opacity) ── */}
+      {/* ── 3. Subtle noise grain ── */}
       <div
         className="absolute inset-0 pointer-events-none z-40"
         style={{ opacity: 0.025 }}
         aria-hidden="true"
       />
 
-      {/* ── 4. Top horizontal rule ──────────────────────────────────────── */}
+      {/* ── 4. Top horizontal rule ── */}
       <div
         className="absolute left-0 right-0 h-px z-50"
         style={{ top: "64px", backgroundColor: "rgba(178, 213, 229, 0.1)" }}
         aria-hidden="true"
       />
 
-      {/* ── 5. Vertical divider (bottom left) ──────────────────────────── */}
+      {/* ── 5. Vertical divider (bottom left) ── */}
       <motion.div
         className="absolute bottom-0 left-12 w-px z-50"
         style={{ height: "80px", backgroundColor: "rgba(178, 213, 229, 0.12)" }}
@@ -243,7 +247,7 @@ export function Hero({ textPosition = { preset: "center" }, className }: HeroPro
         transition={{ duration: 1.2, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
       />
 
-      {/* ── 6. Scroll indicator (bottom left) ──────────────────────────── */}
+      {/* ── 6. Scroll indicator (bottom left) ── */}
       <motion.div
         className="absolute bottom-6 left-6 flex items-center gap-[10px] z-50 pointer-events-none"
         initial={{ opacity: 0 }}

@@ -9,15 +9,7 @@ import { FadeIn } from "@/components/ui/FadeIn";
    Colour tokens
 ───────────────────────────────────────────────────────────────────────── */
 const C = {
-  // Layer 1 — Case Studies SECTION background only.
-  // Paints behind the header + marquee + cards. Swap to a solid color,
-  // gradient, or image url() — completely independent of cardBg below.
-  sectionBg: "transparent", // ← current visual is preserved
-
-  // Layer 2 — individual CARD background only.
-  // Fully decoupled from sectionBg. As long as this stays "transparent"
-  // (today's value), cards paint nothing of their own, so you see straight
-  // through to the page's GlobalVideoBackground underneath everything.
+  sectionBg: "transparent",
   cardBg: "#0d0d0cff",
 
   blue: "#B2D5E5",
@@ -193,7 +185,7 @@ function MarqueeExpandingCard({
         }}
       />
 
-      {/* Inner content – bottom padding increased to make room for the absolute source */}
+      {/* Inner content */}
       <div
         style={{
           position: "relative",
@@ -252,7 +244,7 @@ function MarqueeExpandingCard({
           {c.org}
         </div>
 
-        {/* Headline (news title) – changed to off‑white */}
+        {/* Headline */}
         <h3
           className="font-sans"
           style={{
@@ -274,7 +266,7 @@ function MarqueeExpandingCard({
           {c.headline}
         </h3>
 
-        {/* Expandable body content */}
+        {/* Expandable body */}
         <div
           style={{
             flex: isExpanded ? 1 : "none",
@@ -315,7 +307,7 @@ function MarqueeExpandingCard({
         </div>
       </div>
 
-      {/* Source – absolutely positioned at the bottom, left-aligned */}
+      {/* Source */}
       <div
         style={{
           position: "absolute",
@@ -380,14 +372,14 @@ export function CaseStudies() {
       id="cases"
       aria-label="Real-world AI deployments"
       style={{
-        position: "relative", // anchors the new background layer below
+        position: "relative",
         padding: "120px 0",
         borderTop: `1px solid ${C.border}`,
         borderRadius: "24px",
         overflow: "hidden",
       }}
     >
-      {/* Layer 1: section background — sits behind everything below */}
+      {/* Section background layer */}
       <div
         aria-hidden="true"
         style={{
@@ -432,55 +424,67 @@ export function CaseStudies() {
               <p
                 className="font-sans text-body font-light leading-[1.7]"
                 style={{ color: C.dim }}
-              >
-                {/* placeholder */}
-              </p>
+              ></p>
             </div>
           </div>
         </FadeIn>
 
         <FadeIn delay={0.2}>
+          {/* ── Grey rounded centered box behind the marquee ── */}
           <div
-            className="marquee-container"
             style={{
-              height: "clamp(550px, 60vh, 760px)",
-              overflow: "hidden",
-              width: "100%",
+              background: "#1c1c20ff",          // grey
+              borderRadius: "24px",           // rounded corners
+              padding: "40px",                // internal spacing
+              marginTop: "40px",              // space from heading
+              boxShadow: "0 12px 40px rgba(0,0,0,0.25)",
+              overflow: "hidden",             // keeps rounded corners clipping content
+              position: "relative",
+              width: "100%",                  // centered via margin auto inside the max-width wrapper
             }}
           >
-            <style>{`
-              @keyframes marquee-scroll {
-                0% { transform: translateX(0); }
-                100% { transform: translateX(-50%); }
-              }
-              .marquee-track {
-                display: flex;
-                gap: 1px;
-                height: 100%;
-                animation: marquee-scroll 30s linear infinite;
-              }
-              .marquee-container:hover .marquee-track {
-                animation-play-state: paused;
-              }
-            `}</style>
+            <div
+              className="marquee-container"
+              style={{
+                height: "clamp(550px, 60vh, 760px)",
+                overflow: "hidden",
+                width: "100%",
+              }}
+            >
+              <style>{`
+                @keyframes marquee-scroll {
+                  0% { transform: translateX(0); }
+                  100% { transform: translateX(-50%); }
+                }
+                .marquee-track {
+                  display: flex;
+                  gap: 1px;
+                  height: 100%;
+                  animation: marquee-scroll 30s linear infinite;
+                }
+                .marquee-container:hover .marquee-track {
+                  animation-play-state: paused;
+                }
+              `}</style>
 
-            <div className="marquee-track">
-              {CASES.map((c) => (
-                <MarqueeExpandingCard
-                  key={c.id}
-                  c={c}
-                  isExpanded={activeId === c.id}
-                  onHover={handleHover}
-                />
-              ))}
-              {CASES.map((c) => (
-                <MarqueeExpandingCard
-                  key={`dup-${c.id}`}
-                  c={c}
-                  isExpanded={activeId === c.id}
-                  onHover={handleHover}
-                />
-              ))}
+              <div className="marquee-track">
+                {CASES.map((c) => (
+                  <MarqueeExpandingCard
+                    key={c.id}
+                    c={c}
+                    isExpanded={activeId === c.id}
+                    onHover={handleHover}
+                  />
+                ))}
+                {CASES.map((c) => (
+                  <MarqueeExpandingCard
+                    key={`dup-${c.id}`}
+                    c={c}
+                    isExpanded={activeId === c.id}
+                    onHover={handleHover}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </FadeIn>

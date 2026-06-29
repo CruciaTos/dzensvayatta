@@ -181,13 +181,13 @@ export default function FoundingPrinciples() {
       <div className="sticky top-0 h-screen flex items-center overflow-hidden">
         <Container>
           <div className="text-center">
-            <h2 className="font-serif text-[10rem] leading-none font-bold tracking-[-0.02em] text-[#e5f3e5]">
+            <h2
+              className="text-[10rem] leading-none font-bold tracking-[-0.02em] text-[#e5f3e5]"
+              style={{ fontFamily: "var(--font-sans)" }}
+            >
               <WordSlot text="WE" playRef={wePlayRef} />{" "}
               <WordSlot text="ARE" playRef={arePlayRef} />{" "}
-              <em className="italic text-[#a9bdf8]">
-                <WordSlot text="DZEN" playRef={dzenPlayRef} />
-              </em>
-              .
+              <WordSlot text="DZEN" playRef={dzenPlayRef} />.
             </h2>
           </div>
         </Container>

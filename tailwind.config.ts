@@ -46,7 +46,7 @@ const config: Config = {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
         mono: ["var(--font-mono)", "monospace"],
         zaslia: ["var(--font-zaslia)", "sans-serif"],
-        devanagari: ["var(--font-devanagari)", "Noto Sans Devanagari", "sans-serif"],
+        devanagari: ["var(--font-devanagari)"],
       },
       fontSize: {
         "display-1": ["clamp(64px,8vw,120px)", { lineHeight: "0.93", letterSpacing: "-0.03em" }],
