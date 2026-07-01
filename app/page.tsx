@@ -4,9 +4,6 @@ import { HeroSlideTransition } from "@/components/sections/HeroSlideTransition";
 import { TargetMarkets } from "@/components/sections/TargetMarkets";
 import { CapabilitiesSection } from "@/components/sections/CapabilitiesSection";
 import { IntegrationMarquee } from "@/components/sections/IntegrationMarquee";
-import { GrowthImpact } from "@/components/sections/GrowthImpact";
-import { OptimisationComparison } from "@/components/sections/OptimisationComparison";
-import { Contact } from "@/components/sections/Contact";
 import FoundingPrinciples from "@/components/sections/FoundingPrinciples";
 import { Testimonials } from "@/components/sections";
 

@@ -39,6 +39,12 @@ const sizeClasses: Record<ButtonSize, string> = {
   lg: "px-8 py-[14px] text-[14px]",
 };
 
+function omitAs<T extends { as?: unknown }>(props: T): Omit<T, "as"> {
+  const { as, ...rest } = props;
+  void as;
+  return rest;
+}
+
 export function Button({
   variant = "primary",
   size = "md",
@@ -54,17 +60,15 @@ export function Button({
   );
 
   if ((props as ButtonAsAnchor).as === "a") {
-    const { as: _as, ...anchorProps } = props as ButtonAsAnchor;
     return (
-      <a className={classes} {...anchorProps}>
+      <a className={classes} {...omitAs(props as ButtonAsAnchor)}>
         {children}
       </a>
     );
   }
 
-  const { as: _as, ...buttonProps } = props as ButtonAsButton;
   return (
-    <button className={classes} {...buttonProps}>
+    <button className={classes} {...omitAs(props as ButtonAsButton)}>
       {children}
     </button>
   );

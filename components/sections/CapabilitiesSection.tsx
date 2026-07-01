@@ -81,7 +81,6 @@ const PHASES: Phase[] = [
 function PhaseBlock({
   phase,
   index,
-  isActive,
 }: {
   phase: Phase;
   index: number;

@@ -73,7 +73,7 @@ export function SectionAnchor({ id }: { id: string }) {
 const ACCENT = "#7ec3e2";
 const ACCENT_SOFT = "rgba(178,213,229,0.85)";
 
-function OrbVisual({ progress, formIndex }: { progress: MotionValue<number>; formIndex: MotionValue<number> }) {
+function OrbVisual({ formIndex }: { progress: MotionValue<number>; formIndex: MotionValue<number> }) {
     // formIndex cycles 0..1 within each inter-anchor span:
     // 0.00–0.15  -> circle (resting)
     // 0.15–0.45  -> stretches into a thin horizontal grid-line bridge

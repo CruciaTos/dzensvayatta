@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Geist, DM_Serif_Display, IBM_Plex_Mono } from "next/font/google";
+import { Geist, DM_Serif_Display, IBM_Plex_Mono, Anek_Devanagari } from "next/font/google";
 import localFont from "next/font/local";
 import { siteMetadata, structuredData } from "@/lib/metadata";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
@@ -35,8 +35,9 @@ const zaslia = localFont({
   display: "swap",
 });
 
-const devanagariFont = localFont({
-  src: "../public/fonts/ams-calligraphy-1-regular/AMS_Calligraphy_1_Regular/AMS_Calligraphy_1_Regular.ttf",
+const devanagariFont = Anek_Devanagari({
+  subsets: ["devanagari", "latin"],
+  weight: ["400", "500", "600"],
   variable: "--font-devanagari",
   display: "swap",
 });

@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 import { SectionIndex } from "@/components/ui/SectionIndex";
 import { FadeIn } from "@/components/ui/FadeIn";
 

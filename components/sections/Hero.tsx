@@ -23,7 +23,7 @@ const SVAYATTA_EN = "Svayatta";
 const SVAYATTA_DEV = "स्वयत्ता";
 const TOGGLE_INTERVAL_MS = 10_000;
 
-export function Hero({ textPosition = { preset: "center" }, className }: HeroProps) {
+export function Hero({ className }: HeroProps) {
   const [isDevanagari, setIsDevanagari] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
@@ -138,8 +138,9 @@ export function Hero({ textPosition = { preset: "center" }, className }: HeroPro
                     style={{
                       display: "inline-block",
                       verticalAlign: "baseline",
-                      fontSize: isDevanagari ? "0.9em" : "1em",
-                      fontWeight: isDevanagari ? 300 : 500,
+                      fontSize: isDevanagari ? "0.95em" : "1em",
+                      fontWeight: 500,
+                      letterSpacing: isDevanagari ? "-0.02em" : undefined,
                       fontFamily: isDevanagari
                         ? "var(--font-devanagari)"
                         : "var(--font-zaslia), sans-serif",

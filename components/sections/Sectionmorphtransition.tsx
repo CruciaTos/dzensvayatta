@@ -169,6 +169,35 @@ function CardExpandOverlay({ p }: { p: MotionValue<number> }) {
    shift — referencing the 6-phase layout that follows.
 ───────────────────────────────────────────────────────────────────────────── */
 
+function ScanLine({ y, p }: { y: number; p: MotionValue<number> }) {
+  const opacity = useTransform(p, [0.18, 0.30, 0.64, 0.80], [0, 0.9, 0.9, 0]);
+  const scaleX = useTransform(p, [0.14, 0.33], [0, 1]);
+
+  return (
+    <motion.div
+      aria-hidden
+      style={{
+        position: "absolute",
+        top: `${y}%`,
+        left: 0,
+        right: 0,
+        height: 1,
+        pointerEvents: "none",
+        background: `linear-gradient(90deg,
+          transparent,
+          rgba(143,120,96,0.32) 30%,
+          rgba(178,213,229,0.38) 50%,
+          rgba(143,120,96,0.32) 70%,
+          transparent
+        )`,
+        opacity,
+        scaleX,
+        transformOrigin: "center",
+      }}
+    />
+  );
+}
+
 function GridMorphOverlay({ p }: { p: MotionValue<number> }) {
   const op = useTransform(p, [0.10, 0.22, 0.70, 0.86], [0, 0.7, 0.7, 0]);
 
@@ -192,28 +221,7 @@ function GridMorphOverlay({ p }: { p: MotionValue<number> }) {
 
       {/* Three structural scan-lines at phase positions */}
       {[22, 50, 78].map((y) => (
-        <motion.div
-          key={y}
-          aria-hidden
-          style={{
-            position: "absolute",
-            top: `${y}%`,
-            left: 0,
-            right: 0,
-            height: 1,
-            pointerEvents: "none",
-            background: `linear-gradient(90deg,
-              transparent,
-              rgba(143,120,96,0.32) 30%,
-              rgba(178,213,229,0.38) 50%,
-              rgba(143,120,96,0.32) 70%,
-              transparent
-            )`,
-            opacity: useTransform(p, [0.18, 0.30, 0.64, 0.80], [0, 0.9, 0.9, 0]),
-            scaleX: useTransform(p, [0.14, 0.33], [0, 1]),
-            transformOrigin: "center",
-          }}
-        />
+        <ScanLine key={y} y={y} p={p} />
       ))}
     </>
   );
@@ -226,35 +234,39 @@ function GridMorphOverlay({ p }: { p: MotionValue<number> }) {
    the rectangular card shapes of the Target Markets grid.
 ───────────────────────────────────────────────────────────────────────────── */
 
+function MarqueeMorphCircle({ i, p }: { i: number; p: MotionValue<number> }) {
+  const x = ((i + 0.5) / 6) * 100;
+  const width = useTransform(p, [0.14, 0.60], ["44px", "26%"]);
+  const height = useTransform(p, [0.14, 0.60], ["44px", "70%"]);
+  const borderRadius = useTransform(p, [0.14, 0.54], ["50%", "0%"]);
+  const opacity = useTransform(p, [0.08, 0.18, 0.74, 0.88], [0, 0.55, 0.55, 0]);
+
+  return (
+    <motion.div
+      aria-hidden
+      style={{
+        position: "absolute",
+        left: `${x}%`,
+        top: "50%",
+        transform: "translate(-50%, -50%)",
+        pointerEvents: "none",
+        width,
+        height,
+        borderRadius,
+        border: "1px solid rgba(178,213,229,0.12)",
+        opacity,
+        backgroundColor: "rgba(178,213,229,0.016)",
+      }}
+    />
+  );
+}
+
 function MarqueeMorphOverlay({ p }: { p: MotionValue<number> }) {
   return (
     <>
-      {Array.from({ length: 6 }, (_, i) => {
-        const x = ((i + 0.5) / 6) * 100;
-        return (
-          <motion.div
-            key={i}
-            aria-hidden
-            style={{
-              position: "absolute",
-              left: `${x}%`,
-              top: "50%",
-              transform: "translate(-50%, -50%)",
-              pointerEvents: "none",
-              width: useTransform(p, [0.14, 0.60], ["44px", "26%"]),
-              height: useTransform(p, [0.14, 0.60], ["44px", "70%"]),
-              borderRadius: useTransform(p, [0.14, 0.54], ["50%", "0%"]),
-              border: "1px solid rgba(178,213,229,0.12)",
-              opacity: useTransform(
-                p,
-                [0.08, 0.18, 0.74, 0.88],
-                [0, 0.55, 0.55, 0]
-              ),
-              backgroundColor: "rgba(178,213,229,0.016)",
-            }}
-          />
-        );
-      })}
+      {Array.from({ length: 6 }, (_, i) => (
+        <MarqueeMorphCircle key={i} i={i} p={p} />
+      ))}
     </>
   );
 }

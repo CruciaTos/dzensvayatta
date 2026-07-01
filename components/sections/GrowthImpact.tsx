@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useState } from "react";
 import { motion, useInView, useScroll, useTransform, AnimatePresence } from "framer-motion";
 
 // ── Design tokens (dark theme isolated to this section) ────────────────────
@@ -25,28 +25,6 @@ const C = {
 };
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-
-// ── Count-up hook ──────────────────────────────────────────────────────────
-function useCountUp(target: number, inView: boolean, duration = 1.6) {
-  const [display, setDisplay] = useState(0);
-  const prevInView = useRef(false);
-  useEffect(() => {
-    if (inView && !prevInView.current) {
-      let start: number | null = null;
-      const raf = (ts: number) => {
-        if (!start) start = ts;
-        const p = Math.min((ts - start) / (duration * 1000), 1);
-        const eased = 1 - Math.pow(1 - p, 3);
-        setDisplay(Math.round(eased * target));
-        if (p < 1) requestAnimationFrame(raf);
-        else setDisplay(target);
-      };
-      requestAnimationFrame(raf);
-    }
-    prevInView.current = inView;
-  }, [inView, target, duration]);
-  return display;
-}
 
 // ── Wire grid background ───────────────────────────────────────────────────
 function GridBackground() {
