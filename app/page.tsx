@@ -22,12 +22,13 @@ export default function HomePage() {
 
         <TargetMarkets />
         <TargetAreas />
-        <WhyUs />
+
 
         {/* 2. Target Markets — now follows Case Studies */}
         <CapabilitiesSection />    {/* 3. Methodology (6 Phase) */}
         {/* 4. Connected Systems */}
         <Testimonials />
+        <WhyUs />
 
 
 

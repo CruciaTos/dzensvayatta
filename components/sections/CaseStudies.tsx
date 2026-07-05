@@ -16,8 +16,8 @@ const C = {
   dim: "rgba(178,213,229,0.55)",
   faint: "rgba(178,213,229,0.32)",
   ghost: "rgba(178,213,229,0.018)",
-  // Glass morphism tokens
-  glassBg: "transparent",
+  // ── Glass container tokens (dark glass, like TargetAreas) ──
+  glassBg: "rgba(2, 7, 29, 0.5)",
   glassHighlight: "rgba(255,255,255,0.06)",
   glassBorder: "rgba(178,213,229,0.15)",
   glassShadow: "0 12px 40px rgba(0,0,0,0.2)",
@@ -78,6 +78,7 @@ function MarqueeExpandingCard({
   isExpanded: boolean;
   onHover: (id: string | null) => void;
 }) {
+  // ... unchanged code ...
   return (
     <div
       onMouseEnter={() => onHover(c.id)}
@@ -308,7 +309,7 @@ function MarqueeExpandingCard({
   );
 }
 
-/* ── Main section – with grid lines inside the glass container ── */
+/* ── Main section – container border now matches phase blocks ── */
 export function CaseStudies() {
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -327,7 +328,6 @@ export function CaseStudies() {
         backgroundColor: "transparent",
       }}
     >
-      {/* outer wrapper – same width logic as TargetAreas */}
       <div
         style={{
           maxWidth: "100%",
@@ -337,16 +337,17 @@ export function CaseStudies() {
           zIndex: 1,
         }}
       >
-        {/* ── Glass container ── */}
+        {/* ── Glass container – now with simple solid border ── */}
         <div
           style={{
             position: "relative",
             borderRadius: "40px",
             overflow: "hidden",
             boxShadow: C.glassShadow,
+            border: "1px solid rgba(126,195,226,0.2)",   // matches phase blocks
           }}
         >
-          {/* Transparent blur layer */}
+          {/* Dark semi‑transparent blur layer */}
           <div
             style={{
               position: "absolute",
@@ -358,7 +359,7 @@ export function CaseStudies() {
             }}
           />
 
-          {/* Subtle grid lines */}
+          {/* Grid lines */}
           <div
             aria-hidden="true"
             style={{
@@ -374,39 +375,41 @@ export function CaseStudies() {
             }}
           />
 
-          {/* Gradient border (bumped to zIndex 2) */}
+          {/* Watermarks */}
           <div
             aria-hidden="true"
             style={{
               position: "absolute",
-              inset: 0,
-              borderRadius: "40px",
-              padding: "1px",
-              background: "linear-gradient(135deg, rgba(178,213,229,0.25) 0%, rgba(178,213,229,0.05) 100%)",
-              WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-              WebkitMaskComposite: "xor",
-              maskComposite: "exclude",
+              top: "16px",
+              left: "24px",
+              fontFamily: "var(--font-mono)",
+              fontSize: "7px",
+              color: "rgba(126,195,226,0.2)",
               pointerEvents: "none",
-              zIndex: 2,
+              zIndex: 10,
             }}
-          />
-
-          {/* Top glossy reflection (bumped to zIndex 3) */}
+          >
+            + CASE_STUDY_PROTOCOL
+          </div>
           <div
             aria-hidden="true"
             style={{
               position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              height: "1px",
-              background: `linear-gradient(90deg, transparent, ${C.glassHighlight}, transparent)`,
-              zIndex: 3,
+              bottom: "16px",
+              right: "24px",
+              fontFamily: "var(--font-mono)",
+              fontSize: "7px",
+              color: "rgba(126,195,226,0.2)",
               pointerEvents: "none",
+              zIndex: 10,
             }}
-          />
+          >
+            REF_CS_004
+          </div>
 
-          {/* Content (bumped to zIndex 4) */}
+          {/* Gradient border and top reflection REMOVED */}
+
+          {/* Content */}
           <div style={{ position: "relative", zIndex: 4, padding: "clamp(56px, 7vw, 96px) clamp(40px, 5vw, 72px)" }}>
             <FadeIn>
               <div className="flex items-end justify-between mb-8 gap-12 max-md:flex-col max-md:items-start">

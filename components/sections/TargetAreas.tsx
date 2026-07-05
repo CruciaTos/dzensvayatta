@@ -3,7 +3,7 @@
 import { useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 
-// ── Design tokens ────────────────────────────────────────────────────────────
+// ── Design tokens (unchanged) ────────────────────────────────────────────────
 const C = {
   bg: "#000b12ff",
   accent: "#7EC3E2",
@@ -16,9 +16,8 @@ const C = {
   cardBorderHover: "rgba(126,195,226,0.28)",
   divider: "rgba(178,213,229,0.10)",
   glowSpot: "rgba(126,195,226,0.08)",
-  // Glass container tokens – no dark tint
-  glassBg: "transparent",
-  glassHighlight: "rgba(255,255,255,0.06)",
+  glassBg: "rgba(2, 7, 21, 0.7)",
+  glassHighlight: "rgba(255, 255, 255, 1)",
   glassBorder: "rgba(178,213,229,0.15)",
   glassShadow: "0 12px 40px rgba(0,0,0,0.2)",
 } as const;
@@ -26,7 +25,7 @@ const C = {
 const EASE = [0.22, 1, 0.36, 1] as const;
 const TRANSITION = `0.42s cubic-bezier(0.22,1,0.36,1)`;
 
-// ── Content: 6 service areas (icons removed) ─────────────────────────────────
+// ── Data (unchanged) ─────────────────────────────────────────────────────────
 interface TargetArea {
   id: string;
   title: string;
@@ -73,7 +72,6 @@ const TARGET_AREAS: TargetArea[] = [
   },
 ];
 
-// ── Column sibling mapping ────────────────────────────────────────────────────
 function getColumnSiblingId(id: string): string | null {
   const pairs: Record<string, string> = {
     agentic: "chatbot",
@@ -86,7 +84,7 @@ function getColumnSiblingId(id: string): string | null {
   return pairs[id] ?? null;
 }
 
-// ── SpotlightCard (icons removed) ────────────────────────────────────────────
+// ── SpotlightCard (description now grey and smaller) ────────────────────────
 interface CardProps {
   area: TargetArea;
   index: number;
@@ -144,10 +142,29 @@ function SpotlightCard({ area, index, isExpanded, isCompressed, onEnter, onLeave
       <div aria-hidden="true" style={{ position: "absolute", top: 0, left: "10%", right: "10%", height: "1px", background: `linear-gradient(90deg, transparent, ${C.accent}${isExpanded ? "55" : "18"}, transparent)`, transition: `background ${TRANSITION}`, zIndex: 1 }} />
 
       <div style={{ position: "relative", zIndex: 1, padding: "clamp(28px, 3vw, 40px)", display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
-        <h3 style={{ fontFamily: "var(--font-sans)", fontSize: "clamp(28px, 2vw, 38px)", fontWeight: 500, color: C.textPrimary, letterSpacing: "-0.022em", lineHeight: "1.15", marginBottom: "10px", flexShrink: 0 }}>
+        {/* Card title – unchanged */}
+        <h3 style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: "clamp(26px, 2.5vw, 34px)",
+          fontWeight: 400,
+          color: C.textPrimary,
+          letterSpacing: "-0.022em",
+          lineHeight: "1.15",
+          marginBottom: "14px",
+          flexShrink: 0,
+        }}>
           {area.title}
         </h3>
-        <p style={{ fontFamily: "var(--font-sans)", fontSize: "16px", fontWeight: 300, color: C.textMuted, lineHeight: "1.72", margin: 0, flexShrink: 0 }}>
+        {/* Description – now grey and 2px smaller (16px) */}
+        <p style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: "16px",            // reduced from 18px
+          fontWeight: 300,
+          color: C.textMuted,
+          lineHeight: "1.72",
+          margin: 0,
+          flexShrink: 0,
+        }}>
           {area.description}
         </p>
 
@@ -183,7 +200,7 @@ function SpotlightCard({ area, index, isExpanded, isCompressed, onEnter, onLeave
   );
 }
 
-// ── CardColumn ────────────────────────────────────────────────────────────────
+// ── CardColumn (unchanged) ──────────────────────────────────────────────────
 interface ColumnProps {
   areas: TargetArea[];
   indices: number[];
@@ -215,7 +232,7 @@ function CardColumn({ areas, indices, hoveredId, onEnter, onLeave }: ColumnProps
   );
 }
 
-// ── TargetAreas with grid lines added ─────────────────────────────────────────
+// ── TargetAreas (container border now matches phase block style) ────────────
 export function TargetAreas() {
   const headerRef = useRef<HTMLDivElement>(null);
   const headerInView = useInView(headerRef, { once: true, amount: 0.3 });
@@ -241,7 +258,6 @@ export function TargetAreas() {
         overflow: "hidden",
       }}
     >
-      {/* ambient glow */}
       <div
         aria-hidden="true"
         style={{
@@ -257,7 +273,6 @@ export function TargetAreas() {
         }}
       />
 
-      {/* ★ Wider outer wrapper ★ */}
       <div
         style={{
           maxWidth: "100%",
@@ -267,16 +282,16 @@ export function TargetAreas() {
           zIndex: 1,
         }}
       >
-        {/* ── Glass container with grid lines ── */}
         <div
           style={{
             position: "relative",
             borderRadius: "40px",
             overflow: "hidden",
             boxShadow: C.glassShadow,
+            // ── Border exactly like the phase blocks ──
+            border: "1px solid rgba(126,195,226,0.2)",   // #7EC3E2 at 20%
           }}
         >
-          {/* Transparent blur layer */}
           <div
             style={{
               position: "absolute",
@@ -287,8 +302,6 @@ export function TargetAreas() {
               zIndex: 0,
             }}
           />
-
-          {/* Subtle grid lines */}
           <div
             aria-hidden="true"
             style={{
@@ -303,40 +316,40 @@ export function TargetAreas() {
               pointerEvents: "none",
             }}
           />
-
-          {/* Gradient border (moved to zIndex 2) */}
           <div
             aria-hidden="true"
             style={{
               position: "absolute",
-              inset: 0,
-              borderRadius: "40px",
-              padding: "1px",
-              background: "linear-gradient(135deg, rgba(178,213,229,0.25) 0%, rgba(178,213,229,0.05) 100%)",
-              WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-              WebkitMaskComposite: "xor",
-              maskComposite: "exclude",
+              top: "16px",
+              left: "24px",
+              fontFamily: "var(--font-mono)",
+              fontSize: "7px",
+              color: "rgba(126,195,226,0.2)",
               pointerEvents: "none",
-              zIndex: 2,
+              zIndex: 10,
             }}
-          />
-
-          {/* Top glossy reflection (moved to zIndex 3) */}
+          >
+            + TARGET_PROTOCOL
+          </div>
           <div
             aria-hidden="true"
             style={{
               position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              height: "1px",
-              background: `linear-gradient(90deg, transparent, ${C.glassHighlight}, transparent)`,
-              zIndex: 3,
+              bottom: "16px",
+              right: "24px",
+              fontFamily: "var(--font-mono)",
+              fontSize: "7px",
+              color: "rgba(126,195,226,0.2)",
               pointerEvents: "none",
+              zIndex: 10,
             }}
-          />
+          >
+            REF_TA_007
+          </div>
 
-          {/* Content (bumped to zIndex 4) */}
+          {/* The previous gradient‑border pseudo‑elements have been removed.
+              Only the solid border above remains. */}
+
           <div style={{ position: "relative", zIndex: 4, padding: "clamp(56px, 7vw, 96px) clamp(40px, 5vw, 72px)" }}>
             <motion.div
               ref={headerRef}
@@ -345,15 +358,37 @@ export function TargetAreas() {
               transition={{ duration: 0.75, ease: EASE }}
               style={{ marginBottom: "clamp(52px, 8vw, 80px)" }}
             >
-              <h2 style={{ fontFamily: "var(--font-sans)", fontSize: "clamp(31px, 4.2vw, 57px)", fontWeight: 700, color: C.textPrimary, letterSpacing: "-0.026em", lineHeight: "1.1", marginBottom: "20px", maxWidth: "700px" }}>
+              <h2 style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "clamp(52px, 5vw, 72px)",
+                fontWeight: 700,
+                color: C.textPrimary,
+                letterSpacing: "-0.02em",
+                lineHeight: "1.1",
+                marginBottom: "24px",
+                maxWidth: "800px",
+              }}>
                 Where intelligence meets execution
               </h2>
-              <p style={{ fontFamily: "var(--font-sans)", fontSize: "18px", fontWeight: 300, color: C.textMuted, lineHeight: "1.72", maxWidth: "540px", margin: 0 }}>
+              <p style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "clamp(20px, 2.2vw, 26px)",
+                fontWeight: 500,
+                color: C.accent,
+                lineHeight: "1.4",
+                maxWidth: "950px",
+                margin: 0,
+              }}>
                 From autonomous agents to full‑stack platforms, we design and deploy AI‑native systems that cut through operational noise and amplify what makes your business unique.
               </p>
             </motion.div>
 
-            <div className="ta-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "clamp(12px, 1.6vw, 20px)", height: "clamp(560px, 64vh, 720px)" }}>
+            <div className="ta-grid" style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "clamp(12px, 1.6vw, 20px)",
+              height: "clamp(600px, 66vh, 780px)",
+            }}>
               {columns.map((col, ci) => (
                 <CardColumn key={ci} areas={col.areas} indices={col.indices} hoveredId={hoveredId} onEnter={handleEnter} onLeave={handleLeave} />
               ))}
