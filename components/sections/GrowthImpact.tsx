@@ -839,7 +839,7 @@ export function GrowthImpact() {
               maxWidth: 380,
               margin: 0,
             }}>
-              Transform operational inefficiencies into quantifiable results — tracked, measured, and continuously improved.
+              Transform operational inefficiencies into quantifiable results: tracked, measured, and continuously improved.
             </p>
           </div>
         </motion.div>

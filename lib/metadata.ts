@@ -9,7 +9,7 @@ export const siteMetadata: Metadata = {
     template: "%s | DZen",
   },
   description:
-    "DZen integrates AI into the operational fabric of your business — connecting the systems you already run, automating the decisions you already make, and delivering intelligence where it creates measurable value.",
+    "DZen integrates AI into how your business runs: connecting your existing systems, automating the work your team already does, and delivering results you can measure.",
   keywords: [
     "workflow integration",
     "enterprise AI",
@@ -29,7 +29,7 @@ export const siteMetadata: Metadata = {
     siteName: "DZen",
     title: "DZen — Intelligent Workflow Integration",
     description:
-      "We integrate AI into the operational fabric of your business — connecting the systems you already run, automating the decisions you already make.",
+      "We build AI into how your business runs: connecting your existing systems and automating the work your team already does.",
     images: [
       {
         url: "/og-image.png",

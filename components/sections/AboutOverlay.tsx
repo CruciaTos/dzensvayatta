@@ -8,6 +8,7 @@ import {
   useSpring,
 } from "framer-motion";
 import { LogoMark } from "@/components/ui/Icons";
+import { useLenis } from "@/components/providers/SmoothScroll";
 
 interface AboutOverlayProps {
   open: boolean;
@@ -15,6 +16,7 @@ interface AboutOverlayProps {
 }
 
 const C = {
+  bg: "#000b12",
   accent: "#7EC3E2",
   accentSoft: "#B2D5E5",
   textPrimary: "#e5f3e5",
@@ -22,12 +24,13 @@ const C = {
   cardBg: "#0d0d0c",
   cardBorder: "rgba(178,213,229,0.10)",
   divider: "rgba(178,213,229,0.10)",
-  panelBg: "#0a0b0d",
+  panelBg: "#000b12",
+  headerBg: "rgba(0, 11, 18, 0.95)",
 } as const;
 
 const COMPANY_META = [
   { label: "Established", value: "2025" },
-  { label: "Operation Scope", value: "Enterprise System Orchestration" },
+  { label: "Operation Scope", value: "Enterprise Workflow Integration" },
   { label: "Model Architecture", value: "Fixed-Scope, Human-in-the-Loop Integrations" },
   { label: "Compliance Standard", value: "SOC 2 Compatible · ISO 27001 Ready" },
 ];
@@ -39,7 +42,7 @@ const FOUNDERS = [
     email: "boridkar24@gmail.com",
     linkedIn: "https://linkedin.com/in/sohamboridkar",
     quote:
-      "The true test of a system is silence. If a pipeline requires excessive alerts and corrections, it lacks soul. We build models that run invisibly so managers can focus purely on outcomes.",
+      "The real test is when nobody notices the system running. If a pipeline needs constant alerts and fixes, something is wrong. We build things that stay out of the way so managers can focus on outcomes.",
     delay: 0.1,
   },
   {
@@ -48,7 +51,7 @@ const FOUNDERS = [
     email: "smit2004mhatre@gmail.com",
     linkedIn: "https://linkedin.com/in/smit-mhatre",
     quote:
-      "We map the exact heuristics your top specialists apply when matching spreadsheets or vetting invoices, then translate those steps into robust, auditable decision pipelines.",
+      "We document how your best people match spreadsheets or vet invoices, then turn those steps into pipelines your team can audit.",
     delay: 0.2,
   },
   {
@@ -57,7 +60,7 @@ const FOUNDERS = [
     email: "varun.pal@dzen.io",
     linkedIn: "https://www.linkedin.com/in/b777varunpal/",
     quote:
-      "Integration is only half the equation. The other half is trust — systems that explain their decisions, respect boundaries, and earn their place in daily operations.",
+      "Integration is half the job. The other half is trust: systems that explain what they did, stay within their limits, and earn a place in daily operations.",
     delay: 0.3,
   },
 ] as const;
@@ -193,7 +196,7 @@ function FounderCard({
       <div className="relative z-10">
         <motion.h3
           style={{ x: sx, y: sy, color: C.textPrimary }}
-          className="font-serif text-[clamp(1.75rem,3vw,2.5rem)] font-bold leading-[1.1] tracking-[-0.02em] mb-2 cursor-pointer select-none"
+          className="font-sans text-[clamp(1.75rem,3vw,2.5rem)] font-bold leading-[1.1] tracking-[-0.02em] mb-2 cursor-pointer select-none"
         >
           {name}
         </motion.h3>
@@ -245,19 +248,52 @@ function FounderCard({
 }
 
 export function AboutOverlay({ open, onClose }: AboutOverlayProps) {
+  const lenis = useLenis();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
+
     if (open) {
       document.body.style.overflow = "hidden";
       document.addEventListener("keydown", handler);
+      lenis?.stop();
     }
+
     return () => {
       document.body.style.overflow = "";
       document.removeEventListener("keydown", handler);
+      lenis?.start();
     };
-  }, [open, onClose]);
+  }, [open, onClose, lenis]);
+
+  useEffect(() => {
+    if (!open) return;
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const onWheel = (e: WheelEvent) => {
+      const { scrollTop, scrollHeight, clientHeight } = el;
+      const maxScroll = scrollHeight - clientHeight;
+      if (maxScroll <= 0) return;
+
+      const scrollingDown = e.deltaY > 0;
+      const scrollingUp = e.deltaY < 0;
+      const atTop = scrollTop <= 0;
+      const atBottom = scrollTop >= maxScroll - 1;
+
+      if ((scrollingUp && atTop) || (scrollingDown && atBottom)) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      el.scrollTop += e.deltaY;
+    };
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [open]);
 
   return (
     <AnimatePresence>
@@ -292,7 +328,7 @@ export function AboutOverlay({ open, onClose }: AboutOverlayProps) {
               className="flex-shrink-0 flex items-center justify-between px-8 sm:px-10 py-5 z-30"
               style={{
                 borderBottom: `1px solid ${C.divider}`,
-                backgroundColor: "rgba(10,11,13,0.95)",
+                backgroundColor: C.headerBg,
                 backdropFilter: "blur(12px)",
               }}
             >
@@ -301,7 +337,7 @@ export function AboutOverlay({ open, onClose }: AboutOverlayProps) {
                   className="w-6 h-6 flex items-center justify-center flex-shrink-0 rounded-[1px]"
                   style={{ backgroundColor: C.accent }}
                 >
-                  <LogoMark className="w-[12px] h-[12px] text-[#0a0b0d]" />
+                  <LogoMark className="w-[12px] h-[12px] text-[#000b12]" />
                 </div>
                 <span
                   className="font-mono text-[13px] font-bold tracking-[0.1em] uppercase"
@@ -332,7 +368,11 @@ export function AboutOverlay({ open, onClose }: AboutOverlayProps) {
               </button>
             </div>
 
-            <div className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain scrollbar-thin px-8 sm:px-10 py-10 sm:py-12 space-y-12">
+            <div
+              ref={scrollRef}
+              data-lenis-prevent
+              className="founders-scroll flex-1 min-h-0 overflow-y-auto overscroll-y-contain scrollbar-thin px-8 sm:px-10 py-10 sm:py-12 space-y-12"
+            >
               <div className="space-y-6">
                 <div className="flex items-center gap-2">
                   <span
@@ -343,19 +383,19 @@ export function AboutOverlay({ open, onClose }: AboutOverlayProps) {
                 </div>
 
                 <h2
-                  className="font-serif text-[clamp(2rem,4vw,3rem)] font-bold leading-[1.05] tracking-[-0.03em]"
+                  className="font-sans text-[clamp(2rem,4vw,3rem)] font-bold leading-[1.05] tracking-[-0.03em]"
                   style={{ color: C.textPrimary }}
                 >
                   Enterprise systems need{" "}
-                  <span className="italic" style={{ color: C.textMuted }}>soul</span> and{" "}
-                  <span className="italic" style={{ color: C.textMuted }}>symmetry</span>.
+                  <span style={{ color: C.accentSoft }}>clarity</span> and{" "}
+                  <span style={{ color: C.accentSoft }}>control</span>.
                 </h2>
 
                 <p
                   className="font-sans text-[14px] font-normal leading-relaxed max-w-xl"
                   style={{ color: C.textMuted }}
                 >
-                  DZen was pioneered to close the silent operational gaps that drain corporate focus, time, and revenue. We build the secure, custom AI-native orchestrator layer that connects ERP layouts with communications channels seamlessly.
+                  DZen was built to close the operational gaps that drain focus, time, and revenue. We build secure, custom integrations that connect your ERP, comms tools, and the systems you already run.
                 </p>
 
                 <p

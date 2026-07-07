@@ -152,9 +152,9 @@ export function Workflow() {
         {/* Legend */}
         <FadeIn delay={0.1} className="flex gap-8 mt-16 pt-10 border-t border-border flex-wrap">
           {[
-            { accent: false, label: "Existing systems — unchanged" },
+            { accent: false, label: "Existing systems stay unchanged" },
             { accent: true, label: "DZen intelligence layer" },
-            { accent: false, label: "Automated outputs — measurable outcomes" },
+            { accent: false, label: "Automated outputs with measurable outcomes" },
           ].map(({ accent, label }) => (
             <div key={label} className="flex items-center gap-[10px]">
               <div

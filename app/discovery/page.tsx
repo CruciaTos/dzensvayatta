@@ -2,7 +2,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { DiscoveryForm } from "@/components/sections/DiscoveryForm";
 
 export const metadata = {
-  title: "Request a Discovery Call — DZen",
+  title: "Request a Discovery Call | DZen",
   description:
     "Schedule a discovery call with us to discuss how we can integrate AI into your business operations.",
 };

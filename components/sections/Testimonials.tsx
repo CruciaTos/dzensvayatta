@@ -34,9 +34,20 @@ interface Testimonial {
 
 const TESTIMONIALS: Testimonial[] = [
   {
+    id: "bharat-aarti",
+    quote:
+      "\u201CDzen Svayatta automated our operations and gave us complete visibility into how our business runs. What once took constant follow-ups and manual coordination is now streamlined, transparent, and built to scale. The way we work has changed.\u201D",
+    author: "Bharat Boridkar",
+    role: "Senior Accountant",
+    company: "Aarti Enterprise",
+    industry: "Professional Services",
+    service: "Operations Automation",
+    outcome: { value: "Full", label: "operational visibility" },
+  },
+  {
     id: "1",
     quote:
-      "\u201CThey didn't just connect our systems — they gave us a single source of truth that our entire leadership team now trusts. The discovery phase alone saved us months.\u201D",
+      "\u201CThey connected our systems and gave leadership one source of truth everyone trusts. The discovery phase alone saved us months.\u201D",
     author: "Sarah Chen",
     role: "VP of Operations",
     company: "Meridian Logistics",
@@ -58,7 +69,7 @@ const TESTIMONIALS: Testimonial[] = [
   {
     id: "3",
     quote:
-      "\u201CTheir approach to data migration was methodical and transparent — not a single record lost. We were live two weeks ahead of schedule.\u201D",
+      "\u201CTheir data migration was methodical and transparent. We did not lose a single record and went live two weeks early.\u201D",
     author: "Elena Vasquez",
     role: "Chief Data Officer",
     company: "Nexus Finance",
@@ -91,18 +102,18 @@ const TESTIMONIALS: Testimonial[] = [
   {
     id: "6",
     quote:
-      "\u201CThe AI chatbot they integrated into our e‑commerce platform handles over 60% of our support tickets. Our team finally has time to focus on complex issues.\u201D",
+      "\u201CThe AI chatbot they integrated into our e-commerce platform handles over 60% of our support tickets. Our team finally has time to focus on complex issues.\u201D",
     author: "Rachel Kim",
     role: "Head of Customer Experience",
     company: "Luxe & Bloom",
-    industry: "E‑commerce",
+    industry: "E-commerce",
     service: "AI Integration",
     outcome: { value: "60%", label: "ticket deflection" },
   },
   {
     id: "7",
     quote:
-      "\u201CAs a nonprofit, we were skeptical about AI. But they proved it could work for us — now we match donors to causes in real time, and our giving has doubled.\u201D",
+      "\u201CWe were skeptical about AI as a nonprofit. They showed us it could work. We now match donors to causes in real time and giving has doubled.\u201D",
     author: "James Worthy",
     role: "Executive Director",
     company: "Bridge to Tomorrow",
@@ -219,9 +230,9 @@ export function Testimonials() {
           </h2>
 
           {/* Quote block – text with ScrollReveal, marks fade in together */}
-          <div ref={quoteContainerRef} className="h-60 sm:h-52 flex items-center justify-center max-w-[1700px] px-4 overflow-hidden">
+          <div ref={quoteContainerRef} className="flex items-center justify-center w-full max-w-[1700px] px-4 py-2 min-h-[8rem]">
             <AnimatePresence mode="wait">
-              <div key={active.id} className="flex items-center justify-center text-center">
+              <div key={active.id} className="flex items-start justify-center text-center gap-1 max-w-5xl mx-auto w-full">
                 {startsWithQuote && (
                   <motion.span
                     aria-hidden="true"
@@ -231,7 +242,7 @@ export function Testimonials() {
                     transition={{ duration: 0.5 }}
                     style={{
                       color: C.accent,
-                      fontSize: "clamp(34px,3vw,44px)",
+                      fontSize: "clamp(28px,2.5vw,38px)",
                       lineHeight: 1,
                       fontFamily: "var(--font-sans)",
                     }}
@@ -246,9 +257,9 @@ export function Testimonials() {
                   baseOpacity={0}
                   baseRotation={0}
                   blurStrength={6}
-                  containerClassName="inline m-0 p-0"
-                  textClassName="text-[clamp(34px,3vw,44px)] font-normal leading-tight text-center inline m-0 p-0"
-                  style={{ color: C.textPrimary, wordSpacing: "0.09em", fontFamily: "var(--font-sans)" }}
+                  containerClassName="flex-1 min-w-0 m-0 p-0"
+                  textClassName="text-[clamp(26px,2.5vw,38px)] font-normal leading-snug text-center block m-0 p-0"
+                  style={{ color: C.textPrimary, wordSpacing: "0.06em", fontFamily: "var(--font-sans)" }}
                 >
                   {mainText}
                 </ScrollReveal>
@@ -262,7 +273,7 @@ export function Testimonials() {
                     transition={{ duration: 0.5 }}
                     style={{
                       color: C.accent,
-                      fontSize: "clamp(34px,3vw,44px)",
+                      fontSize: "clamp(28px,2.5vw,38px)",
                       lineHeight: 1,
                       fontFamily: "var(--font-sans)",
                     }}
@@ -282,7 +293,7 @@ export function Testimonials() {
               animate={{ opacity: isQuoteInView ? 1 : 0 }}
               exit={{ opacity: 0, transition: { duration: 0.2 } }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="mt-20 flex flex-col items-center"
+              className="mt-12 sm:mt-16 flex flex-col items-center"
             >
               <p className="font-sans text-[32px] font-bold mb-1" style={{ color: C.textPrimary }}>
                 {active.author}

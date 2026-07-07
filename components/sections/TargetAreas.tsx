@@ -55,7 +55,7 @@ const TARGET_AREAS: TargetArea[] = [
       "Predictive Modeling & Forecasting",
       "NLP & Document Intelligence",
       "Anomaly Detection & Risk Signals",
-      "Executive Dashboards ",
+      "Executive Dashboards & KPI Reporting",
     ],
   },
   {

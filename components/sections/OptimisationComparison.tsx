@@ -97,7 +97,7 @@ export function OptimisationComparison() {
             </div>
             <div className="max-w-[380px] flex-shrink-0">
               <p className="font-sans text-body font-light text-stone-400 leading-[1.7]">
-                Real before-and-after figures from deployed automations — the same workflows, measured before and after the integration layer went live.
+                Real before-and-after figures from deployed automations: the same workflows, measured before and after the integration layer went live.
               </p>
             </div>
           </div>

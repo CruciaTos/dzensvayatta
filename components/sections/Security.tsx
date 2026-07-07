@@ -74,7 +74,7 @@ export function Security() {
             </p>
 
             <p className="font-sans text-[14px] font-light text-stone-400 leading-[1.7]">
-              We build every integration with enterprise security standards as a baseline — not an afterthought. Every automated decision is auditable, every access point is controlled, and every deployment is reversible.
+              We build every integration with enterprise security standards as a baseline, not an afterthought. Every automated decision is auditable, every access point is controlled, and every deployment is reversible.
             </p>
 
             <div className="mt-12 flex flex-wrap gap-[10px]" role="list" aria-label="Compliance certifications">

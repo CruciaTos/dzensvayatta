@@ -59,7 +59,7 @@ export function Hero({ className }: HeroProps) {
     <section
       ref={sectionRef}
       id="hero"
-      aria-label="DZen hero — Intelligent Workflow Integration"
+      aria-label="DZen hero, intelligent workflow integration"
       className={`min-h-screen flex flex-col items-start justify-center relative overflow-hidden ${className ?? ""}`}
     >
       {/* ── 1. DotField (interactive, behind content) ─────────────────── */}
@@ -171,9 +171,9 @@ export function Hero({ className }: HeroProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
           >
-            We integrate AI into the operational fabric of your business. <br />Connect the systems you
-            already run, automate the decisions you already make, and deliver intelligence where
-            it creates actual value.
+            We build AI into how your business actually runs. <br />Connect the systems you
+            already use, automate the work your team already does, and put intelligence where
+            it pays off.
           </motion.p>
 
           {/* CTA buttons */}

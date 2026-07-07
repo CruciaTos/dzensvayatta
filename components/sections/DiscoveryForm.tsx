@@ -65,77 +65,24 @@ export function DiscoveryForm() {
     setStep("sending");
 
     try {
-      const startISO = new Date(`${form.meetDate}T${form.meetTime}:00`).toISOString();
-      const endDate = new Date(`${form.meetDate}T${form.meetTime}:00`);
-      endDate.setMinutes(endDate.getMinutes() + 60);
-      const endISO = endDate.toISOString();
-
-      const emailBody = `
-New Discovery Call Request — DZen
-
-Company: ${form.companyName}
-Industry: ${form.companyField}
-Description: ${form.description}
-Email: ${form.email}
-Contact: ${form.contactNo}
-Requested Meeting: ${form.meetDate} at ${form.meetTime}
-      `.trim();
-
-      const gmailRes = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch("/api/discovery", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-6",
-          max_tokens: 1000,
-          mcp_servers: [
-            { type: "url", url: "https://gmailmcp.googleapis.com/mcp/v1", name: "gmail" },
-          ],
-          messages: [
-            {
-              role: "user",
-              content: `Send an email using Gmail with:
-- To: dzen.ai.platform@gmail.com
-- Subject: [Discovery Call] ${form.companyName} — ${form.meetDate} ${form.meetTime}
-- Body: ${emailBody}
-
-After sending, reply with just: SENT`,
-            },
-          ],
-        }),
+        body: JSON.stringify(form),
       });
 
-      if (!gmailRes.ok) throw new Error("Gmail send failed");
+      const data = (await res.json()) as { error?: string };
 
-      const calRes = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-6",
-          max_tokens: 1000,
-          mcp_servers: [
-            { type: "url", url: "https://calendarmcp.googleapis.com/mcp/v1", name: "gcal" },
-          ],
-          messages: [
-            {
-              role: "user",
-              content: `Create a Google Calendar event with these details:
-- Title: Discovery Call — ${form.companyName}
-- Start: ${startISO}
-- End: ${endISO}
-- Description: ${emailBody}
-- Attendee email: ${form.email}
-
-After creating, reply with just: CREATED`,
-            },
-          ],
-        }),
-      });
-
-      if (!calRes.ok) throw new Error("Calendar event creation failed");
+      if (!res.ok) {
+        throw new Error(data.error || "Unable to schedule the discovery call.");
+      }
 
       setStep("success");
     } catch (err) {
       console.error(err);
+      setErrorMsg(
+        err instanceof Error ? err.message : "Something went wrong. Please try again."
+      );
       setStep("error");
     }
   }
@@ -202,11 +149,14 @@ After creating, reply with just: CREATED`,
           <h1 className="font-sans text-3xl" style={{ color: C.textPrimary }}>
             Something went wrong.
           </h1>
-          <p style={{ color: C.textMuted }} className="text-sm">
-            Please try again or email us directly.
+          <p style={{ color: C.textMuted }} className="text-sm max-w-[360px]">
+            {errorMsg || "Please try again or email us directly."}
           </p>
           <button
-            onClick={() => setStep("form")}
+            onClick={() => {
+              setErrorMsg("");
+              setStep("form");
+            }}
             className="font-mono text-[11px] tracking-[0.14em] uppercase hover:opacity-70 transition-opacity bg-transparent border-none cursor-pointer"
             style={{ color: C.accent }}
           >

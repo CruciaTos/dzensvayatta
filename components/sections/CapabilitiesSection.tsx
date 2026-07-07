@@ -29,7 +29,7 @@ const PHASES: Phase[] = [
     navLabel: "Audit",
     title: "Workflow Audit",
     description:
-      "We map your existing workflows before writing a single line of code — surfacing the integrations, edge cases, and legacy constraints that shape every decision that follows.",
+      "We map your workflows before we write code. That surfaces the integrations, edge cases, and legacy constraints that shape what we build next.",
     deliverables: [
       "Stakeholder shadow interviews",
       "Process bottleneck maps",
@@ -41,7 +41,7 @@ const PHASES: Phase[] = [
     navLabel: "Blueprint",
     title: "Execution Blueprint",
     description:
-      "Every system touchpoint is documented, sequenced, and assigned a risk tier — so engineering effort flows to the highest-impact work first, with nothing built speculatively.",
+      "Every system touchpoint gets documented, sequenced, and risk-rated. Engineering effort goes to the highest-impact work first. Nothing gets built on assumptions.",
     deliverables: [
       "Event sequence maps",
       "API contract outlines",
@@ -53,7 +53,7 @@ const PHASES: Phase[] = [
     navLabel: "Build",
     title: "Build & Testing",
     description:
-      "Custom agents trained on your actual data and business logic — with human review checkpoints built into every critical pipeline stage from day one.",
+      "Custom agents trained on your data and business logic. Human review checkpoints sit in every critical pipeline stage from day one.",
     deliverables: [
       "Custom model fine-tuning",
       "Pipeline logic scripts",
@@ -65,7 +65,7 @@ const PHASES: Phase[] = [
     navLabel: "Deploy",
     title: "Deploy & Optimization",
     description:
-      "Changes ship in controlled increments with automatic rollback conditions — your users see zero disruption while the new system settles.",
+      "Changes ship in small, controlled increments with rollback built in. Users see no disruption while the new system beds in.",
     deliverables: [
       "Canary release filters",
       "Reversible DB states",

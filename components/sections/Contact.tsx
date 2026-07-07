@@ -27,7 +27,7 @@ export function Contact() {
               Let&apos;s start the conversation.
             </h2>
             <p className="font-sans text-[14px] font-light text-stone-400 leading-[1.7] max-w-[420px] mb-10">
-              Tell us what&apos;s slowing your team down. We&apos;ll respond within one business day with next steps — no sales deck, just a direct answer.
+              Tell us what&apos;s slowing your team down. We&apos;ll respond within one business day with next steps. No sales deck, just a direct answer.
             </p>
             <Button as="a" href="mailto:hello@DZen.io" variant="primary" size="md">
               Send us a message →

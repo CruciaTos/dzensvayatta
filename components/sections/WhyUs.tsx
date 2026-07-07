@@ -22,14 +22,14 @@ const C = {
 } as const;
 
 const PARAGRAPHS: string[] = [
-  "We are a team of founders, young, ambitious, and genuinely passionate about what we do.  We are not interested in selling you a product, taking your payment, and moving on to the next client. We are here to make you scale : your workflows, your systems underneth everything,  your marketing, your social presence,. Whatever the case, we can help.",
-  "Everything we do comes back to one thing and that is Clarity. No vague promises, No guess work. We don't try to be the right fit for everyone. Just the people who value clarity, execution,growth. We Are For you, If You Are here To Scale.",
-  "There might be someone cheaper out there. There won't always be someone this invested and reliable. We build systems designed to grow with you, and we keep improving them as your business evolves. In the next few years, every industry will need to make peace with AI or risk being left behind; we'd rather help you get ahead now.",
+  "We are a team of founders, young, ambitious, and genuinely passionate about what we do. We are not interested in selling you a product, taking your payment, and moving on to the next client. We are here to help you scale: your workflows, the systems underneath everything, your marketing, your social presence. Whatever the case, we can help.",
+  "Everything we do comes back to one thing: clarity. No vague promises. No guesswork. We don't try to be the right fit for everyone, just for people who value clarity, execution, and growth. We are for you if you are here to scale.",
+  "There might be someone cheaper out there. There won't always be someone this invested and reliable. We build systems designed to grow with you, and we keep improving them as your business evolves. In the next few years, every industry will need to make peace with AI or risk being left behind. We'd rather help you get ahead now.",
 ];
 
 // ── Word-level scroll highlight ──────────────────────────────────────────────
 type Segment = { type: "word"; text: string } | { type: "break" };
-const LINE_BREAK_PHRASE = "We Are For you, If You Are here To Scale.";
+const LINE_BREAK_PHRASE = "We are for you if you are here to scale.";
 
 function toWordSegments(chunk: string): Segment[] {
   return chunk
@@ -179,7 +179,7 @@ export function WhyUs() {
               className="font-sans text-[13px] md:text-[14px] font-semibold tracking-[0.1em] uppercase mb-16"
               style={{ color: C.accentSoft }}
             >
-              Quality is clarity <span style={{ color: C.textFaint }}>—</span> and clarity is growth
+              Quality is clarity. Clarity is growth.
             </p>
           </FadeIn>
 

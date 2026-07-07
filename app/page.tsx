@@ -7,6 +7,7 @@ import { IntegrationMarquee } from "@/components/sections/IntegrationMarquee";
 import FoundingPrinciples from "@/components/sections/FoundingPrinciples";
 import { TargetAreas, Testimonials } from "@/components/sections";
 import { WhyUs } from "@/components/sections/WhyUs";
+import { CTA } from "@/components/sections/CTA";
 import { SectionTransition } from "@/components/sections/SectionTransition";
 
 export default function HomePage() {
@@ -42,6 +43,9 @@ export default function HomePage() {
         </SectionTransition>
         <SectionTransition>
           <WhyUs />
+        </SectionTransition>
+        <SectionTransition>
+          <CTA />
         </SectionTransition>
 
 

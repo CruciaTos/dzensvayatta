@@ -15,12 +15,14 @@
 
 /* ─── Scrollbar (thin) ────────────────────────────────── */
 .scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
   height: 2px;
-  background: rgba(216, 211, 203, 0.08);
+  background: rgba(178, 213, 229, 0.06);
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: #8f7860;
+  background: rgba(126, 195, 226, 0.35);
+  border-radius: 999px;
 }
 
 /* ─── Noise texture overlay ───────────────────────────── */

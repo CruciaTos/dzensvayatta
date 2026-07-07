@@ -38,7 +38,7 @@ const CASES: RealCase[] = [
     id: "01", org: "BMC Mumbai", tag: "Municipal AI Enforcement",
     domain: "Infrastructure · Governance",
     headline: "₹19.25 Cr in contractor penalties recovered via AI site monitoring.",
-    body: "AI detected image reuse, missing videos, and code mismatches — violations that previously went unnoticed. Penalties were deducted directly from contractor bills.",
+    body: "AI flagged image reuse, missing videos, and code mismatches that manual audits missed. Penalties were deducted straight from contractor bills.",
     metrics: [{ value: "₹19.25Cr", label: "Penalties enforced" }, { value: "Real-time", label: "AI site monitoring" }, { value: "Zero", label: "Manual audit reliance" }],
     accent: "#B2D5E5", source: "Hindustan Times — June 2025"
   },
@@ -46,7 +46,7 @@ const CASES: RealCase[] = [
     id: "02", org: "Kerala Police", tag: "Law Enforcement AI",
     domain: "Public Safety · Child Protection",
     headline: "India's first AI system tracks CSAM perpetrators across the dark web.",
-    body: "Katalyst cross‑references victim signatures in hours, not weeks, enabling faster identification and intervention.",
+    body: "Katalyst cross-references victim signatures in hours instead of weeks, which speeds up identification and intervention.",
     metrics: [{ value: "#1", label: "First in India" }, { value: "Hours", label: "vs. Weeks (manual)" }, { value: "Katalyst", label: "AI tool deployed" }],
     accent: "#7ec3e2", source: "The News Minute — 2025"
   },
@@ -54,16 +54,16 @@ const CASES: RealCase[] = [
     id: "03", org: "FTITTP · Indian Airports", tag: "Biometric AI Systems",
     domain: "Border Control · Government",
     headline: "Airport immigration: 30 minutes down to 15 seconds with AI biometrics.",
-    body: "Travellers bypass officers — facial recognition and fingerprint scanners clear them in 15 seconds against government databases.",
+    body: "Travellers skip the officer queue. Facial recognition and fingerprint scanners clear them in 15 seconds against government databases.",
     metrics: [{ value: "15s", label: "Clearance time" }, { value: "120×", label: "Faster than manual" }, { value: "FTITTP", label: "Govt. programme" }],
     accent: "#5aabce", source: "NDTV Travel — 2025"
   },
   {
     id: "04", org: "Bengaluru Traffic Police", tag: "AI Public Shaming",
     domain: "Traffic Enforcement · Smart City",
-    headline: "AI‑powered billboard shames drivers with pending challans in real‑time.",
+    headline: "AI-powered billboard shames drivers with pending challans in real time.",
     body: "A digital board on MG Road displays vehicle photos, registration numbers, and pending fine amounts. Updated live from traffic databases, it uses public accountability to nudge violators into paying their dues.",
-    metrics: [{ value: "Real‑time", label: "Challan updates" }, { value: "Public", label: "Display board" }, { value: "MG Road", label: "Pilot location" }],
+    metrics: [{ value: "Real-time", label: "Challan updates" }, { value: "Public", label: "Display board" }, { value: "MG Road", label: "Pilot location" }],
     accent: "#6fc5e0", source: "NDTV Auto — 2026"
   }
 ];
