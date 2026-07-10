@@ -36,8 +36,8 @@ const TESTIMONIALS: Testimonial[] = [
   {
     id: "bharat-aarti",
     quote:
-      "\u201CDzen Svayatta didn't just automate our operations they gave us complete visibility into how our business runs. What once took constant follow-ups and manual coordination is now streamlined, transparent, and built to scale. Their approach has fundamentally changed how we operate.\u201D",
-    author: "Bharat Boridkar",
+      "\u201CDzen Svayatta didn't just automate our operations they gave us complete visibility into how our business runs. What once took constant follow ups and manual coordination is now streamlined, transparent and built to scale. Their approach has fundamentally changed how we operate.\u201D",
+    author: "Mr. Bharat Boridkar",
     role: "Senior Accountant",
     company: "Aarti Enterprise",
     industry: "Professional Services",
@@ -45,81 +45,37 @@ const TESTIMONIALS: Testimonial[] = [
     outcome: { value: "Full", label: "operational visibility" },
   },
   {
-    id: "1",
+    id: "praful-thakre",
     quote:
-      "\u201CThey didn't just connect our systems — they gave us a single source of truth that our entire leadership team now trusts. The discovery phase alone saved us months.\u201D",
-    author: "Sarah Chen",
-    role: "VP of Operations",
-    company: "Meridian Logistics",
-    industry: "Logistics",
-    service: "Systems Integration",
-    outcome: { value: "Org-wide", label: "single source of truth" },
+      "\u201CAs CEO of Aarti Enterprise, I watched this same project transform our operations from the top down. Dzen Svayatta delivered the same scalable automation Bharat's team is using and the results are already visible across finance, logistics and delivery.\u201D",
+    author: "Mr. Praful Thakre",
+    role: "CEO",
+    company: "Aarti Enterprise",
+    industry: "Manufacturing",
+    service: "Enterprise Automation",
+    outcome: { value: "Company-wide", label: "operational alignment" },
   },
   {
-    id: "2",
+    id: "rutuja-nilgunkar",
     quote:
-      "\u201CWe went from seven disconnected tools to one unified workflow. The audit trail they built into every automated decision is exactly what our compliance team needed.\u201D",
-    author: "Marcus Okafor",
-    role: "CTO",
-    company: "Resonant Health",
+      "\u201CThey built our patient management system with an AI voice assistant that answers calls, triages new patients and schedules follow ups automatically. It has become the digital front desk our clinic needed.\u201D",
+    author: "Dr. Rutuja Nilgunkar",
+    role: "Physiotherapist & Clinic Owner",
+    company: "Nilgunkar Clinic",
     industry: "Healthcare",
-    service: "Workflow Automation",
-    outcome: { value: "7 → 1", label: "tools unified" },
+    service: "AI Patient Management",
+    outcome: { value: "24/7", label: "call handling" },
   },
   {
-    id: "3",
+    id: "neeta-save",
     quote:
-      "\u201CTheir approach to data migration was methodical and transparent — not a single record lost. We were live two weeks ahead of schedule.\u201D",
-    author: "Elena Vasquez",
-    role: "Chief Data Officer",
-    company: "Nexus Finance",
-    industry: "Financial Services",
-    service: "Data Migration",
-    outcome: { value: "0%", label: "data loss" },
-  },
-  {
-    id: "4",
-    quote:
-      "\u201CWhat impressed me most was how quickly they understood our unique manufacturing constraints. The custom dashboard they built is now used daily on the factory floor.\u201D",
-    author: "David Park",
-    role: "Plant Manager",
-    company: "Apex Manufacturing",
-    industry: "Industrial",
-    service: "Custom Development",
-    outcome: { value: "98%", label: "adoption rate" },
-  },
-  {
-    id: "5",
-    quote:
-      "\u201COur patient portal overhaul could have been a nightmare. Instead, it became the smoothest launch our hospital system has ever experienced.\u201D",
-    author: "Dr. Amara Obi",
-    role: "Chief Medical Information Officer",
-    company: "St. Clair Health",
+      "\u201COur new patient management system with AI voice support took the burden off front desk staff. Patients can now book appointments and get answers to common questions without waiting on hold.\u201D",
+    author: "Dr. Neeta Save",
+    role: "Clinic Owner & BHMS",
+    company: "Aarogya Clinic",
     industry: "Healthcare",
-    service: "UX & Portal Redesign",
-    outcome: { value: "4.8 ★", label: "patient satisfaction" },
-  },
-  {
-    id: "6",
-    quote:
-      "\u201CThe AI chatbot they integrated into our e‑commerce platform handles over 60% of our support tickets. Our team finally has time to focus on complex issues.\u201D",
-    author: "Rachel Kim",
-    role: "Head of Customer Experience",
-    company: "Luxe & Bloom",
-    industry: "E‑commerce",
-    service: "AI Integration",
-    outcome: { value: "60%", label: "ticket deflection" },
-  },
-  {
-    id: "7",
-    quote:
-      "\u201CAs a nonprofit, we were skeptical about AI. But they proved it could work for us — now we match donors to causes in real time, and our giving has doubled.\u201D",
-    author: "James Worthy",
-    role: "Executive Director",
-    company: "Bridge to Tomorrow",
-    industry: "Nonprofit",
-    service: "AI for Good",
-    outcome: { value: "2x", label: "increase in donations" },
+    service: "Patient Engagement",
+    outcome: { value: "Higher", label: "staff capacity" },
   },
 ];
 
@@ -230,7 +186,7 @@ export function Testimonials() {
           </h2>
 
           {/* Quote block – text with ScrollReveal, marks fade in together */}
-          <div ref={quoteContainerRef} className="h-60 sm:h-52 flex items-center justify-center max-w-[1700px] px-4 overflow-hidden">
+          <div ref={quoteContainerRef} className="min-h-[260px] sm:min-h-[220px] flex items-center justify-center max-w-[1700px] px-4">
             <AnimatePresence mode="wait">
               <div key={active.id} className="flex items-center justify-center text-center">
                 {startsWithQuote && (

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { SectionIndex } from "@/components/ui/SectionIndex";
 import { FadeIn } from "@/components/ui/FadeIn";
 
 /* ── Design tokens ── */
@@ -375,38 +374,6 @@ export function CaseStudies() {
             }}
           />
 
-          {/* Watermarks */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              top: "16px",
-              left: "24px",
-              fontFamily: "var(--font-mono)",
-              fontSize: "7px",
-              color: "rgba(126,195,226,0.2)",
-              pointerEvents: "none",
-              zIndex: 10,
-            }}
-          >
-            + CASE_STUDY_PROTOCOL
-          </div>
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              bottom: "16px",
-              right: "24px",
-              fontFamily: "var(--font-mono)",
-              fontSize: "7px",
-              color: "rgba(126,195,226,0.2)",
-              pointerEvents: "none",
-              zIndex: 10,
-            }}
-          >
-            REF_CS_004
-          </div>
-
           {/* Gradient border and top reflection REMOVED */}
 
           {/* Content */}
@@ -414,7 +381,6 @@ export function CaseStudies() {
             <FadeIn>
               <div className="flex items-end justify-between mb-8 gap-12 max-md:flex-col max-md:items-start">
                 <div>
-                  <SectionIndex number="04" tag="AI in the Real World" className="mb-6" />
                   <h2
                     className="font-sans font-bold"
                     style={{

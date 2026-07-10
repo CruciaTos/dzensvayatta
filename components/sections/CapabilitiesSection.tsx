@@ -21,7 +21,7 @@ interface Phase {
   navLabel: string;
   title: string;
   description: string;
-  deliverables: string[];
+  
 }
 
 const PHASES: Phase[] = [
@@ -30,48 +30,28 @@ const PHASES: Phase[] = [
     title: "Workflow Audit",
     description:
       "We map your workflows before we write code. That surfaces the integrations, edge cases, and legacy constraints that shape what we build next.",
-    deliverables: [
-      "Stakeholder shadow interviews",
-      "Process bottleneck maps",
-      "API version cataloging",
-      "Data structure checks",
-    ],
+
   },
   {
     navLabel: "Blueprint",
     title: "Execution Blueprint",
     description:
       "Every system touchpoint gets documented, sequenced, and risk-rated. Engineering effort goes to the highest-impact work first. Nothing gets built on assumptions.",
-    deliverables: [
-      "Event sequence maps",
-      "API contract outlines",
-      "ROI priority models",
-      "Data validation rules",
-    ],
+
   },
   {
     navLabel: "Build",
     title: "Build & Testing",
     description:
       "Custom agents trained on your data and business logic. Human review checkpoints sit in every critical pipeline stage from day one.",
-    deliverables: [
-      "Custom model fine-tuning",
-      "Pipeline logic scripts",
-      "CRM sync interfaces",
-      "Human review lists",
-    ],
+
   },
   {
     navLabel: "Deploy",
     title: "Deploy & Optimization",
     description:
       "Changes ship in small, controlled increments with rollback built in. Users see no disruption while the new system beds in.",
-    deliverables: [
-      "Canary release filters",
-      "Reversible DB states",
-      "Mock regression checks",
-      "SLA logging monitors",
-    ],
+
   },
 ];
 
@@ -152,28 +132,7 @@ function PhaseBlock({
           {phase.description}
         </p>
 
-        <div
-          className={cn(
-            "flex flex-wrap gap-2 pt-1",
-            isLeft ? "justify-start" : "justify-end"
-          )}
-        >
-          {phase.deliverables.map((item, i) => (
-            <motion.span
-              key={item}
-              initial={{ opacity: 0, y: 6 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.4, delay: 0.28 + i * 0.07 }}
-              className={cn(
-                "font-mono text-[9.5px] tracking-wider uppercase px-3 py-1.5 border transition-all duration-500",
-                "max-md:text-[8.5px] max-md:px-2.5 max-md:py-1",
-                "border-[#7EC3E2]/30 text-[#e5f3e5] bg-[#7EC3E2]/5"
-              )}
-            >
-              {item}
-            </motion.span>
-          ))}
-        </div>
+
       </motion.div>
     </div>
   );
@@ -229,24 +188,10 @@ export function CapabilitiesSection() {
         backgroundColor: "transparent",
       }}
     >
-      {/* Watermarks */}
-      <div
-        aria-hidden
-        className="absolute top-4 left-6 font-mono text-[7px] text-[#7EC3E2]/20 pointer-events-none z-10"
-      >
-        + SEQUENCE_FLOW_TERMINAL
-      </div>
-      <div
-        aria-hidden
-        className="absolute bottom-4 right-6 font-mono text-[7px] text-[#7EC3E2]/20 pointer-events-none"
-      >
-        REF_BLUEPRINT_9048
-      </div>
-
       {/* Layout: nav + alternating phases */}
       <div className="w-full pl-12 pr-2 flex gap-20 relative max-md:pl-6">
         {/* Sticky nav */}
-        <aside className="hidden min-[1100px]:flex flex-col w-[120px] shrink-0 sticky top-[180px] h-fit z-25 leading-none">
+        <aside className="hidden min-[1100px]:flex flex-col w-[160px] shrink-0 sticky top-[160px] h-fit z-25 leading-none">
           <div className="font-mono text-[9px] tracking-[2px] uppercase text-[rgba(229,243,229,0.4)] font-bold mb-7">
             Execution Path
           </div>
@@ -256,7 +201,7 @@ export function CapabilitiesSection() {
                 key={p.navLabel}
                 onClick={() => scrollToPhase(i)}
                 className={cn(
-                  "flex items-center py-4 border-l-2 pl-4 cursor-pointer text-left transition-all duration-300 focus:outline-none",
+                  "flex items-center py-7 border-l-2 pl-5 cursor-pointer text-left transition-all duration-300 focus:outline-none",
                   activePhase === i
                     ? "border-[#7EC3E2] text-[#e5f3e5]"
                     : "border-[rgba(178,213,229,0.10)] text-[rgba(229,243,229,0.45)] hover:text-[rgba(229,243,229,0.8)] hover:border-[rgba(126,195,226,0.3)]"

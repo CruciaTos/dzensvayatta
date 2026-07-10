@@ -241,7 +241,7 @@ function FooterLinks({
   onLinkClick: (e: React.MouseEvent<HTMLAnchorElement>, label: string) => void;
 }) {
   // Exclude sections we no longer want
-  const excludedSections = new Set(["Platform", "Resources", "Methodology"]);
+  const excludedSections = new Set(["Platform", "Resources", "Methodology", "Contact"]);
   const filteredEntries = Object.entries(FOOTER_LINKS).filter(
     ([title]) => !excludedSections.has(title)
   );

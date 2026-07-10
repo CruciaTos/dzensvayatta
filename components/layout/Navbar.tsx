@@ -89,10 +89,11 @@ export function Navbar() {
               aria-label="DZen home"
               className="flex items-center gap-2.5 no-underline"
             >
-              <span
-                className="w-[6px] h-[6px] rounded-full flex-shrink-0"
-                style={{ backgroundColor: BLUE.dot }}
-                aria-hidden="true"
+              <img
+                src="/images/logo.png"
+                alt="DZen logo"
+                className="h-11 w-auto object-contain flex-shrink-0 bg-transparent"
+                style={{ backgroundColor: "transparent" }}
               />
               <span
                 className="font-zaslia text-[19px] leading-none tracking-[-0.01em]"

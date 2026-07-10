@@ -203,37 +203,6 @@ export function TargetMarkets() {
             }}
           />
 
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              top: "16px",
-              left: "24px",
-              fontFamily: "var(--font-mono)",
-              fontSize: "7px",
-              color: "rgba(126,195,226,0.2)",
-              pointerEvents: "none",
-              zIndex: 10,
-            }}
-          >
-            + MARKET_PROTOCOL
-          </div>
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              bottom: "16px",
-              right: "24px",
-              fontFamily: "var(--font-mono)",
-              fontSize: "7px",
-              color: "rgba(126,195,226,0.2)",
-              pointerEvents: "none",
-              zIndex: 10,
-            }}
-          >
-            REF_TM_006
-          </div>
-
           <div style={{ position: "relative", zIndex: 4, padding: "clamp(56px, 7vw, 96px) clamp(40px, 5vw, 72px)" }}>
             <motion.div
               ref={headerRef}

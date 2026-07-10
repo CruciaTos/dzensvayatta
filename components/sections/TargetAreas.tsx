@@ -285,7 +285,7 @@ export function TargetAreas() {
 
   return (
     <section
-      id="target-areas"
+      id="areas"
       aria-label="Intelligent systems and digital solutions we build"
       style={{
         position: "relative",
@@ -352,37 +352,6 @@ export function TargetAreas() {
               pointerEvents: "none",
             }}
           />
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              top: "16px",
-              left: "24px",
-              fontFamily: "var(--font-mono)",
-              fontSize: "7px",
-              color: "rgba(126,195,226,0.2)",
-              pointerEvents: "none",
-              zIndex: 10,
-            }}
-          >
-            + TARGET_PROTOCOL
-          </div>
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              bottom: "16px",
-              right: "24px",
-              fontFamily: "var(--font-mono)",
-              fontSize: "7px",
-              color: "rgba(126,195,226,0.2)",
-              pointerEvents: "none",
-              zIndex: 10,
-            }}
-          >
-            REF_TA_007
-          </div>
-
           {/* The previous gradient‑border pseudo‑elements have been removed.
               Only the solid border above remains. */}
 
