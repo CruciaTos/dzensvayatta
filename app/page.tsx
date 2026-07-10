@@ -9,6 +9,7 @@ import { TargetAreas, Testimonials } from "@/components/sections";
 import { WhyUs } from "@/components/sections/WhyUs";
 import { CTA } from "@/components/sections/CTA";
 import { SectionTransition } from "@/components/sections/SectionTransition";
+import { Projects } from "@/components/sections/Projects";
 
 export default function HomePage() {
   return (
@@ -31,6 +32,7 @@ export default function HomePage() {
         <SectionTransition>
           <TargetAreas />
         </SectionTransition>
+        <Projects/>
 
 
         {/* 2. Target Markets — now follows Case Studies */}
