@@ -1,15 +1,14 @@
 import { NextResponse } from "next/server";
 import { scheduleDiscoveryCall } from "@/lib/discovery/schedule";
 import { validateDiscoveryPayload } from "@/lib/discovery/validate";
-import { isGoogleConfigured } from "@/lib/google/oauth";
 
 export async function POST(request: Request) {
   try {
-    if (!isGoogleConfigured()) {
+    if (!process.env.RESEND_API_KEY) {
       return NextResponse.json(
         {
           error:
-            "Booking is not configured yet. Add Google API credentials to .env.local on the server.",
+            "Email delivery is not configured yet. Add RESEND_API_KEY to .env.local on the server.",
         },
         { status: 503 }
       );
