@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -16,7 +16,7 @@ import {
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { useScrolled } from "@/hooks/useScrolled";
 import { AboutOverlay } from "@/components/sections/AboutOverlay";
-import { NAV_LINKS } from "@/lib/data";
+import { NAV_LINKS, PROJECTS_LINK } from "@/lib/data";
 
 const SECTION_IDS = ["hero", "areas", "capabilities", "cases", "contact"];
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -34,6 +34,8 @@ export function Navbar() {
   const [aboutOpen, setAboutOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+  const isProjectsActive = pathname === PROJECTS_LINK.href;
 
   const [hidden, setHidden] = useState(false);
   const lastScrollY = useRef(0);
@@ -88,6 +90,8 @@ export function Navbar() {
               href="/"
               aria-label="DZen home"
               className="flex items-center gap-2.5 no-underline"
+              // 👇 Manual vertical offset: negative moves up, positive moves down
+              style={{ transform: 'translateY(-5px)' }}
             >
               <img
                 src="/images/logo.png"
@@ -104,9 +108,68 @@ export function Navbar() {
             </Link>
 
             <ul className="flex items-center gap-9 list-none">
-              {NAV_LINKS.map(({ label, href }) => {
+              {NAV_LINKS.slice(0, 3).map(({ label, href }) => {
                 const sectionId = href.replace("#", "");
-                const isActive = activeSection === sectionId;
+                const isActive = !isProjectsActive && activeSection === sectionId;
+                return (
+                  <li key={href}>
+                    <a
+                      href={href}
+                      className="font-mono text-[11px] uppercase tracking-[0.18em] no-underline transition-colors duration-200 flex items-center gap-[7px] py-1"
+                      style={{
+                        color: isActive ? BLUE.active : BLUE.idle,
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) e.currentTarget.style.color = BLUE.active;
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) e.currentTarget.style.color = BLUE.idle;
+                      }}
+                    >
+                      <span
+                        className="w-[3px] h-[3px] rounded-full transition-opacity duration-200"
+                        style={{
+                          backgroundColor: BLUE.active,
+                          opacity: isActive ? 1 : 0,
+                        }}
+                        aria-hidden="true"
+                      />
+                      {label}
+                    </a>
+                  </li>
+                );
+              })}
+
+              {/* Projects — a full standalone route, not a same-page anchor */}
+              <li>
+                <Link
+                  href={PROJECTS_LINK.href}
+                  className="font-mono text-[11px] uppercase tracking-[0.18em] no-underline transition-colors duration-200 flex items-center gap-[7px] py-1"
+                  style={{
+                    color: isProjectsActive ? BLUE.active : BLUE.idle,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isProjectsActive) e.currentTarget.style.color = BLUE.active;
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isProjectsActive) e.currentTarget.style.color = BLUE.idle;
+                  }}
+                >
+                  <span
+                    className="w-[3px] h-[3px] rounded-full transition-opacity duration-200"
+                    style={{
+                      backgroundColor: BLUE.active,
+                      opacity: isProjectsActive ? 1 : 0,
+                    }}
+                    aria-hidden="true"
+                  />
+                  {PROJECTS_LINK.label}
+                </Link>
+              </li>
+
+              {NAV_LINKS.slice(3).map(({ label, href }) => {
+                const sectionId = href.replace("#", "");
+                const isActive = !isProjectsActive && activeSection === sectionId;
                 return (
                   <li key={href}>
                     <a
@@ -168,11 +231,14 @@ export function Navbar() {
                 href="/"
                 aria-label="DZen home"
                 className="flex items-center gap-2.5 no-underline"
+                // 👇 Same manual offset for mobile header
+                style={{ transform: 'translateY(-2px)' }}
               >
-                <span
-                  className="w-[6px] h-[6px] rounded-full flex-shrink-0"
-                  style={{ backgroundColor: BLUE.dot }}
-                  aria-hidden="true"
+                <img
+                  src="/images/logo.png"
+                  alt="DZen logo"
+                  className="h-11 w-auto object-contain flex-shrink-0 bg-transparent"
+                  style={{ backgroundColor: "transparent" }}
                 />
                 <span
                   className="font-zaslia text-[19px] leading-none tracking-[-0.01em]"
@@ -191,9 +257,39 @@ export function Navbar() {
               isOpen={isMobileMenuOpen}
               onClose={() => setIsMobileMenuOpen(false)}
             >
-              {NAV_LINKS.map(({ label, href }) => {
+              {NAV_LINKS.slice(0, 3).map(({ label, href }) => {
                 const sectionId = href.replace("#", "");
-                const isActive = activeSection === sectionId;
+                const isActive = !isProjectsActive && activeSection === sectionId;
+                return (
+                  <a
+                    key={href}
+                    href={href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block font-mono text-[12px] uppercase tracking-[0.18em] no-underline"
+                    style={{
+                      color: isActive ? BLUE.active : "rgba(178, 213, 229, 0.55)",
+                    }}
+                  >
+                    {label}
+                  </a>
+                );
+              })}
+
+              {/* Projects — a full standalone route, not a same-page anchor */}
+              <Link
+                href={PROJECTS_LINK.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block font-mono text-[12px] uppercase tracking-[0.18em] no-underline"
+                style={{
+                  color: isProjectsActive ? BLUE.active : "rgba(178, 213, 229, 0.55)",
+                }}
+              >
+                {PROJECTS_LINK.label}
+              </Link>
+
+              {NAV_LINKS.slice(3).map(({ label, href }) => {
+                const sectionId = href.replace("#", "");
+                const isActive = !isProjectsActive && activeSection === sectionId;
                 return (
                   <a
                     key={href}

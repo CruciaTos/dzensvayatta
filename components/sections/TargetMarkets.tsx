@@ -89,7 +89,16 @@ function SpotlightCard({ card, index }: CardProps) {
       <div ref={spotRef} aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none", transition: "background 0.5s ease", zIndex: 0 }} />
       <div aria-hidden="true" style={{ position: "absolute", top: 0, left: "10%", right: "10%", height: "1px", background: `linear-gradient(90deg, transparent, ${C.accent}18, transparent)`, zIndex: 1 }} />
 
-      <div style={{ position: "relative", zIndex: 1, padding: "clamp(22px, 2.8vw, 36px)", display: "flex", flexDirection: "column", justifyContent: "center", height: "100%" }}>
+      <div style={{
+        position: "relative",
+        zIndex: 1,
+        padding: "clamp(22px, 2.8vw, 36px)",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",   // ← added to center the title horizontally
+        height: "100%",
+      }}>
         <h3 style={{
           fontFamily: "var(--font-sans)",
           fontSize: "clamp(26px, 2.5vw, 34px)",
@@ -98,6 +107,7 @@ function SpotlightCard({ card, index }: CardProps) {
           letterSpacing: "-0.022em",
           lineHeight: "1.15",
           margin: 0,
+          textAlign: "center",  // ← ensures multi‑line titles are centered too
         }}>
           {card.title}
         </h3>
