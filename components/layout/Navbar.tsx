@@ -89,13 +89,13 @@ export function Navbar() {
           <NavBody>
             <Link
               href="/"
-              aria-label="DZen home"
+              aria-label="Svayatta home"
               className="flex items-center gap-0 no-underline"
               style={{ transform: 'translateY(-5px)' }}
             >
               <img
                 src="/images/logo.png"
-                alt="DZen logo"
+                alt="Svayatta logo"
                 className="h-11 w-auto object-contain flex-shrink-0 bg-transparent"
                 style={{ backgroundColor: "transparent" }}
               />
@@ -241,13 +241,13 @@ export function Navbar() {
             <MobileNavHeader>
               <Link
                 href="/"
-                aria-label="DZen home"
+                aria-label="Svayatta home"
                 className="flex items-center gap-2.5 no-underline"
                 style={{ transform: 'translateY(-2px)' }}
               >
                 <img
                   src="/images/logo.png"
-                  alt="DZen logo"
+                  alt="Svayatta logo"
                   className="h-11 w-auto object-contain flex-shrink-0 bg-transparent"
                   style={{ backgroundColor: "transparent" }}
                 />

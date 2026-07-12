@@ -37,7 +37,7 @@ export function CTA() {
         className="absolute bottom-[-20px] right-[-20px] font-zaslia text-[clamp(100px,14vw,220px)] font-normal leading-none tracking-[-0.04em] pointer-events-none select-none z-0"
         aria-hidden="true"
       >
-        <span style={{ color: "rgba(126,195,226,0.06)" }}>DZen</span>
+        <span style={{ color: "rgba(126,195,226,0.06)" }}>Svayatta</span>
       </motion.div>
 
       <div

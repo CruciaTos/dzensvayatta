@@ -5,7 +5,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://svayatta.in";
 export const siteMetadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "DZen — Intelligent Workflow Integration",
+    default: "Dzen Svayatta - Quality with Clarity",
     template: "%s | DZen",
   },
   description:
@@ -27,7 +27,7 @@ export const siteMetadata: Metadata = {
     locale: "en_US",
     url: BASE_URL,
     siteName: "DZen",
-    title: "DZen — Intelligent Workflow Integration",
+    title: "Dzen Svayatta - Quality with Clarity",
     description:
       "We build AI into how your business runs: connecting your existing systems and automating the work your team already does.",
     images: [
@@ -35,13 +35,13 @@ export const siteMetadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "DZen — Intelligent Workflow Integration",
+        alt: "Dzen Svayatta - Quality with Clarity",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "DZen — Intelligent Workflow Integration",
+    title: "Dzen Svayatta - Quality with Clarity",
     description:
       "We integrate AI into the operational fabric of your business. Your systems, working together.",
     images: ["/og-image.png"],

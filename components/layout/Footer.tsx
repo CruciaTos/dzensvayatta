@@ -522,7 +522,7 @@ export function Footer() {
           transform: none;
         }
 
-        /* Smooth sweep with minimal off‑screen pause – now a tad faster */
+        /* Smooth sweep from left to right – now reversed */
         @keyframes ghostShine {
           0% {
             mask-position: -20% 0;
@@ -535,7 +535,8 @@ export function Footer() {
         }
 
         .ghost-shine {
-          animation: ghostShine 8s linear infinite;   /* ← slightly faster */
+          animation: ghostShine 8s linear infinite;
+          animation-direction: reverse; /* Sweep from left to right */
         }
       `}</style>
     </footer>

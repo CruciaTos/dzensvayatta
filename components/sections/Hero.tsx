@@ -61,7 +61,7 @@ export function Hero({ className }: HeroProps) {
     <section
       ref={sectionRef}
       id="hero"
-      aria-label="DZen hero, intelligent workflow integration"
+      aria-label="Svayatta , intelligent workflow integration"
       className={`min-h-screen flex flex-col items-start justify-center relative overflow-hidden ${className ?? ""}`}
     >
       {/* ── 1. DotField ── */}
@@ -262,7 +262,7 @@ export function Hero({ className }: HeroProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.9 }}
-        aria-label="Scroll to explore"
+        aria-label=""
       >
         <div
           className="w-[5px] h-[5px] rounded-full animate-pulse"
@@ -277,7 +277,7 @@ export function Hero({ className }: HeroProps) {
             letterSpacing: "0.16em",
           }}
         >
-          Scroll to explore
+          
         </span>
       </motion.div>
     </section>

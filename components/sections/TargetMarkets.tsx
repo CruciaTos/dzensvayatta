@@ -146,7 +146,7 @@ export function TargetMarkets() {
   return (
     <section
       id="target-markets"
-      aria-label="Business functions DZen optimizes with AI"
+      aria-label="Business functions Svayatta optimizes with AI"
       style={{
         position: "relative",
         backgroundColor: "transparent",
