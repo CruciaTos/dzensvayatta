@@ -23,7 +23,6 @@ const C = {
 } as const;
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-const TRANSITION = `0.42s cubic-bezier(0.22,1,0.36,1)`;
 
 // ── Data ─────────────────────────────────────────────────────────────────────
 interface MarketCard {

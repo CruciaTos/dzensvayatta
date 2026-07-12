@@ -4,12 +4,10 @@ import localFont from "next/font/local";
 import { siteMetadata, structuredData } from "@/lib/metadata";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import { SectionFlowProvider } from "@/components/providers/SectionFlow";
-import { GlobalSilkBackground } from "@/components/ui/GlobalSilkBackground";
 import { cn } from "@/lib/utils";
 import "@/app/globals.css";
 import { GlobalVideoBackground } from "@/components/ui/GlobalVideoBackground";
 
-// ─── Font loading ─────────────────────────────────────────────────────────────
 const geist = Geist({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -42,10 +40,14 @@ const devanagariFont = localFont({
   display: "swap",
 });
 
-// ─── Metadata export ──────────────────────────────────────────────────────────
 export const metadata = siteMetadata;
 
-// ─── Layout ───────────────────────────────────────────────────────────────────
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#000b12",
+};
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html

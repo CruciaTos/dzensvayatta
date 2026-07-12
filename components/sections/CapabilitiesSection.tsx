@@ -73,7 +73,13 @@ function PhaseBlock({
   // isLeft = text is on the left → image goes on the right
   const isLeft = index % 2 === 0;
 
-  const placeholderLabels = ["", "Blueprint", "Build", "Deploy"];
+  const PHASE_IMAGES = [
+    "/images/workflow.jpeg",
+    "/images/blueprint.jpeg",
+    "/images/build.jpeg",
+    "/images/deploy.jpeg",
+  ];
+  const imageSrc = PHASE_IMAGES[index % PHASE_IMAGES.length];
 
   // ── Image panel ──────────────────────────────────────────────────
   const ImagePanel = (
@@ -84,7 +90,7 @@ function PhaseBlock({
       transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
     >
       <Image
-        src="/images/workflow.png"
+        src={imageSrc}
         alt={`${phase.title} visual`}
         fill
         className="object-cover rounded-xl"

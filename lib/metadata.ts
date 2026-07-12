@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://DZen.io";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://svayatta.in";
 
 export const siteMetadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -59,9 +59,13 @@ export const siteMetadata: Metadata = {
     },
   },
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
     apple: "/apple-touch-icon.png",
+    other: [{ rel: "manifest", url: "/site.webmanifest" }],
   },
 };
 
@@ -87,8 +91,8 @@ export const structuredData = {
   ],
   contactPoint: {
     "@type": "ContactPoint",
-    email: "hello@DZen.io",
+    email: "hello@svayatta.in",
     contactType: "customer service",
   },
-  sameAs: ["https://linkedin.com/company/DZen"],
+  sameAs: ["https://linkedin.com/company/dzen-svayatta"],
 };

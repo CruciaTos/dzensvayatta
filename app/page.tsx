@@ -3,7 +3,6 @@ import { Footer } from "@/components/layout/Footer";
 import { HeroSlideTransition } from "@/components/sections/HeroSlideTransition";
 import { TargetMarkets } from "@/components/sections/TargetMarkets";
 import { CapabilitiesSection } from "@/components/sections/CapabilitiesSection";
-import { IntegrationMarquee } from "@/components/sections/IntegrationMarquee";
 import FoundingPrinciples from "@/components/sections/FoundingPrinciples";
 import { TargetAreas, Testimonials } from "@/components/sections";
 import { WhyUs } from "@/components/sections/WhyUs";

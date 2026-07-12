@@ -97,51 +97,6 @@ function markOf(company: string) {
     .toUpperCase();
 }
 
-/** Real company logo when available, generated monogram otherwise. */
-function CompanyMark({
-  company,
-  logo,
-  size = 28,
-  fontSize = 10,
-}: {
-  company: string;
-  logo?: string;
-  size?: number;
-  fontSize?: number;
-}) {
-  if (logo) {
-    return (
-      <img
-        src={logo}
-        alt={`${company} logo`}
-        className="rounded-md object-contain flex-shrink-0"
-        style={{
-          width: size,
-          height: size,
-          padding: size * 0.16,
-          backgroundColor: C.markBg,
-          border: `1px solid ${C.hairline}`,
-        }}
-      />
-    );
-  }
-  return (
-    <div
-      aria-hidden="true"
-      className="rounded-md flex items-center justify-center font-mono font-semibold flex-shrink-0"
-      style={{
-        width: size,
-        height: size,
-        fontSize,
-        backgroundColor: C.markBg,
-        border: `1px solid ${C.hairline}`,
-        color: C.accentSoft,
-      }}
-    >
-      {markOf(company)}
-    </div>
-  );
-}
 
 export function Testimonials() {
   const [index, setIndex] = useState(0);
@@ -182,7 +137,7 @@ export function Testimonials() {
             className="font-sans text-[clamp(52px,5vw,72px)] font-bold tracking-[-0.02em] mb-[90px]"
             style={{ color: C.textPrimary }}
           >
-            Don't Take Our Word For It
+            Don&apos;t Take Our Word For It
           </h2>
 
           {/* Quote block – text with ScrollReveal, marks fade in together */}

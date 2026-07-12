@@ -35,6 +35,7 @@ export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const isHome = pathname === "/";
   const isProjectsActive = pathname === PROJECTS_LINK.href;
 
   const [hidden, setHidden] = useState(false);
@@ -113,8 +114,8 @@ export function Navbar() {
                 const isActive = !isProjectsActive && activeSection === sectionId;
                 return (
                   <li key={href}>
-                    <a
-                      href={href}
+                    <Link
+                      href={isHome ? href : `/${href}`}
                       className="font-mono text-[11px] uppercase tracking-[0.18em] no-underline transition-colors duration-200 flex items-center gap-[7px] py-1"
                       style={{
                         color: isActive ? BLUE.active : BLUE.idle,
@@ -135,7 +136,7 @@ export function Navbar() {
                         aria-hidden="true"
                       />
                       {label}
-                    </a>
+                    </Link>
                   </li>
                 );
               })}
@@ -172,8 +173,8 @@ export function Navbar() {
                 const isActive = !isProjectsActive && activeSection === sectionId;
                 return (
                   <li key={href}>
-                    <a
-                      href={href}
+                    <Link
+                      href={isHome ? href : `/${href}`}
                       className="font-mono text-[11px] uppercase tracking-[0.18em] no-underline transition-colors duration-200 flex items-center gap-[7px] py-1"
                       style={{
                         color: isActive ? BLUE.active : BLUE.idle,
@@ -194,7 +195,7 @@ export function Navbar() {
                         aria-hidden="true"
                       />
                       {label}
-                    </a>
+                    </Link>
                   </li>
                 );
               })}
@@ -261,9 +262,9 @@ export function Navbar() {
                 const sectionId = href.replace("#", "");
                 const isActive = !isProjectsActive && activeSection === sectionId;
                 return (
-                  <a
+                  <Link
                     key={href}
-                    href={href}
+                    href={isHome ? href : `/${href}`}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="block font-mono text-[12px] uppercase tracking-[0.18em] no-underline"
                     style={{
@@ -271,7 +272,7 @@ export function Navbar() {
                     }}
                   >
                     {label}
-                  </a>
+                  </Link>
                 );
               })}
 
@@ -291,9 +292,9 @@ export function Navbar() {
                 const sectionId = href.replace("#", "");
                 const isActive = !isProjectsActive && activeSection === sectionId;
                 return (
-                  <a
+                  <Link
                     key={href}
-                    href={href}
+                    href={isHome ? href : `/${href}`}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="block font-mono text-[12px] uppercase tracking-[0.18em] no-underline"
                     style={{
@@ -301,7 +302,7 @@ export function Navbar() {
                     }}
                   >
                     {label}
-                  </a>
+                  </Link>
                 );
               })}
 
