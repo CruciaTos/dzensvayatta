@@ -37,7 +37,7 @@ const zaslia = localFont({
 });
 
 const devanagariFont = localFont({
-  src: "../public/fonts/AMS_Calligraphy_1_Regular.ttf",
+  src: "../public/fonts/RozhaOne-Regular.ttf",
   variable: "--font-devanagari",
   display: "swap",
 });

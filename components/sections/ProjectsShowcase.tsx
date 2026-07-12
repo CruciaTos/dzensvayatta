@@ -18,7 +18,7 @@ const C = {
   hairline: "rgba(178,213,229,0.18)",
   chipBg: "rgba(126,195,226,0.08)",
   chipBorder: "rgba(178,213,229,0.16)",
-  cardBg: "rgba(9,9,9,0.55)", // kept in constants but no longer used as card background
+  cardBg: "rgba(9,9,9,0.55)",
 } as const;
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -43,12 +43,24 @@ const PROJECTS: Project[] = [
     domain: "Windows Desktop · Flutter",
     headline: "An unified ERP for employee records, payroll, and finance.",
     body: "Designed to replace scattered spreadsheets and disconnected tools, CruSam helps businesses manage employee records, process salaries, create invoices and vouchers, organize documents, and generate reports from a single platform. An integrated AI assistant further streamlines daily operations by helping users find information, automate routine tasks, and work more efficiently.",
-    stack: ["Flutter", "SQLite", "Gemini"],
+    stack: [
+      "Agentic AI Assistant",
+      "Semantic Search Engine",
+      "Multimodal AI Input",
+      "Self-Updating Desktop App",
+      "Automated Cloud Backup",
+      "Deduplicated Sync",
+      "Email Integration",
+      "Versioned Local Database",
+      "Encrypted Local Storage",
+      "Usage & Cost Governance",
+    ],
     status: "Live",
     images: [
-      "/project-mock.jpg",
-      "/project-mock-2.jpg",
-      "/project-mock-3.jpg",
+      "/images/Crusam_Mockups/Dashboard_MD.png",
+      "/images/Crusam_Mockups/Invoice Creation.png",
+      "/images/Crusam_Mockups/invoice-snapshot.png",
+      "/images/Crusam_Mockups/salaryentry-analytics.png",
     ],
   },
 ];
@@ -134,7 +146,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         position: "relative",
         borderRadius: "24px",
         border: `1px solid ${C.hairline}`,
-        backgroundColor: "transparent",
+        backgroundColor: "#000000",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
         overflow: "hidden",
@@ -222,11 +234,12 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           {project.body}
         </p>
 
-        <div className="flex flex-wrap gap-3">
+        {/* Smaller tech stack tags */}
+        <div className="flex flex-wrap gap-2">
           {project.stack.map((s) => (
             <span
               key={s}
-              className="font-mono text-[13px] uppercase tracking-[0.1em] px-4 py-2 rounded-md"
+              className="font-mono text-[10px] uppercase tracking-[0.08em] px-2.5 py-1 rounded-md"
               style={{
                 color: C.textFaint,
                 border: `1px solid ${C.divider}`,
@@ -238,25 +251,38 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         </div>
       </div>
 
-      {/* RIGHT IMAGE CAROUSEL */}
+      {/* RIGHT IMAGE CAROUSEL with rounded black border */}
       <div
         style={{
           flex: "1 1 45%",
           position: "relative",
           minHeight: "100%",
-          overflow: "hidden",
+          padding: "24px",
+          display: "flex",
+          alignItems: "stretch",
         }}
       >
-        <ImageCarousel images={project.images} />
         <div
           style={{
-            position: "absolute",
-            inset: 0,
-            background: "rgba(9,9,9,0.25)",
-            pointerEvents: "none",
-            zIndex: 1,
+            position: "relative",
+            width: "100%",
+            height: "100%",
+            border: "1px solid #000000",
+            borderRadius: "20px",
+            overflow: "hidden",
           }}
-        />
+        >
+          <ImageCarousel images={project.images} />
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: "rgba(9,9,9,0.25)",
+              pointerEvents: "none",
+              zIndex: 1,
+            }}
+          />
+        </div>
       </div>
     </motion.div>
   );
@@ -273,29 +299,23 @@ export function ProjectsShowcase() {
       }}
     >
       <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
-        <FadeIn className="mb-14 md:mb-20">
+        {/* Centered heading, forced single line */}
+        <FadeIn className="mb-14 md:mb-20 text-center">
           <h1
-            className="font-sans font-bold mb-5"
+            className="font-sans font-bold"
             style={{
-              fontSize: "clamp(40px, 6vw, 72px)",
+              fontSize: "clamp(48px, 8vw, 96px)",
               color: C.textPrimary,
               letterSpacing: "-0.025em",
               lineHeight: 1.05,
+              whiteSpace: "nowrap",   // ensures single line
             }}
           >
-            What we&apos;ve
-            <br />
+            What we&apos;ve{" "}
             <em className="not-italic" style={{ color: C.textMuted }}>
-              actually built.
+              built so far.
             </em>
           </h1>
-          <p
-            className="font-sans font-light max-w-[560px]"
-            style={{ fontSize: "17px", color: C.textMuted, lineHeight: 1.7 }}
-          >
-            No placeholder case studies. These are the systems we&apos;ve shipped
-            for real clients, and the platform we run ourselves.
-          </p>
         </FadeIn>
 
         <div className="flex flex-col gap-10 md:gap-12">

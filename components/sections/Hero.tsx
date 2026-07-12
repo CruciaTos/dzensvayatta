@@ -23,21 +23,23 @@ const SVAYATTA_EN = "Svayatta";
 const SVAYATTA_DEV = "स्वयत्ता";
 const TOGGLE_INTERVAL_MS = 10_000;
 
+type HeroDisplayState = "svayatta-en" | "svayatta-dev";
+const HERO_STATES: HeroDisplayState[] = ["svayatta-en", "svayatta-dev"];
+
 export function Hero({ className }: HeroProps) {
-  const [isDevanagari, setIsDevanagari] = useState(false);
+  const [stateIndex, setStateIndex] = useState(0);
+  const displayState = HERO_STATES[stateIndex];
   const sectionRef = useRef<HTMLElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
 
-  // ── Language toggle ────────────────────────────────────────────────
   useEffect(() => {
     const id = setInterval(
-      () => setIsDevanagari((prev) => !prev),
+      () => setStateIndex((prev) => (prev + 1) % HERO_STATES.length),
       TOGGLE_INTERVAL_MS,
     );
     return () => clearInterval(id);
   }, []);
 
-  // ── Dynamic scaling: expose actual h1 size as a CSS variable ──────
   useEffect(() => {
     const section = sectionRef.current;
     const h1 = headlineRef.current;
@@ -62,7 +64,7 @@ export function Hero({ className }: HeroProps) {
       aria-label="DZen hero, intelligent workflow integration"
       className={`min-h-screen flex flex-col items-start justify-center relative overflow-hidden ${className ?? ""}`}
     >
-      {/* ── 1. DotField (interactive, behind content) ─────────────────── */}
+      {/* ── 1. DotField ── */}
       <div className="absolute inset-0 z-20" aria-hidden="true">
         <DotField
           gap={30}
@@ -77,7 +79,7 @@ export function Hero({ className }: HeroProps) {
         />
       </div>
 
-      {/* ── 2. Text content (allows pointer events to pass through to dots) ──────── */}
+      {/* ── 2. Text content ── */}
       <div
         className="absolute z-30 pointer-events-none"
         style={{
@@ -90,7 +92,7 @@ export function Hero({ className }: HeroProps) {
         }}
       >
         <div className="flex flex-col items-center text-center w-full">
-          {/* Eyebrow – now contains ". WE BUILD. YOU SCALE" */}
+          {/* Eyebrow */}
           <motion.p
             className="font-mono uppercase tracking-[0.22em]"
             style={{
@@ -105,7 +107,7 @@ export function Hero({ className }: HeroProps) {
             WE BUILD.YOU SCALE
           </motion.p>
 
-          {/* Headline */}
+          {/* Headline – extra‑wide fixed container to completely eliminate layout shift */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -123,28 +125,32 @@ export function Hero({ className }: HeroProps) {
               }}
               aria-label="DZ Svayatta"
             >
-              {/* Svayatta – toggles between Devanagari and Latin (centered) */}
-              <span
+              {/* Even wider container – plenty of room for Devanagari at 1.25em */}
+              <div
                 style={{
-                  display: "inline-block",
-                  minWidth: "5.25em",
-                  textAlign: "center",
-                  verticalAlign: "baseline",
+                  width: "clamp(500px, 80vw, 1000px)",   // ← increased a lot more
+                  height: "1.25em",                       // matches the larger Devanagari size
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  overflow: "hidden",
                 }}
               >
                 <AnimatePresence mode="wait">
                   <motion.span
-                    key={isDevanagari ? "svayatta-dev" : "svayatta-en"}
+                    key={displayState}
                     style={{
                       display: "inline-block",
+                      textAlign: "center",
                       verticalAlign: "baseline",
-                      fontSize: isDevanagari ? "0.86em" : "1em",
-                      fontWeight: isDevanagari ? 400 : 500,
-                      letterSpacing: isDevanagari ? "-0.012em" : undefined,
+                      fontSize: displayState === "svayatta-dev" ? "1.25em" : "1em",
+                      fontWeight: displayState === "svayatta-dev" ? 300 : 500,
+                      letterSpacing: displayState === "svayatta-dev" ? "-0.012em" : undefined,
                       lineHeight: 1,
-                      fontFamily: isDevanagari
-                        ? "var(--font-devanagari)"
-                        : "var(--font-zaslia), sans-serif",
+                      fontFamily:
+                        displayState === "svayatta-dev"
+                          ? "var(--font-devanagari)"
+                          : "var(--font-zaslia), sans-serif",
                     }}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -152,14 +158,14 @@ export function Hero({ className }: HeroProps) {
                     transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                     aria-hidden="true"
                   >
-                    {isDevanagari ? SVAYATTA_DEV : SVAYATTA_EN}
+                    {displayState === "svayatta-dev" ? SVAYATTA_DEV : SVAYATTA_EN}
                   </motion.span>
                 </AnimatePresence>
-              </span>
+              </div>
             </h1>
           </motion.div>
 
-          {/* Body paragraph – reworked to fit exactly 3 lines */}
+          {/* Body paragraph */}
           <motion.p
             className="font-sans max-w-[720px] leading-[1.75]"
             style={{
@@ -226,21 +232,21 @@ export function Hero({ className }: HeroProps) {
         </div>
       </div>
 
-      {/* ── 3. Subtle noise grain ── */}
+      {/* ── 3. Noise grain ── */}
       <div
         className="absolute inset-0 pointer-events-none z-40"
         style={{ opacity: 0.025 }}
         aria-hidden="true"
       />
 
-      {/* ── 4. Top horizontal rule ── */}
+      {/* ── 4. Top rule ── */}
       <div
         className="absolute left-0 right-0 h-px z-50"
         style={{ top: "64px", backgroundColor: "rgba(178, 213, 229, 0.1)" }}
         aria-hidden="true"
       />
 
-      {/* ── 5. Vertical divider (bottom left) ── */}
+      {/* ── 5. Vertical divider ── */}
       <motion.div
         className="absolute bottom-0 left-12 w-px z-50"
         style={{ height: "80px", backgroundColor: "rgba(178, 213, 229, 0.12)" }}
@@ -250,7 +256,7 @@ export function Hero({ className }: HeroProps) {
         transition={{ duration: 1.2, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
       />
 
-      {/* ── 6. Scroll indicator (bottom left) ── */}
+      {/* ── 6. Scroll indicator ── */}
       <motion.div
         className="absolute bottom-6 left-6 flex items-center gap-[10px] z-50 pointer-events-none"
         initial={{ opacity: 0 }}
