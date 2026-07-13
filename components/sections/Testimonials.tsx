@@ -67,8 +67,8 @@ const TESTIMONIALS: Testimonial[] = [
     quote:
       "\u201CThey built an AI voice assistant that answers calls, triages patients and schedules follow-ups automatically. It's the digital front desk our clinic needed.\u201D",
     author: "Dr. Rutuja Nilgunkar",
-    role: "Physiotherapist & Clinic Owner",
-    company: "",
+    role: "Physiotherapist",
+    company: "Personal Clinic.",
     industry: "Healthcare",
     service: "AI Patient Management",
     outcome: { value: "24/7", label: "call handling" },
