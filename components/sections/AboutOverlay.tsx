@@ -1,12 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import {
-  motion,
-  AnimatePresence,
-  useMotionValue,
-  useSpring,
-} from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { LogoMark } from "@/components/ui/Icons";
 import { useLenis } from "@/components/providers/SmoothScroll";
 
@@ -110,24 +105,6 @@ function FounderCard({
   const [hovered, setHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const sx = useSpring(mx, { stiffness: 120, damping: 18 });
-  const sy = useSpring(my, { stiffness: 120, damping: 18 });
-
-  function onMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    const rect = cardRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    mx.set(((e.clientX - rect.left) / rect.width - 0.5) * 12);
-    my.set(((e.clientY - rect.top) / rect.height - 0.5) * 8);
-  }
-
-  function onMouseLeave() {
-    mx.set(0);
-    my.set(0);
-    setHovered(false);
-  }
-
   return (
     <motion.div
       ref={cardRef}
@@ -138,8 +115,7 @@ function FounderCard({
         transition: "border-color 0.3s ease",
       }}
       onMouseEnter={() => setHovered(true)}
-      onMouseLeave={onMouseLeave}
-      onMouseMove={onMouseMove}
+      onMouseLeave={() => setHovered(false)}
       initial={{ opacity: 0, y: 30 }}
       animate={open ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
       transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
@@ -179,18 +155,18 @@ function FounderCard({
       </motion.span>
 
       <div className="relative z-10">
-        <motion.h3
-          style={{ x: sx, y: sy, color: C.textPrimary }}
-          className="font-sans text-[clamp(1.75rem,3vw,2.5rem)] font-bold leading-[1.1] tracking-[-0.02em] mb-2 cursor-pointer select-none"
+        <h3
+          className="font-sans font-bold leading-[1.1] tracking-[-0.02em] mb-2 cursor-pointer select-none text-[clamp(2.8rem,4.5vw,3.8rem)] -ml-[0.375rem]"
+          style={{ color: C.textPrimary }}
         >
           {name}
-        </motion.h3>
+        </h3>
 
         <div
           className="font-mono text-[9px] tracking-[2px] uppercase font-bold mb-6"
           style={{ color: C.accent }}
         >
-          Co-Founder & Operator
+          Co-Founder
         </div>
 
         <div className="space-y-3">
@@ -212,7 +188,7 @@ function FounderCard({
             onMouseEnter={(e) => { e.currentTarget.style.color = C.accent; }}
             onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(178,213,229,0.65)"; }}
           >
-            LinkedIn Profile ↗
+            LinkedIn ↗
           </a>
         </div>
       </div>
@@ -273,8 +249,11 @@ export function AboutOverlay({ open, onClose }: AboutOverlayProps) {
       {open && (
         <>
           <motion.div
-            className="fixed inset-0 z-[100] backdrop-blur-md"
-            style={{ backgroundColor: "rgba(0, 11, 18, 0.82)" }}
+            className="fixed inset-0 z-[100] backdrop-blur-3xl"
+            style={{ 
+              backgroundColor: "rgba(0, 11, 18, 0.55)",
+              border: "1px solid rgba(255,255,255,0.05)"
+            }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -316,7 +295,7 @@ export function AboutOverlay({ open, onClose }: AboutOverlayProps) {
                   className="font-mono text-[13px] font-bold tracking-[0.1em] uppercase"
                   style={{ color: C.accentSoft }}
                 >
-                  DZen Context
+                  Our Ambitions & Us
                 </span>
               </div>
 
@@ -358,7 +337,7 @@ export function AboutOverlay({ open, onClose }: AboutOverlayProps) {
                 </div>
 
                 <h2
-                  className="font-sans text-[clamp(2rem,4vw,3rem)] font-bold leading-[1.05] tracking-[-0.03em]"
+                  className="font-sans font-bold leading-[1.05] tracking-[-0.03em] text-[clamp(2.5rem,5vw,3.8rem)]"
                   style={{ color: C.textPrimary }}
                 >
                   DZen is us. <span style={{ color: C.accentSoft }}>Svayatta</span> is how we build.
@@ -375,7 +354,7 @@ export function AboutOverlay({ open, onClose }: AboutOverlayProps) {
                   className="font-sans text-[14px] font-normal leading-relaxed max-w-[740px]"
                   style={{ color: C.textMuted }}
                 >
-                  Svayatta is the division inside DZen specifically for tech upscalings. The software, the workflow integrations, all applied intelligence is handled here. {" "}
+                  Svayatta is the division inside DZen specifically for tech upscalings. The software, the workflow integrations, all applied intelligence is handled here.{" "}
                   <span style={{ color: C.accentSoft }}>स्वयत्ता</span> means self-governance and that&rsquo;s not for just a gimmik name. It&rsquo;s our Standard: Its the systems that upscales you; the systems that break the tranditional workflow redundancies and hold to their own limits.
                 </p>
 
@@ -383,7 +362,7 @@ export function AboutOverlay({ open, onClose }: AboutOverlayProps) {
                   className="font-sans text-[14px] font-normal leading-relaxed max-w-[740px]"
                   style={{ color: C.textMuted }}
                 >
-                  It&rsquo;s the same idea behind everything else here. Providing remarkable Quality with uncompromised Clarity  
+                  It&rsquo;s the same idea behind everything else here. Providing remarkable Quality with uncompromised Clarity
                 </p>
               </div>
 
@@ -397,7 +376,7 @@ export function AboutOverlay({ open, onClose }: AboutOverlayProps) {
                 </div>
 
                 <h2
-                  className="font-sans text-[clamp(2rem,4vw,3rem)] font-bold leading-[1.05] tracking-[-0.03em]"
+                  className="font-sans font-bold leading-[1.05] tracking-[-0.03em] text-[clamp(2.5rem,5vw,3.8rem)]"
                   style={{ color: C.textPrimary }}
                 >
                   This isn&rsquo;t a <span style={{ color: C.accentSoft }}>side project</span>.
@@ -414,7 +393,7 @@ export function AboutOverlay({ open, onClose }: AboutOverlayProps) {
                   className="font-sans text-[14px] font-normal leading-relaxed max-w-[740px]"
                   style={{ color: C.textMuted }}
                 >
-                  If you&rsquo;re passionate for Growth, Shared Ambitions and building something meaningful, that&rsquo;s exactly the conversation we&rsquo;re looking to have.
+                  If you&rsquo;re passionate for growth, shared ambitions and building something meaningful, that&rsquo;s exactly the conversation we&rsquo;re looking to have.
                 </p>
               </div>
 
