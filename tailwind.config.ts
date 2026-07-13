@@ -9,34 +9,28 @@ const config: Config = {
   theme: {
     extend: {
       // ─── Colors ───────────────────────────────────────────────
+      // Matches the palette actually used across every section (was previously
+      // a leftover warm beige/stone theme that nothing on the site rendered in).
       colors: {
-        background: "#121416",   // ← added
-        foreground: "#FAFAF8",   // ← added
-        bg: {
-          primary: "#121416",
-          secondary: "#0A0B0D",
-          tertiary: "#1C1E22",
-          panel: "#191B1F",
-        },
-        beige: "#EFE6D8",
-        offwhite: "#FAFAF8",
-        ink: "#121416",
-        stone: {
-          100: "#F5F1EA",
-          200: "#D9D4CC",
-          300: "#B0A89B",
-          400: "#968D7F",
-          500: "#8F7860",
-          600: "#6D6257",
-        },
+        background: "#000b12",
+        foreground: "#e5f3e5",
+
+        // Sky-blue accent used for highlights, active states, and CTAs
         accent: {
-          DEFAULT: "#8F7860",
-          light: "#A8947E",
-          dim: "rgba(143, 120, 96, 0.15)",
+          DEFAULT: "#7EC3E2",
+          light: "#B2D5E5",
         },
+
+        // Only the two shades actually referenced (SectionIndex, marquee heading)
+        stone: {
+          100: "#e5f3e5",
+          500: "#7C93A0",
+        },
+
+        // Hairline dividers / card borders
         border: {
-          DEFAULT: "rgba(216, 211, 203, 0.10)",
-          strong: "rgba(216, 211, 203, 0.18)",
+          DEFAULT: "rgba(178, 213, 229, 0.10)",
+          strong: "rgba(126, 195, 226, 0.28)",
         },
       },
 
