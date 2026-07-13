@@ -51,7 +51,7 @@ const TESTIMONIALS: Testimonial[] = [
   {
     id: "praful-thakre",
     quote:
-      "\u201CDzen delivered scalable automation across our entire operation. The results are already visible across finance, logistics and delivery.\u201D",
+      "\u201COverall CruSam and this new workflow makes it work so efficient. It saves us time every day, and everything is easier to keep track of.\u201D",
     author: "Mr. Praful Thakre",
     role: "CEO",
     company: "Aarti Enterprise",
@@ -65,7 +65,7 @@ const TESTIMONIALS: Testimonial[] = [
   {
     id: "rutuja-nilgunkar",
     quote:
-      "\u201CThey built an AI voice assistant that answers calls, triages patients and schedules follow-ups automatically. It's the digital front desk our clinic needed.\u201D",
+      "\u201CI don't have to think about where things are anymore. The AI takes care of the calls, and the app keeps our patients, appointments, records, and everything else in one place. It has made our work much smoother.\u201D",
     author: "Dr. Rutuja Nilgunkar",
     role: "Physiotherapist",
     company: "Personal Clinic.",
