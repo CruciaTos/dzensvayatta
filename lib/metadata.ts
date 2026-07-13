@@ -9,7 +9,7 @@ export const siteMetadata: Metadata = {
     template: "%s | DZen",
   },
   description:
-    "DZen integrates AI into how your business runs: connecting your existing systems, automating the work your team already does, and delivering results you can measure.",
+    "We build the infrastructure behind how your business scales.",
   keywords: [
     "workflow integration",
     "enterprise AI",
@@ -29,7 +29,7 @@ export const siteMetadata: Metadata = {
     siteName: "DZen",
     title: "Dzen Svayatta - Quality with Clarity",
     description:
-      "We build AI into how your business runs: connecting your existing systems and automating the work your team already does.",
+      "We build the infrastructure behind how your business scales.",
     images: [
       {
         url: "/og-image.png",
@@ -43,9 +43,9 @@ export const siteMetadata: Metadata = {
     card: "summary_large_image",
     title: "Dzen Svayatta - Quality with Clarity",
     description:
-      "We integrate AI into the operational fabric of your business. Your systems, working together.",
+      "WWe build the infrastructure behind how your business scales.",
     images: ["/og-image.png"],
-    creator: "@DZen_io",
+    creator: "@DZenSvayatta_io",
   },
   robots: {
     index: true,
@@ -72,11 +72,11 @@ export const siteMetadata: Metadata = {
 export const structuredData = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "DZen",
+  name: "DZenSvayatta",
   url: BASE_URL,
   logo: `${BASE_URL}/logo.png`,
   description:
-    "Intelligent workflow integration for mid-market and enterprise businesses.",
+    "We build the infrastructure behind how your business scales.",
   founder: [
     {
       "@type": "Person",

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import { FOOTER_LINKS } from "@/lib/data";
 import { siInstagram } from "simple-icons";
 
 // ── Design tokens (identical to TargetAreas, TargetMarkets, CaseStudies) ──
@@ -236,21 +235,7 @@ function FooterCTA() {
   );
 }
 
-function FooterLinks({
-  onLinkClick,
-}: {
-  onLinkClick: (e: React.MouseEvent<HTMLAnchorElement>, label: string) => void;
-}) {
-  const excludedSections = new Set([
-    "Platform",
-    "Resources",
-    "Methodology",
-    "Contact",
-  ]);
-  const filteredEntries = Object.entries(FOOTER_LINKS).filter(
-    ([title]) => !excludedSections.has(title)
-  );
-
+function FooterLinks() {
   const contactLinks = [
     { label: "info@svayatta.in", href: "mailto:info@svayatta.in" },
     { label: "+91 91520 35526", href: "https://wa.me/9152035526", external: true },
@@ -321,34 +306,6 @@ function FooterLinks({
             @dzensvayatta
           </span>
         </MagLink>
-      </div>
-
-      {/* Nav categories – centered */}
-      <div className="flex flex-wrap gap-x-16 gap-y-10 flex-1 justify-center min-w-0">
-        {filteredEntries.map(([title, links]) => (
-          <div key={title} className="min-w-[140px]">
-            <div
-              className="[font-family:var(--font-mono)] text-[20px] tracking-[0.18em] uppercase mb-5"
-              style={{ color: C.textMuted }}
-            >
-              {title}
-            </div>
-            <ul className="list-none flex flex-col gap-[12px]" role="list">
-              {links.map((link: string) => (
-                <li key={link}>
-                  <a
-                    href="#"
-                    onClick={(e) => onLinkClick(e, link)}
-                    className="[font-family:var(--font-sans)] text-[18px] font-light no-underline transition-colors duration-200"
-                    style={{ color: C.textMuted }}
-                  >
-                    {link}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
       </div>
 
       {/* Contact column – right */}
@@ -435,32 +392,6 @@ export function Footer() {
     };
   }, []);
 
-  const handleFooterLinkClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    label: string
-  ) => {
-    e.preventDefault();
-    if (
-      label.includes("Configurator") ||
-      label.includes("RFP") ||
-      label.includes("Audit") ||
-      label.includes("Briefing Builder")
-    ) {
-      document
-        .getElementById("briefing-builder")
-        ?.scrollIntoView({ behavior: "smooth" });
-    } else if (
-      label.includes("Briefing") ||
-      label.includes("Booking") ||
-      label.includes("Call") ||
-      label.includes("Start a conversation")
-    ) {
-      document.getElementById("cta")?.scrollIntoView({ behavior: "smooth" });
-    } else {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
-
   return (
     <footer
       id="contact"
@@ -504,7 +435,7 @@ export function Footer() {
       {/* LAYER 3: footer content */}
       <div className="relative z-20 mix-blend-difference max-w-[1320px] mx-auto px-12 max-md:px-6">
         <FooterCTA />
-        <FooterLinks onLinkClick={handleFooterLinkClick} />
+        <FooterLinks />
         <FooterBottomBar />
       </div>
 

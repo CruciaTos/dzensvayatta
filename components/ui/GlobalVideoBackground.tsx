@@ -5,6 +5,31 @@ import { useEffect, useState, useRef } from "react";
 export function GlobalVideoBackground() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  // Respect prefers-reduced-motion: skip autoplay entirely, fall back to the poster frame
+  useEffect(() => {
+    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(mql.matches);
+    const handleChange = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    mql.addEventListener("change", handleChange);
+    return () => mql.removeEventListener("change", handleChange);
+  }, []);
+
+  // Pause playback while the tab isn't visible to save CPU/battery
+  useEffect(() => {
+    const handleVisibility = () => {
+      const video = videoRef.current;
+      if (!video) return;
+      if (document.hidden) {
+        video.pause();
+      } else if (!reducedMotion) {
+        video.play().catch(() => {});
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [reducedMotion]);
 
   useEffect(() => {
     // ── Helper: calculate progress (0 → 1) ──
@@ -40,11 +65,12 @@ export function GlobalVideoBackground() {
       <video
         ref={videoRef}
         className="absolute inset-0 w-full h-full object-cover"
-        autoPlay
+        autoPlay={!reducedMotion}
         muted
-        loop
+        loop={!reducedMotion}
         playsInline
         preload="auto"
+        poster="/videos/hero3-poster.jpg"
         style={{
           // Dynamic vertical position: 0% = top of video, 100% = bottom
           objectPosition: `center ${scrollProgress * 100}%`,
