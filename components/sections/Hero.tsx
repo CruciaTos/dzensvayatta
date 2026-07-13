@@ -276,9 +276,7 @@ export function Hero({ className }: HeroProps) {
             fontSize: "clamp(9px, calc(var(--h1-size) * 0.05), 11px)",
             letterSpacing: "0.16em",
           }}
-        >
-          
-        </span>
+        />
       </motion.div>
     </section>
   );

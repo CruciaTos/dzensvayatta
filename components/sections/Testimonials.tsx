@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion, useInView } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -244,17 +245,19 @@ export function Testimonials() {
                     className="relative rounded-2xl overflow-visible flex-shrink-0 w-28 h-28 sm:w-40 sm:h-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300/60"
                   >
                     <div
-                      className="w-full h-full rounded-2xl overflow-hidden transition-shadow duration-500"
+                      className="relative w-full h-full rounded-2xl overflow-hidden transition-shadow duration-500"
                       style={{
                         border: isActive ? `2px solid ${C.accent}` : `1px solid ${C.hairline}`,
                         boxShadow: isActive ? "0 8px 24px -8px rgba(126,195,226,0.35)" : "none",
                       }}
                     >
                       {t.avatar ? (
-                        <img
+                        <Image
                           src={t.avatar}
                           alt={t.author}
-                          className="w-full h-full object-cover transition-all duration-500"
+                          fill
+                          sizes="(min-width: 640px) 160px, 112px"
+                          className="object-cover transition-all duration-500"
                           style={{ filter: isActive ? "none" : "grayscale(1) opacity(0.6)" }}
                         />
                       ) : (

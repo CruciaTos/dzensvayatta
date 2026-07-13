@@ -2,6 +2,11 @@
 
 import { useEffect, useState, useRef } from "react";
 
+interface LenisLike {
+  on: (event: "scroll", callback: (data: { scroll: number }) => void) => void;
+  off: (event: "scroll", callback: (data: { scroll: number }) => void) => void;
+}
+
 export function GlobalVideoBackground() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -44,10 +49,11 @@ export function GlobalVideoBackground() {
 
     // ── 1. Try to use Lenis (if your SmoothScroll is Lenis‑based) ──
     // Look for the global Lenis instance that most setups expose.
-    const lenis = (window as any).__lenis; // adjust if your instance is stored elsewhere
+    const lenis = (window as unknown as { __lenis?: LenisLike }).__lenis;
     if (lenis && typeof lenis.on === "function") {
-      lenis.on("scroll", ({ scroll }: any) => updateProgress(scroll));
-      return () => lenis.off("scroll", updateProgress);
+      const onLenisScroll = ({ scroll }: { scroll: number }) => updateProgress(scroll);
+      lenis.on("scroll", onLenisScroll);
+      return () => lenis.off("scroll", onLenisScroll);
     }
 
     // ── 2. Fallback to native scroll ──

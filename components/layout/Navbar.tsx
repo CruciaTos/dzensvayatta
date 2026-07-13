@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import {
   Navbar as NavbarShell,
@@ -93,9 +94,12 @@ export function Navbar() {
               className="flex items-center gap-0 no-underline"
               style={{ transform: 'translateY(-5px)' }}
             >
-              <img
+              <Image
                 src="/images/logo.png"
                 alt="Svayatta logo"
+                width={44}
+                height={44}
+                priority
                 className="h-11 w-auto object-contain flex-shrink-0 bg-transparent"
                 style={{ backgroundColor: "transparent" }}
               />
@@ -245,9 +249,12 @@ export function Navbar() {
                 className="flex items-center gap-2.5 no-underline"
                 style={{ transform: 'translateY(-2px)' }}
               >
-                <img
+                <Image
                   src="/images/logo.png"
                   alt="Svayatta logo"
+                  width={44}
+                  height={44}
+                  priority
                   className="h-11 w-auto object-contain flex-shrink-0 bg-transparent"
                   style={{ backgroundColor: "transparent" }}
                 />

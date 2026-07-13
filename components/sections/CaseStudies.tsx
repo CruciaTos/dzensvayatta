@@ -399,7 +399,7 @@ export function CaseStudies() {
                   <p
                     className="font-sans text-body font-light leading-[1.7]"
                     style={{ color: C.textMuted }}
-                  ></p>
+                  />
                 </div>
               </div>
             </FadeIn>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Container } from "@/components/ui/Container";
 
 const SCROLL_DISTANCE_VH = 400;
@@ -47,17 +47,17 @@ function WordSlot({
   const [chars, setChars] = useState<CharState[]>(makeHiddenChars);
   const timersRef = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
 
-  const clearTimer = (index: number) => {
+  const clearTimer = useCallback((index: number) => {
     const t = timersRef.current[index];
     if (t) {
       clearTimeout(t);
       delete timersRef.current[index];
     }
-  };
+  }, []);
 
-  const clearAllTimers = () => {
+  const clearAllTimers = useCallback(() => {
     Object.keys(timersRef.current).forEach((k) => clearTimer(Number(k)));
-  };
+  }, [clearTimer]);
 
   const scrambleIn = (index: number, delay: number) => {
     if (text[index] === " ") return;
@@ -101,7 +101,7 @@ function WordSlot({
 
   useEffect(() => {
     return () => clearAllTimers();
-  }, []);
+  }, [clearAllTimers]);
 
   return (
     <span className={className}>
