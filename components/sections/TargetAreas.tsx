@@ -416,6 +416,7 @@ export function TargetAreas() {
         backgroundColor: "transparent",
         padding: "clamp(88px, 11vw, 144px) 0",
         overflow: "hidden",
+        borderTop: "1px solid rgba(178,213,229,0.10)",
       }}
     >
       {/* background glow */}

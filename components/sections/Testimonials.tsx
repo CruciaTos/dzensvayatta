@@ -37,7 +37,7 @@ const TESTIMONIALS: Testimonial[] = [
   {
     id: "bharat-aarti",
     quote:
-      "\u201CThe biggest change is that we don't have to think about the little things anymore. Everything just works the way it should.\u201D",
+      "\u201CWe don't have to think about the little things anymore. Everything just works the way it should.\u201D",
     author: "Mr. Bharat Boridkar",
     role: "Senior Accountant",
     company: "Aarti Enterprise",
@@ -48,7 +48,7 @@ const TESTIMONIALS: Testimonial[] = [
   {
     id: "praful-thakre",
     quote:
-      "\u201CAs CEO of Aarti Enterprise, I watched this same project transform our operations from the top down. Dzen Svayatta delivered the same scalable automation Bharat's team is using and the results are already visible across finance, logistics and delivery.\u201D",
+      "\u201CDzen delivered scalable automation across our entire operation. The results are already visible across finance, logistics and delivery.\u201D",
     author: "Mr. Praful Thakre",
     role: "CEO",
     company: "Aarti Enterprise",
@@ -59,7 +59,7 @@ const TESTIMONIALS: Testimonial[] = [
   {
     id: "rutuja-nilgunkar",
     quote:
-      "\u201CThey built our patient management system with an AI voice assistant that answers calls, triages new patients and schedules follow ups automatically. It has become the digital front desk our clinic needed.\u201D",
+      "\u201CThey built an AI voice assistant that answers calls, triages patients and schedules follow-ups automatically. It's the digital front desk our clinic needed.\u201D",
     author: "Dr. Rutuja Nilgunkar",
     role: "Physiotherapist & Clinic Owner",
     company: "Nilgunkar Clinic",
@@ -70,7 +70,7 @@ const TESTIMONIALS: Testimonial[] = [
   {
     id: "neeta-save",
     quote:
-      "\u201COur new patient management system with AI voice support took the burden off front desk staff. Patients can now book appointments and get answers to common questions without waiting on hold.\u201D",
+      "\u201CPatients can now book appointments and get answers to common questions without waiting on hold. It took real pressure off our front desk.\u201D",
     author: "Dr. Neeta Save",
     role: "Clinic Owner & BHMS",
     company: "Aarogya Clinic",
