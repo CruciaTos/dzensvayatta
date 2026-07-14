@@ -86,7 +86,9 @@ function MarqueeExpandingCard({
       tabIndex={0}
       aria-expanded={isExpanded}
       style={{
-        flex: isExpanded ? "0 0 clamp(360px, 42vw, 500px)" : "0 0 clamp(280px, 35vw, 360px)",
+        flex: isExpanded
+          ? "0 0 var(--card-w-exp, clamp(360px, 42vw, 500px))"
+          : "0 0 var(--card-w, clamp(280px, 35vw, 360px))",
         transition: `flex 0.65s ${SPRING}, border-color 0.45s ease`,
         position: "relative",
         overflow: "hidden",
@@ -185,7 +187,7 @@ function MarqueeExpandingCard({
               color: "#a9bdf8ff",
               opacity: isExpanded ? 1 : 0,
               transition: "opacity 0.35s ease",
-              whiteSpace: "nowrap",
+              overflowWrap: "break-word",
             }}
           >
             {c.domain}
@@ -194,8 +196,8 @@ function MarqueeExpandingCard({
         <div
           className="font-mono"
           style={{
-            fontSize: "13px",
-            letterSpacing: "0.22em",
+            fontSize: "var(--org-fs, 13px)",
+            letterSpacing: "var(--org-ls, 0.22em)",
             textTransform: "uppercase",
             color: "#a9bdf8ff",
             marginBottom: "12px",
@@ -209,7 +211,9 @@ function MarqueeExpandingCard({
         <h3
           className="font-sans"
           style={{
-            fontSize: isExpanded ? "clamp(19px, 2.2vw, 34px)" : "clamp(32px, 4.2vw, 52px)",
+            fontSize: isExpanded
+              ? "clamp(19px, 2.2vw, 34px)"
+              : "var(--headline-fs, clamp(32px, 4.2vw, 52px))",
             fontWeight: 600,
             color: C.textPrimary,                    // ← unified headline colour
             lineHeight: 1.15,
@@ -217,6 +221,8 @@ function MarqueeExpandingCard({
             margin: 0,
             transition: `font-size 0.65s ${SPRING}`,
             overflow: "hidden",
+            overflowWrap: "break-word",
+            wordBreak: "break-word",
             display: "-webkit-box",
             WebkitLineClamp: isExpanded ? "unset" : 5,
             WebkitBoxOrient: "vertical",
@@ -412,13 +418,22 @@ export function CaseStudies() {
               <div
                 className="marquee-container"
                 style={{
-                  height: "clamp(550px, 60vh, 760px)",
+                  height: "var(--marquee-h, clamp(550px, 60vh, 760px))",
                   overflow: "hidden",
                   width: "100%",
                   marginTop: "40px",
                 }}
               >
                 <style>{`
+                  .marquee-container {
+                    --marquee-h: clamp(550px, 60vh, 760px);
+                    --card-w: clamp(280px, 35vw, 360px);
+                    --card-w-exp: clamp(360px, 42vw, 500px);
+                    --marquee-duration: 30s;
+                    --headline-fs: clamp(32px, 4.2vw, 52px);
+                    --org-fs: 13px;
+                    --org-ls: 0.22em;
+                  }
                   @keyframes marquee-scroll {
                     0% { transform: translateX(0); }
                     100% { transform: translateX(-50%); }
@@ -427,10 +442,22 @@ export function CaseStudies() {
                     display: flex;
                     gap: 16px;
                     height: 100%;
-                    animation: marquee-scroll 30s linear infinite;
+                    animation: marquee-scroll var(--marquee-duration) linear infinite;
                   }
                   .marquee-container:hover .marquee-track {
                     animation-play-state: paused;
+                  }
+                  /* Mobile-only: smaller cards, faster loop, smaller text. Desktop values above are untouched. */
+                  @media (max-width: 767px) {
+                    .marquee-container {
+                      --marquee-h: 380px;
+                      --card-w: 220px;
+                      --card-w-exp: 250px;
+                      --marquee-duration: 14s;
+                      --headline-fs: 22px;
+                      --org-fs: 11px;
+                      --org-ls: 0.08em;
+                    }
                   }
                 `}</style>
 
