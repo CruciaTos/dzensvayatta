@@ -61,6 +61,21 @@ export function DiscoveryForm() {
       setErrorMsg("Please enter a valid email address.");
       return;
     }
+
+    // ── Client-side working-hours check (10 AM – 10 PM) ─────────────────────
+    const [hh, mm] = form.meetTime.split(":").map(Number);
+    const totalMinutes = hh * 60 + mm;
+    if (totalMinutes < 10 * 60 || totalMinutes > 22 * 60) {
+      setErrorMsg("Meetings must be scheduled between 10:00 AM and 10:00 PM.");
+      return;
+    }
+
+    // ── Client-side 30-minute lead-time check ────────────────────────────────
+    const meetDateTime = new Date(`${form.meetDate}T${form.meetTime}:00`);
+    if (meetDateTime.getTime() - Date.now() < 30 * 60 * 1000) {
+      setErrorMsg("Please schedule your meeting at least 30 minutes from now.");
+      return;
+    }
     setErrorMsg("");
     setStep("sending");
 
@@ -87,7 +102,29 @@ export function DiscoveryForm() {
     }
   }
 
-  const today = new Date().toISOString().split("T")[0];
+  // ── Working-hours + lead-time helpers ──────────────────────────────────────
+  const WORK_START = "10:00";
+  const WORK_END = "22:00"; // 10 PM
+
+  const now = new Date();
+
+  // Earliest bookable date: today (meetings same-day are fine if time allows)
+  const minDate = now.toISOString().split("T")[0];
+
+  // Earliest bookable time on the SELECTED date.
+  // If the user picked today → must be ≥ now + 30 min, but also ≥ 10:00.
+  // If they picked a future date → just 10:00.
+  const getMinTime = (): string => {
+    if (!form.meetDate || form.meetDate !== minDate) return WORK_START;
+    const earliest = new Date(now.getTime() + 30 * 60 * 1000);
+    const hh = String(earliest.getHours()).padStart(2, "0");
+    const mm = String(earliest.getMinutes()).padStart(2, "0");
+    const leadTime = `${hh}:${mm}`;
+    // Take whichever is later: work-start or lead-time
+    return leadTime > WORK_START ? leadTime : WORK_START;
+  };
+
+  const today = minDate; // keep legacy var name for the date Input below
 
   return (
     <motion.div
@@ -299,10 +336,16 @@ export function DiscoveryForm() {
                     onChange={(v) => handleChange("meetDate", v)}
                   />
                 </Field>
-                <Field label="Preferred Time *" htmlFor="meetTime">
+                <Field
+                  label="Preferred Time *"
+                  htmlFor="meetTime"
+                  hint="10 AM – 10 PM · 30 min "
+                >
                   <Input
                     id="meetTime"
                     type="time"
+                    min={getMinTime()}
+                    max={WORK_END}
                     value={form.meetTime}
                     onChange={(v) => handleChange("meetTime", v)}
                   />
@@ -386,6 +429,7 @@ function Input({
   value,
   onChange,
   min,
+  max,
 }: {
   id: string;
   type?: string;
@@ -393,6 +437,7 @@ function Input({
   value: string;
   onChange: (v: string) => void;
   min?: string;
+  max?: string;
 }) {
   return (
     <input
@@ -401,6 +446,7 @@ function Input({
       placeholder={placeholder}
       value={value}
       min={min}
+      max={max}
       onChange={(e) => onChange(e.target.value)}
       className="w-full bg-transparent text-sm outline-none"
       style={{
