@@ -39,13 +39,6 @@ const FOUNDERS = [
     linkedIn: "https://linkedin.com/in/smit-mhatre",
     delay: 0.2,
   },
-  {
-    num: "III",
-    name: "Varun Pal",
-    email: "varunpal@svayatta.in",
-    linkedIn: "https://www.linkedin.com/in/b777varunpal/",
-    delay: 0.3,
-  },
 ] as const;
 
 function Typewriter({ text, delay = 0 }: { text: string; delay?: number }) {
