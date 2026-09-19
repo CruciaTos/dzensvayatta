@@ -119,28 +119,6 @@ export function Navbar() {
   const isProjectsActive =
     pathname === PROJECTS_LINK.href || pathname.startsWith(`${PROJECTS_LINK.href}/`);
 
-  const [hidden, setHidden] = useState(false);
-  const lastScrollY = useRef(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentY = window.scrollY;
-      if (currentY < 100) {
-        setHidden(false);
-        lastScrollY.current = currentY;
-        return;
-      }
-      if (currentY > lastScrollY.current + 5) {
-        setHidden(true);
-      } else if (currentY < lastScrollY.current - 5) {
-        setHidden(false);
-      }
-      lastScrollY.current = currentY;
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   // Any open surface closes on navigation — otherwise the mobile sheet
   // stays open on top of the page it just navigated to.
   useEffect(() => {
@@ -220,17 +198,13 @@ export function Navbar() {
   const litKey = hovered ?? activeKey;
 
   const surface = scrolled ? GLASS : CLEAR;
-  const shouldHide = hidden && !isMobileMenuOpen && !projectsMenuOpen;
 
   return (
     <>
       <motion.div
         className="fixed top-0 left-0 right-0 z-50"
         initial={{ opacity: 0, y: -12 }}
-        animate={{
-          opacity: shouldHide ? 0 : 1,
-          y: shouldHide ? -80 : 0,
-        }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.0, ease: EASE }}
       >
         <NavbarShell>
