@@ -1,0 +1,582 @@
+diff --git a/components/ScrollReveal.tsx b/components/ScrollReveal.tsx
+index 16825db..46c4ba5 100644
+--- a/components/ScrollReveal.tsx
++++ b/components/ScrollReveal.tsx
+@@ -3,6 +3,7 @@
+ import React, { useRef } from "react";
+ import { motion, useInView } from "motion/react";
+ import { cn } from "@/lib/utils";
++import { useIsMobile } from "@/hooks/useIsMobile";
+ 
+ interface ScrollRevealProps {
+   children: React.ReactNode;
+@@ -30,6 +31,9 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
+   const ref = useRef<HTMLDivElement>(null);
+   // Trigger animation when the component comes into view
+   const isInView = useInView(ref, { once: true, margin: "-10% 0px -10% 0px" });
++  // Mobile: skip the scroll-triggered reveal entirely, content shows directly.
++  // Desktop is completely untouched (isMobile is always false there).
++  const isMobile = useIsMobile();
+ 
+   const initial = {
+     opacity: baseOpacity,
+@@ -48,9 +52,9 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
+   return (
+     <motion.div
+       ref={ref}
+-      initial={initial}
+-      animate={isInView ? animate : initial}
+-      transition={{ duration: 0.8, ease: "easeOut" }}
++      initial={isMobile ? false : initial}
++      animate={isMobile ? animate : isInView ? animate : initial}
++      transition={isMobile ? { duration: 0 } : { duration: 0.8, ease: "easeOut" }}
+       className={cn(containerClassName, className)}
+       style={style}
+     >
+diff --git a/components/sections/AboutOverlay.tsx b/components/sections/AboutOverlay.tsx
+index 529efb2..dbca156 100644
+--- a/components/sections/AboutOverlay.tsx
++++ b/components/sections/AboutOverlay.tsx
+@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
+ import { motion, AnimatePresence } from "motion/react";
+ import { LogoMark } from "@/components/ui/Icons";
+ import { useLenis } from "@/components/providers/SmoothScroll";
++import { useIsMobile } from "@/hooks/useIsMobile";
+ 
+ interface AboutOverlayProps {
+   open: boolean;
+@@ -104,6 +105,9 @@ function FounderCard({
+ }) {
+   const [hovered, setHovered] = useState(false);
+   const cardRef = useRef<HTMLDivElement>(null);
++  // Mobile: card appears directly with the overlay, no fade/slide-up or
++  // per-card stagger delay. Desktop keeps the exact original animation.
++  const isMobile = useIsMobile();
+ 
+   return (
+     <motion.div
+@@ -116,9 +120,9 @@ function FounderCard({
+       }}
+       onMouseEnter={() => setHovered(true)}
+       onMouseLeave={() => setHovered(false)}
+-      initial={{ opacity: 0, y: 30 }}
+-      animate={open ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+-      transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
++      initial={isMobile ? false : { opacity: 0, y: 30 }}
++      animate={isMobile ? { opacity: 1, y: 0 } : open ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
++      transition={isMobile ? { duration: 0 } : { duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
+     >
+       <motion.div
+         className="absolute inset-0 pointer-events-none"
+diff --git a/components/sections/CapabilitiesSection.tsx b/components/sections/CapabilitiesSection.tsx
+index 1b33987..b6e6f8a 100644
+--- a/components/sections/CapabilitiesSection.tsx
++++ b/components/sections/CapabilitiesSection.tsx
+@@ -3,6 +3,7 @@ import React, { useRef, useEffect, useState } from "react";
+ import Image from "next/image";
+ import { motion, useInView } from "motion/react";
+ import { cn } from "@/lib/utils";
++import { useIsMobile } from "@/hooks/useIsMobile";
+ 
+ // ── Design tokens (matching TargetMarkets) ─────────────────────────────────
+ const C = {
+@@ -64,6 +65,10 @@ function PhaseBlock({
+ }) {
+   const ref = useRef<HTMLDivElement>(null);
+   const inView = useInView(ref, { margin: "-25% 0px -25% 0px", once: false });
++  // Mobile: text and rule show directly at full opacity, no continuous
++  // fade-in/out as the block scrolls through the viewport. Desktop keeps
++  // the exact original scrollytelling behavior.
++  const isMobile = useIsMobile();
+ 
+   const gridSizes = [20, 24, 28, 32];
+   const gridOpacities = [0.03, 0.05, 0.04, 0.06];
+@@ -138,9 +143,9 @@ function PhaseBlock({
+       <motion.div
+         className="absolute top-0 left-0 w-full h-px bg-[#7EC3E2]/30"
+         style={{ transformOrigin: "left" }}
+-        initial={{ scaleX: 0 }}
+-        animate={{ scaleX: inView ? 1 : 0 }}
+-        transition={{ duration: 0.7, ease: "easeInOut" }}
++        initial={isMobile ? false : { scaleX: 0 }}
++        animate={{ scaleX: isMobile ? 1 : inView ? 1 : 0 }}
++        transition={isMobile ? { duration: 0 } : { duration: 0.7, ease: "easeInOut" }}
+       />
+ 
+       {/* ── Text content – full width on mobile (image is hidden there); max width 50% on md+ so image fills the rest ── */}
+@@ -149,9 +154,13 @@ function PhaseBlock({
+           "relative z-10 w-full md:max-w-[50%] flex-shrink-0 min-w-0 space-y-5 select-text",
+           isLeft ? "text-left" : "text-left md:text-right"
+         )}
+-        initial={{ opacity: 0, y: 28 }}
+-        animate={{ opacity: inView ? 1 : 0.18, y: inView ? 0 : 12 }}
+-        transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
++        initial={isMobile ? false : { opacity: 0, y: 28 }}
++        animate={
++          isMobile
++            ? { opacity: 1, y: 0 }
++            : { opacity: inView ? 1 : 0.18, y: inView ? 0 : 12 }
++        }
++        transition={isMobile ? { duration: 0 } : { duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+       >
+         <h3
+           className={cn(
+diff --git a/components/sections/CaseStudies.tsx b/components/sections/CaseStudies.tsx
+index 1ae9cdb..bd95e89 100644
+--- a/components/sections/CaseStudies.tsx
++++ b/components/sections/CaseStudies.tsx
+@@ -317,6 +317,97 @@ function MarqueeExpandingCard({
+   );
+ }
+ 
++/* ── Mobile card – simple, static, non-interactive version of the marquee
++   card above. No auto-scrolling marquee, no duplicated list, no hover/tap
++   expand animation: all the content is shown directly. Desktop keeps the
++   original MarqueeExpandingCard + marquee untouched. ── */
++function MobileCaseCard({ c }: { c: RealCase }) {
++  return (
++    <div
++      style={{
++        position: "relative",
++        overflow: "hidden",
++        backgroundColor: C.cardBg,
++        border: `1px solid ${C.cardBorder}`,
++        borderRadius: "16px",
++        padding: "28px 24px",
++      }}
++    >
++      <div
++        aria-hidden="true"
++        style={{
++          position: "absolute",
++          left: 0,
++          top: 0,
++          bottom: 0,
++          width: "3px",
++          backgroundColor: c.accent,
++        }}
++      />
++      <div
++        className="font-mono"
++        style={{
++          fontSize: "11px",
++          letterSpacing: "0.1em",
++          textTransform: "uppercase",
++          color: "#a9bdf8ff",
++          marginBottom: "10px",
++        }}
++      >
++        {c.domain}
++      </div>
++      <div
++        className="font-mono"
++        style={{
++          fontSize: "12px",
++          letterSpacing: "0.16em",
++          textTransform: "uppercase",
++          color: "#a9bdf8ff",
++          marginBottom: "12px",
++        }}
++      >
++        {c.org}
++      </div>
++      <h3
++        className="font-sans"
++        style={{
++          fontSize: "24px",
++          fontWeight: 600,
++          color: C.textPrimary,
++          lineHeight: 1.2,
++          letterSpacing: "-0.02em",
++          marginBottom: "12px",
++        }}
++      >
++        {c.headline}
++      </h3>
++      <p
++        className="font-sans"
++        style={{
++          fontSize: "15px",
++          fontWeight: 300,
++          color: "#a9bdf8ff",
++          lineHeight: 1.7,
++          marginBottom: "16px",
++        }}
++      >
++        {c.body}
++      </p>
++      <div
++        className="font-mono"
++        style={{
++          fontSize: "11px",
++          letterSpacing: "0.08em",
++          textTransform: "uppercase",
++          color: "#a9bdf8ff",
++        }}
++      >
++        Source: {c.source}
++      </div>
++    </div>
++  );
++}
++
+ /* ── Main section – glass container & heading now match TargetAreas ── */
+ export function CaseStudies() {
+   const [activeId, setActiveId] = useState<string | null>(null);
+@@ -415,8 +506,10 @@ export function CaseStudies() {
+             </FadeIn>
+ 
+             <FadeIn delay={0.2}>
++              {/* Desktop-only auto-scrolling marquee — completely untouched.
++                  Hidden below md; mobile renders the simple static list below. */}
+               <div
+-                className="marquee-container"
++                className="marquee-container hidden md:block"
+                 style={{
+                   height: "var(--marquee-h, clamp(550px, 60vh, 760px))",
+                   overflow: "hidden",
+@@ -480,6 +573,15 @@ export function CaseStudies() {
+                   ))}
+                 </div>
+               </div>
++
++              {/* Mobile-only simple list — cards appear directly, no marquee,
++                  no duplicated cards, no entrance animation. Desktop is
++                  unaffected since this block is hidden at md and above. */}
++              <div className="case-cards-mobile md:hidden flex flex-col gap-4 mt-10">
++                {CASES.map((c) => (
++                  <MobileCaseCard key={c.id} c={c} />
++                ))}
++              </div>
+             </FadeIn>
+           </div>
+         </div>
+diff --git a/components/sections/ProjectsShowcase.tsx b/components/sections/ProjectsShowcase.tsx
+index 5a7a739..160ddcf 100644
+--- a/components/sections/ProjectsShowcase.tsx
++++ b/components/sections/ProjectsShowcase.tsx
+@@ -5,6 +5,7 @@ import Image from "next/image";
+ import { useState, useEffect } from "react";
+ import { motion, AnimatePresence, useReducedMotion } from "motion/react";
+ import { FadeIn } from "@/components/ui/FadeIn";
++import { useIsMobile } from "@/hooks/useIsMobile";
+ 
+ const C = {
+   accent: "#7EC3E2",
+@@ -133,13 +134,16 @@ function ImageCarousel({ images }: { images: string[] }) {
+ 
+ function ProjectCard({ project, index }: { project: Project; index: number }) {
+   const reduce = useReducedMotion();
++  // Mobile: card appears directly, no fade/slide-up or stagger delay.
++  // Desktop keeps the exact original whileInView animation.
++  const isMobile = useIsMobile();
+ 
+   return (
+     <motion.div
+-      initial={reduce ? false : { opacity: 0, y: 28 }}
++      initial={isMobile ? false : reduce ? false : { opacity: 0, y: 28 }}
+       whileInView={{ opacity: 1, y: 0 }}
+       viewport={{ once: true, margin: "-10%" }}
+-      transition={{ duration: 0.65, delay: index * 0.08, ease: EASE }}
++      transition={isMobile ? { duration: 0 } : { duration: 0.65, delay: index * 0.08, ease: EASE }}
+       className="project-card"
+       style={{
+         position: "relative",
+diff --git a/components/sections/TargetAreas.tsx b/components/sections/TargetAreas.tsx
+index 1ecf039..837c124 100644
+--- a/components/sections/TargetAreas.tsx
++++ b/components/sections/TargetAreas.tsx
+@@ -2,6 +2,7 @@
+ 
+ import { useRef, useState, useCallback } from "react";
+ import { motion, AnimatePresence, useInView } from "motion/react";
++import { useIsMobile } from "@/hooks/useIsMobile";
+ 
+ // ── Design tokens ──────────────────────────────────────────────────────────────
+ const C = {
+@@ -134,6 +135,9 @@ function SpotlightCard({ area, index, isHovered, isCompressed, onEnter, onLeave
+   const cardRef = useRef<HTMLDivElement>(null);
+   const spotRef = useRef<HTMLDivElement>(null);
+   const isInView = useInView(cardRef, { once: true, amount: 0.1 });
++  // Mobile: cards appear directly, no fade/slide-up and no per-card stagger
++  // delay. Desktop keeps the exact original scroll-in animation.
++  const isMobile = useIsMobile();
+ 
+   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+     if (!cardRef.current || !spotRef.current) return;
+@@ -165,9 +169,9 @@ function SpotlightCard({ area, index, isHovered, isCompressed, onEnter, onLeave
+       role="button"
+       tabIndex={0}
+       aria-expanded={isHovered}
+-      initial={{ opacity: 0, y: 24 }}
+-      animate={isInView ? { opacity: 1, y: 0 } : {}}
+-      transition={{ duration: 1.0, delay: index * 0.35, ease: EASE }}
++      initial={isMobile ? false : { opacity: 0, y: 24 }}
++      animate={isMobile ? { opacity: 1, y: 0 } : isInView ? { opacity: 1, y: 0 } : {}}
++      transition={isMobile ? { duration: 0 } : { duration: 1.0, delay: index * 0.35, ease: EASE }}
+       style={{
+         flexGrow: isHovered ? 1.36 : isCompressed ? 0.64 : 1,
+         flexShrink: 0,
+@@ -402,6 +406,7 @@ function CardColumn({ areas, indices, hoveredId, onEnter, onLeave }: ColumnProps
+ export function TargetAreas() {
+   const headerRef = useRef<HTMLDivElement>(null);
+   const headerInView = useInView(headerRef, { once: true, amount: 0.3 });
++  const isMobile = useIsMobile();
+   const [hoveredId, setHoveredId] = useState<string | null>(null);
+ 
+   const handleEnter = useCallback((id: string) => setHoveredId(id), []);
+@@ -494,9 +499,9 @@ export function TargetAreas() {
+           >
+             <motion.div
+               ref={headerRef}
+-              initial={{ opacity: 0, y: 22 }}
+-              animate={headerInView ? { opacity: 1, y: 0 } : {}}
+-              transition={{ duration: 0.75, ease: EASE }}
++              initial={isMobile ? false : { opacity: 0, y: 22 }}
++              animate={isMobile ? { opacity: 1, y: 0 } : headerInView ? { opacity: 1, y: 0 } : {}}
++              transition={isMobile ? { duration: 0 } : { duration: 0.75, ease: EASE }}
+               style={{ marginBottom: "clamp(52px, 8vw, 80px)" }}
+             >
+               <h2
+diff --git a/components/sections/TargetMarkets.tsx b/components/sections/TargetMarkets.tsx
+index e3a2036..2808b1a 100644
+--- a/components/sections/TargetMarkets.tsx
++++ b/components/sections/TargetMarkets.tsx
+@@ -2,6 +2,7 @@
+ 
+ import { useRef, useCallback } from "react";
+ import { motion, useInView } from "motion/react";
++import { useIsMobile } from "@/hooks/useIsMobile";
+ 
+ // ── Design tokens ────────────────────────────────────────────────────────────
+ const C = {
+@@ -49,6 +50,9 @@ function SpotlightCard({ card, index }: CardProps) {
+   const cardRef = useRef<HTMLDivElement>(null);
+   const spotRef = useRef<HTMLDivElement>(null);
+   const isInView = useInView(cardRef, { once: true, amount: 0.1 });
++  // Mobile: cards appear directly, no fade/slide-up and no per-card stagger
++  // delay. Desktop keeps the exact original scroll-in animation.
++  const isMobile = useIsMobile();
+ 
+   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+     if (!cardRef.current || !spotRef.current) return;
+@@ -68,9 +72,9 @@ function SpotlightCard({ card, index }: CardProps) {
+       className="tm-card"
+       onMouseMove={handleMouseMove}
+       onMouseLeave={handleMouseLeave}
+-      initial={{ opacity: 0, y: 24 }}
+-      animate={isInView ? { opacity: 1, y: 0 } : {}}
+-      transition={{ duration: 1.0, delay: index * 0.35, ease: EASE }}
++      initial={isMobile ? false : { opacity: 0, y: 24 }}
++      animate={isMobile ? { opacity: 1, y: 0 } : isInView ? { opacity: 1, y: 0 } : {}}
++      transition={isMobile ? { duration: 0 } : { duration: 1.0, delay: index * 0.35, ease: EASE }}
+       style={{
+         flex: 1,
+         minHeight: 0,
+@@ -136,6 +140,7 @@ function CardColumn({ cards, indices }: ColumnProps) {
+ export function TargetMarkets() {
+   const headerRef = useRef<HTMLDivElement>(null);
+   const headerInView = useInView(headerRef, { once: true, amount: 0.3 });
++  const isMobile = useIsMobile();
+ 
+   const columns = [
+     { cards: [MARKET_CARDS[0], MARKET_CARDS[3]], indices: [0, 3] },
+@@ -216,9 +221,9 @@ export function TargetMarkets() {
+           <div style={{ position: "relative", zIndex: 4, padding: "clamp(56px, 7vw, 96px) clamp(40px, 5vw, 72px)" }}>
+             <motion.div
+               ref={headerRef}
+-              initial={{ opacity: 0, y: 22 }}
+-              animate={headerInView ? { opacity: 1, y: 0 } : {}}
+-              transition={{ duration: 0.75, ease: EASE }}
++              initial={isMobile ? false : { opacity: 0, y: 22 }}
++              animate={isMobile ? { opacity: 1, y: 0 } : headerInView ? { opacity: 1, y: 0 } : {}}
++              transition={isMobile ? { duration: 0 } : { duration: 0.75, ease: EASE }}
+               style={{ marginBottom: "clamp(52px, 8vw, 80px)" }}
+             >
+               <h2 style={{
+diff --git a/components/sections/Testimonials.tsx b/components/sections/Testimonials.tsx
+index 8bfd132..ce4fba1 100644
+--- a/components/sections/Testimonials.tsx
++++ b/components/sections/Testimonials.tsx
+@@ -5,6 +5,7 @@ import Image from "next/image";
+ import { AnimatePresence, motion, useReducedMotion, useInView } from "motion/react";
+ import { Container } from "@/components/ui/Container";
+ import ScrollReveal from "@/components/ScrollReveal";
++import { useIsMobile } from "@/hooks/useIsMobile";
+ 
+ const C = {
+   accent: "#7EC3E2",
+@@ -110,6 +111,9 @@ function markOf(company: string) {
+ export function Testimonials() {
+   const [index, setIndex] = useState(0);
+   const reduce = useReducedMotion();
++  // Mobile: content appears directly, no fade-in/quote-reveal animations.
++  // Desktop keeps the exact original behavior.
++  const isMobile = useIsMobile();
+   const active = TESTIMONIALS[index];
+ 
+   const quoteContainerRef = useRef<HTMLDivElement>(null);
+@@ -136,10 +140,10 @@ export function Testimonials() {
+     >
+       <Container>
+         <motion.div
+-          initial={reduce ? false : { opacity: 0, y: 12 }}
++          initial={isMobile ? false : reduce ? false : { opacity: 0, y: 12 }}
+           whileInView={{ opacity: 1, y: 0 }}
+           viewport={{ once: true, margin: "-10%" }}
+-          transition={{ duration: 0.6, ease: EASE }}
++          transition={isMobile ? { duration: 0 } : { duration: 0.6, ease: EASE }}
+           className="flex flex-col items-center text-center"
+         >
+           <h2
+@@ -160,9 +164,9 @@ export function Testimonials() {
+                   <motion.span
+                     aria-hidden="true"
+                     className="flex-shrink-0 self-start"
+-                    initial={{ opacity: 0 }}
+-                    animate={{ opacity: isQuoteInView ? 1 : 0 }}
+-                    transition={{ duration: 0.5 }}
++                    initial={isMobile ? false : { opacity: 0 }}
++                    animate={{ opacity: isMobile ? 1 : isQuoteInView ? 1 : 0 }}
++                    transition={isMobile ? { duration: 0 } : { duration: 0.5 }}
+                     style={{
+                       color: C.accent,
+                       fontSize: "clamp(34px,3vw,44px)",
+@@ -191,9 +195,9 @@ export function Testimonials() {
+                   <motion.span
+                     aria-hidden="true"
+                     className="flex-shrink-0 self-end"
+-                    initial={{ opacity: 0 }}
+-                    animate={{ opacity: isQuoteInView ? 1 : 0 }}
+-                    transition={{ duration: 0.5 }}
++                    initial={isMobile ? false : { opacity: 0 }}
++                    animate={{ opacity: isMobile ? 1 : isQuoteInView ? 1 : 0 }}
++                    transition={isMobile ? { duration: 0 } : { duration: 0.5 }}
+                     style={{
+                       color: C.accent,
+                       fontSize: "clamp(34px,3vw,44px)",
+@@ -212,10 +216,10 @@ export function Testimonials() {
+           <AnimatePresence mode="wait">
+             <motion.div
+               key={active.id}
+-              initial={{ opacity: 0 }}
+-              animate={{ opacity: isQuoteInView ? 1 : 0 }}
++              initial={isMobile ? false : { opacity: 0 }}
++              animate={{ opacity: isMobile ? 1 : isQuoteInView ? 1 : 0 }}
+               exit={{ opacity: 0, transition: { duration: 0.2 } }}
+-              transition={{ duration: 0.5, delay: 0.1 }}
++              transition={isMobile ? { duration: 0 } : { duration: 0.5, delay: 0.1 }}
+               className="mt-20 flex flex-col items-center"
+             >
+               <p className="font-sans text-[32px] font-bold mb-1" style={{ color: C.textPrimary }}>
+@@ -254,7 +258,7 @@ export function Testimonials() {
+                     onClick={() => goTo(i)}
+                     aria-label={`Show testimonial from ${t.author} at ${t.company}`}
+                     aria-current={isActive}
+-                    transition={{ duration: reduce ? 0 : 0.4, ease: EASE }}
++                    transition={{ duration: reduce || isMobile ? 0 : 0.4, ease: EASE }}
+                     className="relative rounded-2xl overflow-visible flex-shrink-0 w-28 h-28 sm:w-40 sm:h-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300/60"
+                   >
+                     <div
+diff --git a/components/sections/WhyUs.tsx b/components/sections/WhyUs.tsx
+index c66a4a0..ae2e9c1 100644
+--- a/components/sections/WhyUs.tsx
++++ b/components/sections/WhyUs.tsx
+@@ -108,6 +108,11 @@ export function WhyUs() {
+     const prefersReducedMotion = window.matchMedia(
+       "(prefers-reduced-motion: reduce)"
+     ).matches;
++    // Mobile: skip the scroll-scrubbed word-by-word highlight entirely and
++    // just show the final resting color, same as the reduced-motion path.
++    // Desktop is completely untouched.
++    const isMobile = window.matchMedia("(max-width: 767px)").matches;
++    const skipAnimation = prefersReducedMotion || isMobile;
+ 
+     const ctx = gsap.context(() => {
+       paragraphRefs.current.forEach((el) => {
+@@ -118,7 +123,7 @@ export function WhyUs() {
+         );
+         if (!words.length) return;
+ 
+-        if (prefersReducedMotion) {
++        if (skipAnimation) {
+           gsap.set(words, { color: C.textMuted });
+           return;
+         }
+diff --git a/components/ui/FadeIn.tsx b/components/ui/FadeIn.tsx
+index e758407..d5e9182 100644
+--- a/components/ui/FadeIn.tsx
++++ b/components/ui/FadeIn.tsx
+@@ -3,6 +3,7 @@
+ import { motion, useInView } from "motion/react";
+ import { useRef, type ReactNode } from "react";
+ import { cn } from "@/lib/utils";
++import { useIsMobile } from "@/hooks/useIsMobile";
+ 
+ interface FadeInProps {
+   children: ReactNode;
+@@ -21,17 +22,24 @@ export function FadeIn({
+ }: FadeInProps) {
+   const ref = useRef<HTMLDivElement>(null);
+   const isInView = useInView(ref, { once: true, margin: "0px 0px -40px 0px" });
++  // Mobile: content appears directly, no fade/slide-up and no scroll-linked
++  // delay/stagger. Desktop keeps the exact original behavior.
++  const isMobile = useIsMobile();
+ 
+   return (
+     <motion.div
+       ref={ref}
+-      initial={{ opacity: 0, y }}
+-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y }}
+-      transition={{
+-        duration,
+-        delay,
+-        ease: [0.22, 1, 0.36, 1],
+-      }}
++      initial={isMobile ? false : { opacity: 0, y }}
++      animate={isMobile ? { opacity: 1, y: 0 } : isInView ? { opacity: 1, y: 0 } : { opacity: 0, y }}
++      transition={
++        isMobile
++          ? { duration: 0 }
++          : {
++              duration,
++              delay,
++              ease: [0.22, 1, 0.36, 1],
++            }
++      }
+       className={cn(className)}
+     >
+       {children}
+diff --git a/hooks/useIsMobile.ts b/hooks/useIsMobile.ts
+new file mode 100644
+index 0000000..508a833
+--- /dev/null
++++ b/hooks/useIsMobile.ts
+@@ -0,0 +1,27 @@
++"use client";
++
++import { useState, useEffect } from "react";
++
++/**
++ * Returns true when the viewport is at/below the site's mobile breakpoint
++ * (767px, matching Tailwind's `md` cutoff used everywhere else in the app).
++ *
++ * Used to gate the scroll/entrance animations that are disabled on mobile
++ * (see MOBILE_SIMPLIFIED_ANIMATIONS.md). Defaults to `false` so server-side
++ * render and desktop are never affected — the value only flips to `true`
++ * after mount, on real mobile-width viewports.
++ */
++export function useIsMobile(breakpoint = 767): boolean {
++  const [isMobile, setIsMobile] = useState(false);
++
++  useEffect(() => {
++    const mql = window.matchMedia(`(max-width: ${breakpoint}px)`);
++    const update = () => setIsMobile(mql.matches);
++
++    update(); // run once on mount
++    mql.addEventListener("change", update);
++    return () => mql.removeEventListener("change", update);
++  }, [breakpoint]);
++
++  return isMobile;
++}

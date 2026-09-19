@@ -24,7 +24,10 @@ const dmSerifDisplay = DM_Serif_Display({
 
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ["latin"],
-  weight: ["300", "400"],
+  // 600 is loaded for the Projects dropdown labels. Without a real SemiBold
+  // cut the browser synthesises one by smearing the 400, which at 11px with
+  // wide tracking reads as blurred rather than bold.
+  weight: ["300", "400", "600"],
   variable: "--font-mono",
   display: "swap",
 });

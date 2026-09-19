@@ -2,9 +2,17 @@
 
 import React from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
 /*  Navbar – top-level wrapper                                        */
+/*                                                                    */
+/*  These primitives are deliberately layout-only: they own structure */
+/*  (which row is desktop, which is mobile, how the sheet animates)   */
+/*  and nothing else. All surface styling — the glass, the radius,    */
+/*  the width it collapses to on scroll — is passed down from         */
+/*  components/layout/Navbar.tsx, so the "resize" is a single source  */
+/*  of truth there instead of being split across two files.           */
 /* ------------------------------------------------------------------ */
 interface NavbarProps extends React.HTMLAttributes<HTMLElement> {
   children: React.ReactNode;
@@ -12,7 +20,7 @@ interface NavbarProps extends React.HTMLAttributes<HTMLElement> {
 
 export function Navbar({ children, className, style, ...rest }: NavbarProps) {
   return (
-    <nav className={className} style={style} {...rest}>
+    <nav className={cn("relative w-full", className)} style={style} {...rest}>
       {children}
     </nav>
   );
@@ -21,15 +29,15 @@ export function Navbar({ children, className, style, ...rest }: NavbarProps) {
 /* ------------------------------------------------------------------ */
 /*  NavBody – desktop nav content row                                 */
 /* ------------------------------------------------------------------ */
-interface NavBodyProps {
+interface NavBodyProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
-  className?: string;
 }
 
-export function NavBody({ children, className }: NavBodyProps) {
+export function NavBody({ children, className, ...rest }: NavBodyProps) {
   return (
     <div
-      className={`hidden md:flex items-center justify-between w-full max-w-[1440px] mx-auto px-8 py-4 ${className ?? ""}`}
+      className={cn("relative hidden w-full items-center justify-between md:flex", className)}
+      {...rest}
     >
       {children}
     </div>
@@ -39,30 +47,28 @@ export function NavBody({ children, className }: NavBodyProps) {
 /* ------------------------------------------------------------------ */
 /*  MobileNav – mobile wrapper                                        */
 /* ------------------------------------------------------------------ */
-interface MobileNavProps {
+interface MobileNavProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
-  className?: string;
 }
 
-export function MobileNav({ children, className }: MobileNavProps) {
+export function MobileNav({ children, className, ...rest }: MobileNavProps) {
   return (
-    <div className={`md:hidden w-full ${className ?? ""}`}>{children}</div>
+    <div className={cn("w-full md:hidden", className)} {...rest}>
+      {children}
+    </div>
   );
 }
 
 /* ------------------------------------------------------------------ */
 /*  MobileNavHeader – logo + toggle row                               */
 /* ------------------------------------------------------------------ */
-interface MobileNavHeaderProps {
+interface MobileNavHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
-  className?: string;
 }
 
-export function MobileNavHeader({ children, className }: MobileNavHeaderProps) {
+export function MobileNavHeader({ children, className, ...rest }: MobileNavHeaderProps) {
   return (
-    <div
-      className={`flex items-center justify-between w-full px-5 py-4 ${className ?? ""}`}
-    >
+    <div className={cn("flex w-full items-center justify-between", className)} {...rest}>
       {children}
     </div>
   );
@@ -74,67 +80,70 @@ export function MobileNavHeader({ children, className }: MobileNavHeaderProps) {
 interface MobileNavToggleProps {
   isOpen: boolean;
   onClick: () => void;
+  color?: string;
 }
 
-export function MobileNavToggle({ isOpen, onClick }: MobileNavToggleProps) {
+export function MobileNavToggle({ isOpen, onClick, color = "#B2D5E5" }: MobileNavToggleProps) {
   return (
     <button
       onClick={onClick}
       aria-label={isOpen ? "Close menu" : "Open menu"}
-      className="relative w-7 h-5 bg-transparent border-none cursor-pointer flex flex-col justify-between p-0"
+      aria-expanded={isOpen}
+      className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border p-0 transition-colors duration-200"
+      style={{
+        borderColor: "rgba(178,213,229,0.16)",
+        backgroundColor: isOpen ? "rgba(178,213,229,0.10)" : "rgba(178,213,229,0.04)",
+      }}
     >
-      <motion.span
-        className="block w-full h-[1.5px] rounded-full origin-center"
-        style={{ backgroundColor: "#B2D5E5" }}
-        animate={isOpen ? { rotate: 45, y: 7.5 } : { rotate: 0, y: 0 }}
-        transition={{ duration: 0.25 }}
-      />
-      <motion.span
-        className="block w-full h-[1.5px] rounded-full origin-center"
-        style={{ backgroundColor: "#B2D5E5" }}
-        animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
-        transition={{ duration: 0.15 }}
-      />
-      <motion.span
-        className="block w-full h-[1.5px] rounded-full origin-center"
-        style={{ backgroundColor: "#B2D5E5" }}
-        animate={isOpen ? { rotate: -45, y: -7.5 } : { rotate: 0, y: 0 }}
-        transition={{ duration: 0.25 }}
-      />
+      <span className="relative flex h-[13px] w-[18px] flex-col justify-between">
+        <motion.span
+          className="block h-[1.5px] w-full origin-center rounded-full"
+          style={{ backgroundColor: color }}
+          animate={isOpen ? { rotate: 45, y: 5.75 } : { rotate: 0, y: 0 }}
+          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+        />
+        <motion.span
+          className="block h-[1.5px] w-full origin-center rounded-full"
+          style={{ backgroundColor: color }}
+          animate={isOpen ? { opacity: 0, scaleX: 0.4 } : { opacity: 1, scaleX: 1 }}
+          transition={{ duration: 0.18 }}
+        />
+        <motion.span
+          className="block h-[1.5px] w-full origin-center rounded-full"
+          style={{ backgroundColor: color }}
+          animate={isOpen ? { rotate: -45, y: -5.75 } : { rotate: 0, y: 0 }}
+          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+        />
+      </span>
     </button>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/*  MobileNavMenu – collapsible link list                             */
+/*  MobileNavMenu – collapsible link sheet                            */
 /* ------------------------------------------------------------------ */
 interface MobileNavMenuProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-export function MobileNavMenu({
-  isOpen,
-  children,
-  className,
-}: MobileNavMenuProps) {
+export function MobileNavMenu({ isOpen, children, className, style }: MobileNavMenuProps) {
   return (
-    <AnimatePresence>
+    <AnimatePresence initial={false}>
       {isOpen && (
         <motion.div
-          className={`flex flex-col gap-5 px-5 pb-6 pt-2 ${className ?? ""}`}
-          style={{
-            backgroundColor: "rgba(0, 11, 18, 0.95)",
-            borderTop: "1px solid rgba(178, 213, 229, 0.08)",
-          }}
+          className="overflow-hidden"
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
         >
-          {children}
+          <div className={cn("flex flex-col gap-4", className)} style={style}>
+            {children}
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
@@ -155,15 +164,19 @@ export function NavbarButton({
   ...props
 }: NavbarButtonProps) {
   const baseClasses =
-    "font-sans text-[13px] tracking-[0.08em] uppercase px-5 py-2.5 rounded-full border transition-colors duration-200 inline-flex items-center justify-center";
+    "group relative inline-flex cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full border font-sans text-[12px] uppercase tracking-[0.1em] transition-all duration-300";
   const primaryClasses =
-    "text-[#B2D5E5] border-[rgba(178,213,229,0.25)] bg-transparent hover:bg-[rgba(178,213,229,0.08)]";
+    "border-transparent text-[#04131c] shadow-[0_6px_18px_-6px_rgba(178,213,229,0.55)] hover:shadow-[0_10px_26px_-6px_rgba(178,213,229,0.7)]";
   const secondaryClasses =
-    "text-[rgba(178,213,229,0.7)] border-transparent hover:border-[rgba(178,213,229,0.25)] hover:text-[#B2D5E5]";
+    "border-[rgba(178,213,229,0.22)] bg-transparent text-[rgba(178,213,229,0.75)] hover:border-[rgba(178,213,229,0.45)] hover:text-[#B2D5E5]";
 
   return (
     <button
-      className={`${baseClasses} ${variant === "primary" ? primaryClasses : secondaryClasses} ${className}`}
+      className={cn(
+        baseClasses,
+        variant === "primary" ? primaryClasses : secondaryClasses,
+        className,
+      )}
       {...props}
     >
       {children}

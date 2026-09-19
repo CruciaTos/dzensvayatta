@@ -12,12 +12,9 @@ out/
 build/
 dist/
 
-# Environment variables
+# Environment variables — every .env variant, including the example
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
 
 # TypeScript
 *.tsbuildinfo

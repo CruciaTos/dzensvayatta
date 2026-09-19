@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { FadeIn } from "@/components/ui/FadeIn";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -22,7 +22,7 @@ const C = {
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-interface Project {
+export interface Project {
   id: string;
   name: string;
   tag: string;
@@ -34,35 +34,46 @@ interface Project {
   images: string[];
 }
 
-const PROJECTS: Project[] = [
-  {
-    id: "01",
-    name: "CruSam",
-    tag: " Deployed - Aarti Enterprises",
-    domain: "Windows Desktop · Flutter",
-    headline: "An unified ERP for employee records, payroll, and finance.",
-    body: "Designed to replace scattered spreadsheets and disconnected tools, CruSam helps businesses manage employee records, process salaries, create invoices and vouchers, organize documents, and generate reports from a single platform. An integrated AI assistant further streamlines daily operations by helping users find information, automate routine tasks, and work more efficiently.",
-    stack: [
-      "Agentic AI Assistant",
-      "Semantic Search Engine",
-      "Multimodal AI Input",
-      "Self-Updating Desktop App",
-      "Automated Cloud Backup",
-      "Deduplicated Sync",
-      "Email Integration",
-      "Versioned Local Database",
-      "Encrypted Local Storage",
-      "Usage & Cost Governance",
-    ],
-    status: "Live",
-    images: [
-      "/images/Crusam_Mockups/Dashboard_MD.png",
-      "/images/Crusam_Mockups/Invoice Creation.png",
-      "/images/Crusam_Mockups/invoice-snapshot.png",
-      "/images/Crusam_Mockups/salaryentry-analytics.png",
-    ],
-  },
-];
+export const CRUSAM_PROJECT: Project = {
+  id: "01",
+  name: "CruSam",
+  tag: " Deployed - Aarti Enterprises",
+  domain: "Windows Desktop · Flutter",
+  headline: "An unified ERP for employee records, payroll, and finance.",
+  body: "Designed to replace scattered spreadsheets and disconnected tools, CruSam helps businesses manage employee records, process salaries, create invoices and vouchers, organize documents, and generate reports from a single platform. An integrated AI assistant further streamlines daily operations by helping users find information, automate routine tasks, and work more efficiently.",
+  stack: [
+    "Agentic AI Assistant",
+    "Semantic Search Engine",
+    "Multimodal AI Input",
+    "Self-Updating Desktop App",
+    "Automated Cloud Backup",
+    "Deduplicated Sync",
+    "Email Integration",
+    "Versioned Local Database",
+    "Encrypted Local Storage",
+    "Usage & Cost Governance",
+  ],
+  status: "Live",
+  images: [
+    "/images/Crusam_Mockups/Dashboard_MD.png",
+    "/images/Crusam_Mockups/Invoice Creation.png",
+    "/images/Crusam_Mockups/invoice-snapshot.png",
+    "/images/Crusam_Mockups/salaryentry-analytics.png",
+  ],
+};
+
+// Placeholder content — swap in real copy, stack, and screenshots once ready.
+export const GROWMONT_PROJECT: Project = {
+  id: "02",
+  name: "Growmont",
+  tag: " In Development",
+  domain: "Web Platform",
+  headline: "A growth platform built to bring clarity to how teams scale.",
+  body: "Growmont is currently in development. Details on its feature set, stack, and screenshots will be added here once the project is ready to showcase.",
+  stack: ["Coming Soon"],
+  status: "In Development",
+  images: ["/images/logo.png"],
+};
 
 function ImageCarousel({ images }: { images: string[] }) {
   const [current, setCurrent] = useState(0);
@@ -132,7 +143,15 @@ function ImageCarousel({ images }: { images: string[] }) {
   );
 }
 
-function ProjectCard({ project, index }: { project: Project; index: number }) {
+function ProjectCard({
+  project,
+  index,
+  action,
+}: {
+  project: Project;
+  index: number;
+  action?: ReactNode;
+}) {
   const reduce = useReducedMotion();
   // Mobile: card appears directly, no fade/slide-up or stagger delay.
   // Desktop keeps the exact original whileInView animation.
@@ -204,7 +223,11 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           </span>
         </div>
 
-        <h3
+        {/* h1, not h3: with the page-level "What we've built so far" heading
+            removed, the product name is the page's top-level heading and was
+            the only one left. Purely structural — the size here is set by the
+            inline style, so nothing changes visually. */}
+        <h1
           className="font-sans font-bold mb-5"
           style={{
             fontSize: "clamp(60px, 7vw, 84px)",
@@ -214,7 +237,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           }}
         >
           {project.name}
-        </h3>
+        </h1>
 
         <p
           className="font-sans font-light mb-6"
@@ -254,6 +277,17 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             </span>
           ))}
         </div>
+
+        {/* Optional per-product action (e.g. Growmont's gated download),
+            closing out the left column under a hairline. */}
+        {action && (
+          <div
+            className="mt-10 pt-8"
+            style={{ borderTop: `1px solid ${C.divider}`, position: "relative", zIndex: 1 }}
+          >
+            {action}
+          </div>
+        )}
       </div>
 
       {/* RIGHT IMAGE CAROUSEL with rounded black border */}
@@ -294,43 +328,28 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
   );
 }
 
-export function ProjectsShowcase() {
+export function ProjectsShowcase({
+  project = CRUSAM_PROJECT,
+  action,
+}: {
+  project?: Project;
+  action?: ReactNode;
+}) {
   return (
     <section
-      id="projects"
-      aria-label="Our projects"
+      id="products"
+      aria-label="Our products"
       style={{
         paddingTop: "clamp(140px, 14vw, 180px)",
         paddingBottom: "clamp(88px, 10vw, 140px)",
       }}
     >
       <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
-        {/* Centered heading, forced single line on desktop; wraps on mobile */}
-        <FadeIn className="mb-14 md:mb-20 text-center">
-          <h1
-            className="font-sans font-bold projects-heading"
-            style={{
-              fontSize: "clamp(48px, 8vw, 96px)",
-              color: C.textPrimary,
-              letterSpacing: "-0.025em",
-              lineHeight: 1.05,
-              whiteSpace: "nowrap",   // ensures single line (desktop only — overridden on mobile below)
-            }}
-          >
-            What we&apos;ve{" "}
-            <em className="not-italic" style={{ color: C.textMuted }}>
-              built so far.
-            </em>
-          </h1>
-        </FadeIn>
-
         <div className="flex flex-col gap-10 md:gap-12">
-          {PROJECTS.map((project, i) => (
-            <ProjectCard key={project.id} project={project} index={i} />
-          ))}
+          <ProjectCard project={project} index={0} action={action} />
         </div>
 
-        {/* More projects coming soon indicator */}
+        {/* More products coming soon indicator */}
         <FadeIn delay={0.3} className="mt-12 flex justify-center">
           <div
             className="flex items-center gap-3 px-5 py-2 rounded-full"
@@ -351,7 +370,7 @@ export function ProjectsShowcase() {
                 animation: "pulse 2s infinite",
               }}
             />
-            More projects coming soon
+            More products coming soon
           </div>
         </FadeIn>
 
