@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { verifyAccessToken } from "@/lib/growmont/access";
-import { resolveReleaseAsset } from "@/lib/growmont/release";
+import { DEFAULT_PLATFORM, isPlatform, resolveReleaseAsset } from "@/lib/growmont/release";
 
 const MESSAGES: Record<string, { status: number; text: string }> = {
   "not-configured": { status: 503, text: "Downloads are not configured yet." },
@@ -10,7 +10,8 @@ const MESSAGES: Record<string, { status: number; text: string }> = {
 };
 
 export async function GET(request: Request) {
-  const token = new URL(request.url).searchParams.get("token");
+  const params = new URL(request.url).searchParams;
+  const token = params.get("token");
   const result = verifyAccessToken(token);
 
   if (!result.ok) {
@@ -21,22 +22,48 @@ export async function GET(request: Request) {
     });
   }
 
+  // Absent means Windows, so links mailed out before Android shipped still
+  // resolve. Present but unrecognised is a typo or a probe, not a default.
+  const rawPlatform = params.get("platform");
+  if (rawPlatform !== null && !isPlatform(rawPlatform)) {
+    return new NextResponse("Unknown download platform.", {
+      status: 400,
+      headers: { "content-type": "text/plain; charset=utf-8" },
+    });
+  }
+  const platform = rawPlatform ?? DEFAULT_PLATFORM;
+
   const githubToken = process.env.GROWMONT_GITHUB_TOKEN;
 
-  const asset = await resolveReleaseAsset();
+  const asset = await resolveReleaseAsset(platform);
   if (!asset) {
     console.error(
       githubToken
-        ? "Growmont release could not be resolved; check the token has Contents:Read on the release repo."
-        : "Growmont release could not be resolved and no GROWMONT_GITHUB_TOKEN is set — a private repo needs one.",
+        ? `Growmont ${platform} release could not be resolved; check the token has Contents:Read on the release repo.`
+        : `Growmont ${platform} release could not be resolved and no GROWMONT_GITHUB_TOKEN is set — a private repo needs one.`,
     );
-    return new NextResponse("The setup file is temporarily unavailable.", { status: 503 });
+    return new NextResponse("This download is temporarily unavailable.", { status: 503 });
   }
 
-  // Public release: hand the browser straight to GitHub. A 17 MB installer
-  // never touches this server, so it costs no bandwidth or execution time.
-  if (!githubToken) {
+  // Whether to proxy is about the RELEASE being private, not about a token
+  // being present: the token is also what buys an authenticated API lookup
+  // (5000/hour instead of 60/hour on a shared serverless IP), so the two
+  // decisions are kept apart.
+  //
+  // Public release: hand the browser straight to GitHub. The bytes never
+  // touch this server, so the download costs no bandwidth and — crucially —
+  // is not bounded by the function's maxDuration. A 66 MB APK proxied
+  // through a serverless function has to finish inside that window or the
+  // user gets a truncated file; a redirect has no such limit.
+  if (process.env.GROWMONT_RELEASE_PRIVATE !== "true") {
     return NextResponse.redirect(asset.downloadUrl, 302);
+  }
+
+  if (!githubToken) {
+    console.error(
+      "GROWMONT_RELEASE_PRIVATE is true but GROWMONT_GITHUB_TOKEN is unset; a private release cannot be served.",
+    );
+    return new NextResponse("This download is temporarily unavailable.", { status: 503 });
   }
 
   // Private release: GitHub will not serve the asset to an unauthenticated
@@ -63,14 +90,14 @@ export async function GET(request: Request) {
     const location = upstream.headers.get("location");
     if (!location) {
       console.error("Growmont asset redirect had no location header");
-      return new NextResponse("The setup file is temporarily unavailable.", { status: 502 });
+      return new NextResponse("This download is temporarily unavailable.", { status: 502 });
     }
     upstream = await fetch(location, { redirect: "follow" });
   }
 
   if (!upstream.ok || !upstream.body) {
     console.error("Growmont asset fetch failed:", upstream.status, upstream.statusText);
-    return new NextResponse("The setup file is temporarily unavailable.", { status: 502 });
+    return new NextResponse("This download is temporarily unavailable.", { status: 502 });
   }
 
   return new NextResponse(upstream.body, {

@@ -7,7 +7,7 @@ import {
   normalizeEmail,
 } from "@/lib/growmont/access";
 import { sendDownloadLink } from "@/lib/growmont/mail";
-import { resolveReleaseAsset } from "@/lib/growmont/release";
+import { type Platform, resolveReleaseAsset } from "@/lib/growmont/release";
 
 // Tighter than the discovery form: this endpoint puts mail into someone
 // else's inbox, so the limit is about not letting a stranger use us to spam
@@ -84,12 +84,20 @@ export async function POST(request: Request) {
     }
 
     // Resolved before sending so a misconfigured token surfaces here rather
-    // than as a dead link in someone's inbox. The lookup is cached, so this
-    // costs a GitHub call at most once every few minutes.
-    const asset = await resolveReleaseAsset();
-    if (!asset) {
+    // than as a dead link in someone's inbox. Both platforms share one cached
+    // release lookup, so this still costs a GitHub call at most once every
+    // few minutes.
+    //
+    // Every release publishes both artifacts, so a missing one means the
+    // release is broken rather than that this recipient should get a
+    // half-working email.
+    const [windowsAsset, androidAsset] = await Promise.all([
+      resolveReleaseAsset("windows"),
+      resolveReleaseAsset("android"),
+    ]);
+    if (!windowsAsset || !androidAsset) {
       return NextResponse.json(
-        { error: "The setup file is temporarily unavailable. Please try again shortly." },
+        { error: "The download is temporarily unavailable. Please try again shortly." },
         { status: 503 },
       );
     }
@@ -102,8 +110,17 @@ export async function POST(request: Request) {
       );
     }
 
-    const link = `${baseUrl(request)}/api/growmont/download?token=${encodeURIComponent(token)}`;
-    await sendDownloadLink(email, link);
+    // One token covers both buttons; the platform only selects which asset
+    // the gate hands back, so it does not need to be signed.
+    const base = baseUrl(request);
+    const link = (platform: Platform) =>
+      `${base}/api/growmont/download?token=${encodeURIComponent(token)}&platform=${platform}`;
+
+    await sendDownloadLink(email, {
+      version: windowsAsset.version,
+      windows: { url: link("windows"), size: windowsAsset.size },
+      android: { url: link("android"), size: androidAsset.size },
+    });
 
     return NextResponse.json({ ok: true });
   } catch (error) {
