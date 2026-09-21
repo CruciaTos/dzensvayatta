@@ -29,7 +29,6 @@ const CARD_BG = "#FFFFFF";
 const HAIRLINE = "#DFE6EA";
 const MUTED = "#5B6B75";
 const ACCENT = "#7EC3E2";
-const NOTE_BG = "#F4F9FC";
 
 export interface DownloadTarget {
   url: string;
@@ -103,7 +102,7 @@ function button(href: string, label: string): string {
  * not a hosted image (Outlook blocks remote images until the reader opts in).
  */
 const ANDROID_QR_CID = "growmont-android-qr";
-const QR_SIZE = 168;
+const QR_SIZE = 220;
 
 function qrImage(cid: string, alt: string): string {
   return `
@@ -188,41 +187,24 @@ function body(links: DownloadLinks): string {
                 Your download is ready
               </div>
               <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;
-                          color:${MUTED};line-height:1.65;padding-top:12px;">
-                Growmont CRM${version} is available for Windows and Android.
-                Take whichever you need — the same account works on both.
+                          color:${MUTED};line-height:1.65;padding-top:8px;">
+                Growmont CRM${version}
               </div>
             </td>
           </tr>
 
           <!-- Downloads -->
           <tr>
-            <td class="pad" style="padding:30px 40px 0 40px;">
+            <td class="pad" style="padding:32px 40px 0 40px;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td class="btn-cell" width="50%" align="center" valign="middle" style="padding-right:8px;">
                     ${button(links.windows.url, "Download for Windows")}
-                    ${caption(winSize ? `Windows &middot; ${winSize}` : "Windows installer")}
+                    ${caption(winSize ? `Windows &middot; ${winSize}` : "Windows")}
                   </td>
                   <td class="btn-cell" width="50%" align="center" valign="middle" style="padding-left:8px;">
                     ${qrImage(ANDROID_QR_CID, "QR code: download Growmont CRM for Android")}
-                    ${caption(droidSize ? `Scan with your Android phone &middot; ${droidSize}` : "Scan with your Android phone")}                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Android install note -->
-          <tr>
-            <td class="pad" style="padding:30px 40px 0 40px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-                     style="background:${NOTE_BG};border-left:3px solid ${ACCENT};border-radius:6px;">
-                <tr>
-                  <td style="padding:16px 18px;font-family:Arial,Helvetica,sans-serif;
-                             font-size:14px;color:${INK};line-height:1.65;">
-                    <strong>Installing on Android?</strong><br />
-                    Android will warn you twice during install — this is expected for apps
-                    distributed outside the Play Store. Tap through both.
+                    ${caption(droidSize ? `Android &middot; ${droidSize}` : "Android")}
                   </td>
                 </tr>
               </table>
@@ -231,12 +213,10 @@ function body(links: DownloadLinks): string {
 
           <!-- Expiry -->
           <tr>
-            <td class="pad" style="padding:26px 40px 34px 40px;">
+            <td class="pad" style="padding:30px 40px 32px 40px;">
               <div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;
                           color:${MUTED};line-height:1.7;">
-                These links expire in <strong style="color:${INK};">${MINUTES} minutes</strong>
-                and were issued for your address only. If you did not request them,
-                you can safely ignore this email.
+                Links expire in ${MINUTES} minutes. Didn&rsquo;t request this? Ignore this email.
               </div>
             </td>
           </tr>
@@ -268,11 +248,7 @@ function text(links: DownloadLinks): string {
     `Windows: ${links.windows.url}`,
     `Android: ${links.android.url}`,
     "",
-    "Installing on Android? Android will warn you twice during install — this is",
-    "expected for apps distributed outside the Play Store. Tap through both.",
-    "",
-    `These links expire in ${MINUTES} minutes and were issued for your address only.`,
-    "If you did not request them, you can safely ignore this email.",
+    `Links expire in ${MINUTES} minutes. Didn't request this? Ignore this email.`,
     "",
     `— ${FROM_NAME}`,
   ].join("\n");
@@ -280,10 +256,11 @@ function text(links: DownloadLinks): string {
 
 export async function sendDownloadLink(to: string, links: DownloadLinks) {
   // Rendered at 2x the displayed size so it stays sharp on high-DPI screens.
-  // The link carries a signed token, so M-level correction keeps the code
-  // from getting too dense to scan off a monitor.
+  // The link carries a signed token, which makes for a dense code; L-level
+  // correction keeps the modules as large as possible, and a code on a screen
+  // doesn't get the smudges or tears the higher levels exist for.
   const androidQr = await QRCode.toBuffer(links.android.url, {
-    errorCorrectionLevel: "M",
+    errorCorrectionLevel: "L",
     margin: 2,
     width: QR_SIZE * 2,
     color: { dark: INK, light: "#FFFFFF" },
