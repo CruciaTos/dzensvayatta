@@ -23,9 +23,16 @@ export const PROJECTS_SUBLINKS: NavLink[] = [
     badgeTone: "live",
   },
   {
-    label: "Growmont",
+    label: "Growmont CRM",
     href: "/projects/growmont",
-    description: "A growth platform built to bring clarity to scale.",
+    description: "Local-first CRM for clients, sales and follow-ups.",
+    badge: "Live",
+    badgeTone: "live",
+  },
+  {
+    label: "Growmont PMS",
+    href: "/projects/growmont-pms",
+    description: "Fund analysis and scoring for wealth managers.",
     badge: "In Dev",
     badgeTone: "wip",
   },
