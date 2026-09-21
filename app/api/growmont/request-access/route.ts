@@ -122,13 +122,10 @@ export async function POST(request: Request) {
 
     await sendDownloadLink(email, {
       version: windowsAsset.version,
-      windows: { url: link("windows"), size: windowsAsset.size },
-      // Android goes through the hand-off page, which re-opens the download
-      // in Chrome instead of the mail app's in-app browser.
-      android: {
-        url: `${ANDROID_HANDOFF_URL}?token=${encodeURIComponent(token)}`,
-        size: androidAsset.size,
-      },
+      windows: link("windows"),
+      // The email's Android QR code opens the download page on the
+      // subdomain, which starts the download from there.
+      android: `${ANDROID_HANDOFF_URL}?token=${encodeURIComponent(token)}`,
     });
 
     return NextResponse.json({ ok: true });

@@ -30,15 +30,9 @@ const HAIRLINE = "#DFE6EA";
 const MUTED = "#5B6B75";
 const ACCENT = "#7EC3E2";
 
-export interface DownloadTarget {
-  url: string;
-  /** Bytes. 0 or absent when unknown, e.g. behind a pinned release URL. */
-  size?: number;
-}
-
 export interface DownloadLinks {
-  windows: DownloadTarget;
-  android: DownloadTarget;
+  windows: string;
+  android: string;
   /** Release tag, e.g. "v1.0.0". Absent when unknown. */
   version?: string;
 }
@@ -57,14 +51,6 @@ function attr(value: string): string {
 function formatVersion(tag?: string): string {
   const match = tag?.match(/\d+(?:\.\d+)+/);
   return match ? ` v${match[0]}` : "";
-}
-
-function formatSize(bytes?: number): string {
-  if (!bytes || bytes <= 0) return "";
-  const mb = bytes / (1024 * 1024);
-  // One decimal only when it says something: "9.4 MB", but "9 MB" not "9.0 MB".
-  const value = mb >= 10 ? Math.round(mb) : Math.round(mb * 10) / 10;
-  return `${value} MB`;
 }
 
 /**
@@ -119,8 +105,6 @@ function caption(label: string): string {
 
 function body(links: DownloadLinks): string {
   const version = formatVersion(links.version);
-  const winSize = formatSize(links.windows.size);
-  const droidSize = formatSize(links.android.size);
 
   return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -199,12 +183,12 @@ function body(links: DownloadLinks): string {
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td class="btn-cell" width="50%" align="center" valign="middle" style="padding-right:8px;">
-                    ${button(links.windows.url, "Download for Windows")}
-                    ${caption(winSize ? `Windows &middot; ${winSize}` : "Windows")}
+                    ${button(links.windows, "Download for Windows")}
+                    ${caption("Windows")}
                   </td>
                   <td class="btn-cell" width="50%" align="center" valign="middle" style="padding-left:8px;">
                     ${qrImage(ANDROID_QR_CID, "QR code: download Growmont CRM for Android")}
-                    ${caption(droidSize ? `Android &middot; ${droidSize}` : "Android")}
+                    ${caption("Android")}
                   </td>
                 </tr>
               </table>
@@ -245,8 +229,8 @@ function text(links: DownloadLinks): string {
   return [
     `Growmont CRM${version} — your download links`,
     "",
-    `Windows: ${links.windows.url}`,
-    `Android: ${links.android.url}`,
+    `Windows: ${links.windows}`,
+    `Android: ${links.android}`,
     "",
     `Links expire in ${MINUTES} minutes. Didn't request this? Ignore this email.`,
     "",
@@ -259,7 +243,7 @@ export async function sendDownloadLink(to: string, links: DownloadLinks) {
   // The link carries a signed token, which makes for a dense code; L-level
   // correction keeps the modules as large as possible, and a code on a screen
   // doesn't get the smudges or tears the higher levels exist for.
-  const androidQr = await QRCode.toBuffer(links.android.url, {
+  const androidQr = await QRCode.toBuffer(links.android, {
     errorCorrectionLevel: "L",
     margin: 2,
     width: QR_SIZE * 2,
