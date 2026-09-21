@@ -1,3 +1,4 @@
+import QRCode from "qrcode";
 import { Resend } from "resend";
 import { TOKEN_TTL_MS } from "./access";
 
@@ -93,6 +94,34 @@ function button(href: string, label: string): string {
 <!--<![endif]-->`;
 }
 
+/**
+ * The Android download is a QR code rather than a button: the email is
+ * usually read on a PC, and the APK belongs on the phone. Readers already on
+ * their phone get a tap link under it. Both point at the hand-off page, not
+ * at the APK.
+ *
+ * Sent as an inline CID attachment, not a data: URI (Gmail strips those) and
+ * not a hosted image (Outlook blocks remote images until the reader opts in).
+ */
+const ANDROID_QR_CID = "growmont-android-qr";
+const QR_SIZE = 168;
+
+function qrImage(cid: string, alt: string): string {
+  return `
+<img src="cid:${cid}" width="${QR_SIZE}" height="${QR_SIZE}" alt="${alt}"
+     style="display:block;margin:0 auto;width:${QR_SIZE}px;height:${QR_SIZE}px;
+            border:0;outline:none;text-decoration:none;" />`;
+}
+
+function phoneLink(href: string): string {
+  return `
+<div style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:${MUTED};
+            text-align:center;padding-top:6px;">
+  On your phone?
+  <a href="${attr(href)}" style="color:${INK};font-weight:bold;text-decoration:underline;">Tap here to download</a>
+</div>`;
+}
+
 function caption(label: string): string {
   return `
 <div style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:${MUTED};
@@ -181,13 +210,14 @@ function body(links: DownloadLinks): string {
             <td class="pad" style="padding:30px 40px 0 40px;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td class="btn-cell" width="50%" align="center" valign="top" style="padding-right:8px;">
+                  <td class="btn-cell" width="50%" align="center" valign="middle" style="padding-right:8px;">
                     ${button(links.windows.url, "Download for Windows")}
                     ${caption(winSize ? `Windows &middot; ${winSize}` : "Windows installer")}
                   </td>
-                  <td class="btn-cell" width="50%" align="center" valign="top" style="padding-left:8px;">
-                    ${button(links.android.url, "Download for Android")}
-                    ${caption(droidSize ? `Android &middot; ${droidSize}` : "Android APK")}
+                  <td class="btn-cell" width="50%" align="center" valign="middle" style="padding-left:8px;">
+                    ${qrImage(ANDROID_QR_CID, "QR code: download Growmont CRM for Android")}
+                    ${caption(droidSize ? `Scan with your Android phone &middot; ${droidSize}` : "Scan with your Android phone")}
+                    ${phoneLink(links.android.url)}
                   </td>
                 </tr>
               </table>
@@ -261,12 +291,32 @@ function text(links: DownloadLinks): string {
 }
 
 export async function sendDownloadLink(to: string, links: DownloadLinks) {
+  // Rendered at 2x the displayed size so it stays sharp on high-DPI screens.
+  // The link carries a signed token, so M-level correction keeps the code
+  // from getting too dense to scan off a monitor.
+  const androidQr = await QRCode.toBuffer(links.android.url, {
+    errorCorrectionLevel: "M",
+    margin: 2,
+    width: QR_SIZE * 2,
+    color: { dark: INK, light: "#FFFFFF" },
+  });
+
   const { error } = await resend().emails.send({
     from: `${FROM_NAME} <${FROM_EMAIL}>`,
     to: [to],
     subject: "Your Growmont CRM download — Windows & Android",
     html: body(links),
     text: text(links),
+    attachments: [
+      {
+        filename: "growmont-android-qr.png",
+        // Base64, not the Buffer: the SDK passes content through untouched, and
+        // a Buffer would be JSON-encoded as a byte array.
+        content: androidQr.toString("base64"),
+        contentType: "image/png",
+        contentId: ANDROID_QR_CID,
+      },
+    ],
   });
 
   if (error) throw error;

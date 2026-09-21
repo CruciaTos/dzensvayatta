@@ -15,6 +15,10 @@ import { type Platform, resolveReleaseAsset } from "@/lib/growmont/release";
 const WINDOW_MS = 15 * 60 * 1000;
 const MAX_REQUESTS = 4;
 
+// Static page on the separate growmont-downloads Vercel project. It hands the
+// token on to this site's /api/growmont/download, which still does the check.
+const ANDROID_HANDOFF_URL = "https://downloads.svayatta.in/android";
+
 const ipMap = new Map<string, { count: number; windowStart: number }>();
 
 function isRateLimited(ip: string): boolean {
@@ -119,7 +123,12 @@ export async function POST(request: Request) {
     await sendDownloadLink(email, {
       version: windowsAsset.version,
       windows: { url: link("windows"), size: windowsAsset.size },
-      android: { url: link("android"), size: androidAsset.size },
+      // Android goes through the hand-off page, which re-opens the download
+      // in Chrome instead of the mail app's in-app browser.
+      android: {
+        url: `${ANDROID_HANDOFF_URL}?token=${encodeURIComponent(token)}`,
+        size: androidAsset.size,
+      },
     });
 
     return NextResponse.json({ ok: true });
