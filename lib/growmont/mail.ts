@@ -96,9 +96,8 @@ function button(href: string, label: string): string {
 
 /**
  * The Android download is a QR code rather than a button: the email is
- * usually read on a PC, and the APK belongs on the phone. Readers already on
- * their phone get a tap link under it. Both point at the hand-off page, not
- * at the APK.
+ * usually read on a PC, and the APK belongs on the phone. It points at the
+ * hand-off page, not at the APK.
  *
  * Sent as an inline CID attachment, not a data: URI (Gmail strips those) and
  * not a hosted image (Outlook blocks remote images until the reader opts in).
@@ -111,15 +110,6 @@ function qrImage(cid: string, alt: string): string {
 <img src="cid:${cid}" width="${QR_SIZE}" height="${QR_SIZE}" alt="${alt}"
      style="display:block;margin:0 auto;width:${QR_SIZE}px;height:${QR_SIZE}px;
             border:0;outline:none;text-decoration:none;" />`;
-}
-
-function phoneLink(href: string): string {
-  return `
-<div style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:${MUTED};
-            text-align:center;padding-top:6px;">
-  On your phone?
-  <a href="${attr(href)}" style="color:${INK};font-weight:bold;text-decoration:underline;">Tap here to download</a>
-</div>`;
 }
 
 function caption(label: string): string {
@@ -216,9 +206,7 @@ function body(links: DownloadLinks): string {
                   </td>
                   <td class="btn-cell" width="50%" align="center" valign="middle" style="padding-left:8px;">
                     ${qrImage(ANDROID_QR_CID, "QR code: download Growmont CRM for Android")}
-                    ${caption(droidSize ? `Scan with your Android phone &middot; ${droidSize}` : "Scan with your Android phone")}
-                    ${phoneLink(links.android.url)}
-                  </td>
+                    ${caption(droidSize ? `Scan with your Android phone &middot; ${droidSize}` : "Scan with your Android phone")}                  </td>
                 </tr>
               </table>
             </td>
