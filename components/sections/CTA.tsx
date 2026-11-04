@@ -7,12 +7,12 @@ import { Container } from "@/components/ui/Container";
 import { FadeIn } from "@/components/ui/FadeIn";
 
 const C = {
-  accent: "#7EC3E2",
-  accentSoft: "#B2D5E5",
+  accent: "#6CB4F0",
+  accentSoft: "#BECEE4",
   textPrimary: "#e5f3e5",
   textMuted: "rgba(229,243,229,0.65)",
-  textFaint: "rgba(178,213,229,0.4)",
-  divider: "rgba(178,213,229,0.10)",
+  textFaint: "rgba(190,206,228,0.4)",
+  divider: "rgba(190,206,228,0.10)",
 } as const;
 
 export function CTA() {
@@ -37,14 +37,14 @@ export function CTA() {
         className="absolute bottom-[-20px] right-[-20px] font-zaslia text-[clamp(100px,14vw,220px)] font-normal leading-none tracking-[-0.04em] pointer-events-none select-none z-0"
         aria-hidden="true"
       >
-        <span style={{ color: "rgba(126,195,226,0.06)" }}>Svayatta</span>
+        <span style={{ color: "rgba(108,180,240,0.06)" }}>Svayatta</span>
       </motion.div>
 
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse at 30% 50%, rgba(126,195,226,0.06) 0%, transparent 60%)",
+            "radial-gradient(ellipse at 30% 50%, rgba(108,180,240,0.06) 0%, transparent 60%)",
         }}
         aria-hidden="true"
       />
@@ -86,15 +86,15 @@ export function CTA() {
                 className="group inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.12em] uppercase px-7 py-[15px] border transition-colors duration-300 no-underline"
                 style={{
                   color: C.textPrimary,
-                  borderColor: "rgba(178,213,229,0.25)",
-                  backgroundColor: "rgba(126,195,226,0.08)",
+                  borderColor: "rgba(190,206,228,0.25)",
+                  backgroundColor: "rgba(108,180,240,0.08)",
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = C.accent;
                   e.currentTarget.style.color = "#00080e";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "rgba(126,195,226,0.08)";
+                  e.currentTarget.style.backgroundColor = "rgba(108,180,240,0.08)";
                   e.currentTarget.style.color = C.textPrimary;
                 }}
               >

@@ -4,6 +4,8 @@ const nextConfig: NextConfig = {
   // Enable experimental features for Next.js 15
   experimental: {
     optimizePackageImports: ["motion"],
+    // Page transitions: React's <ViewTransition> (components/motion/PageTransition.tsx).
+    viewTransition: true,
   },
   images: {
     formats: ["image/avif", "image/webp"],

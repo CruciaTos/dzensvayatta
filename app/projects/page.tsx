@@ -1,23 +1,11 @@
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
-import { ProjectsShowcase } from "@/components/sections/ProjectsShowcase";
+import { ProductsHub } from "@/components/sections/ProductsHub";
 
 export const metadata = {
-  title: "Products | DZen",
+  title: "Work",
   description:
-    "A showcase of the systems DZen has built — CruSam, CruDoc, and the platform we run ourselves.",
+    "Products in production: CruSam payroll ERP, Growmont CRM and Growmont PMS, built and supported by Svayatta.",
 };
 
 export default function ProjectsPage() {
-  return (
-    <>
-      <Navbar />
-
-      <main id="main-content" className="min-h-screen">
-        <ProjectsShowcase />
-      </main>
-
-      <Footer />
-    </>
-  );
+  return <ProductsHub />;
 }

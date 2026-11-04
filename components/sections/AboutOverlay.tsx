@@ -12,16 +12,16 @@ interface AboutOverlayProps {
 }
 
 const C = {
-  bg: "#000b12",
-  accent: "#7EC3E2",
-  accentSoft: "#B2D5E5",
+  bg: "#061A3D",
+  accent: "#6CB4F0",
+  accentSoft: "#BECEE4",
   textPrimary: "#e5f3e5",
   textMuted: "rgba(229,243,229,0.65)",
   cardBg: "#0d0d0c",
-  cardBorder: "rgba(178,213,229,0.10)",
-  divider: "rgba(178,213,229,0.10)",
-  panelBg: "#000b12",
-  headerBg: "rgba(0, 11, 18, 0.95)",
+  cardBorder: "rgba(190,206,228,0.10)",
+  divider: "rgba(190,206,228,0.10)",
+  panelBg: "#061A3D",
+  headerBg: "rgba(6,26,61, 0.95)",
 } as const;
 
 const FOUNDERS = [
@@ -107,7 +107,7 @@ function FounderCard({
       ref={cardRef}
       className="relative overflow-hidden flex flex-col justify-center min-h-[180px] px-8 py-9 rounded-[2px]"
       style={{
-        border: `1px solid ${hovered ? "rgba(126,195,226,0.28)" : C.cardBorder}`,
+        border: `1px solid ${hovered ? "rgba(108,180,240,0.28)" : C.cardBorder}`,
         backgroundColor: C.cardBg,
         transition: "border-color 0.3s ease",
       }}
@@ -119,7 +119,7 @@ function FounderCard({
     >
       <motion.div
         className="absolute inset-0 pointer-events-none"
-        style={{ backgroundColor: "rgba(126,195,226,0.04)", transformOrigin: "bottom" }}
+        style={{ backgroundColor: "rgba(108,180,240,0.04)", transformOrigin: "bottom" }}
         animate={{ scaleY: hovered ? 1 : 0 }}
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       />
@@ -131,7 +131,7 @@ function FounderCard({
             className="absolute top-0 h-full w-[1.5px] pointer-events-none z-20"
             style={{
               left: 0,
-              background: "linear-gradient(to bottom, rgba(126,195,226,0.45), transparent)",
+              background: "linear-gradient(to bottom, rgba(108,180,240,0.45), transparent)",
             }}
             initial={{ x: 0 }}
             animate={{ x: cardRef.current?.offsetWidth ?? 400 }}
@@ -143,7 +143,7 @@ function FounderCard({
 
       <motion.span
         className="absolute right-[-10px] top-[-10px] font-serif font-black leading-none pointer-events-none select-none tracking-tighter text-[130px]"
-        style={{ color: "rgba(178,213,229,0.06)" }}
+        style={{ color: "rgba(190,206,228,0.06)" }}
         aria-hidden="true"
         animate={hovered ? { scale: 1.05, y: -5, opacity: 0.12 } : { scale: 1, y: 0, opacity: 0.06 }}
         transition={{ duration: 0.4 }}
@@ -181,9 +181,9 @@ function FounderCard({
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 font-mono text-[10px] tracking-widest uppercase transition-colors duration-200"
-            style={{ color: "rgba(178,213,229,0.65)" }}
+            style={{ color: "rgba(190,206,228,0.65)" }}
             onMouseEnter={(e) => { e.currentTarget.style.color = C.accent; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(178,213,229,0.65)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(190,206,228,0.65)"; }}
           >
             LinkedIn ↗
           </a>
@@ -248,7 +248,7 @@ export function AboutOverlay({ open, onClose }: AboutOverlayProps) {
           <motion.div
             className="fixed inset-0 z-[100] backdrop-blur-3xl"
             style={{
-              backgroundColor: "rgba(0, 11, 18, 0.55)",
+              backgroundColor: "rgba(6,26,61, 0.55)",
               border: "1px solid rgba(255,255,255,0.05)"
             }}
             initial={{ opacity: 0 }}
@@ -286,7 +286,7 @@ export function AboutOverlay({ open, onClose }: AboutOverlayProps) {
                   className="w-6 h-6 flex items-center justify-center flex-shrink-0 rounded-[1px]"
                   style={{ backgroundColor: C.accent }}
                 >
-                  <LogoMark className="w-[12px] h-[12px] text-[#000b12]" />
+                  <LogoMark className="w-[12px] h-[12px] text-[#061A3D]" />
                 </div>
                 <span
                   className="font-mono text-[13px] font-bold tracking-[0.1em] uppercase"
@@ -305,7 +305,7 @@ export function AboutOverlay({ open, onClose }: AboutOverlayProps) {
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = C.accentSoft;
-                  e.currentTarget.style.borderColor = "rgba(126,195,226,0.28)";
+                  e.currentTarget.style.borderColor = "rgba(108,180,240,0.28)";
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.color = C.textMuted;
@@ -397,7 +397,7 @@ export function AboutOverlay({ open, onClose }: AboutOverlayProps) {
               <div className="space-y-6 pb-4">
                 <div
                   className="font-mono text-[9px] tracking-widest uppercase font-bold"
-                  style={{ color: "rgba(178,213,229,0.45)" }}
+                  style={{ color: "rgba(190,206,228,0.45)" }}
                 >
                   Active Operators
                 </div>

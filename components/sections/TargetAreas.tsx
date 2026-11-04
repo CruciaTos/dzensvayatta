@@ -6,20 +6,20 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
 const C = {
-  bg: "#000b12ff",
-  accent: "#7EC3E2",
-  accentSoft: "#B2D5E5",
+  bg: "#061A3Dff",
+  accent: "#6CB4F0",
+  accentSoft: "#BECEE4",
   textPrimary: "#e5f3e5ff",
   textMuted: "rgba(229,243,229,0.65)",
   cardBg: "#0d0d0cff",
   cardBgHover: "#141413ff",
-  cardBorder: "rgba(178,213,229,0.10)",
-  cardBorderHover: "rgba(126,195,226,0.28)",
-  divider: "rgba(178,213,229,0.10)",
-  glowSpot: "rgba(126,195,226,0.08)",
+  cardBorder: "rgba(190,206,228,0.10)",
+  cardBorderHover: "rgba(108,180,240,0.28)",
+  divider: "rgba(190,206,228,0.10)",
+  glowSpot: "rgba(108,180,240,0.08)",
   glassBg: "rgba(9, 9, 9, 0.5)",
   glassHighlight: "rgba(255, 255, 255, 1)",
-  glassBorder: "rgba(178,213,229,0.15)",
+  glassBorder: "rgba(190,206,228,0.15)",
   glassShadow: "0 12px 40px rgba(0,0,0,0.2)",
 } as const;
 
@@ -144,7 +144,7 @@ function SpotlightCard({ area, index, isHovered, isCompressed, onEnter, onLeave 
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    spotRef.current.style.background = `radial-gradient(300px circle at ${x}px ${y}px, ${C.glowSpot} 0%, rgba(126,195,226,0.012) 50%, transparent 72%)`;
+    spotRef.current.style.background = `radial-gradient(300px circle at ${x}px ${y}px, ${C.glowSpot} 0%, rgba(108,180,240,0.012) 50%, transparent 72%)`;
   }, []);
 
   const handleMouseLeave = useCallback(() => {
@@ -312,7 +312,7 @@ function SpotlightCard({ area, index, isHovered, isCompressed, onEnter, onLeave 
                         fontFamily: "var(--font-mono)",
                         fontSize: "14px",
                         letterSpacing: "0.07em",
-                        color: "rgba(178,213,229,0.75)",
+                        color: "rgba(190,206,228,0.75)",
                         lineHeight: 1,
                       }}
                     >
@@ -350,7 +350,7 @@ function SpotlightCard({ area, index, isHovered, isCompressed, onEnter, onLeave 
                     width: "3px",
                     height: "3px",
                     borderRadius: "50%",
-                    background: `rgba(178,213,229,${0.12 + i * 0.05})`,
+                    background: `rgba(190,206,228,${0.12 + i * 0.05})`,
                   }}
                 />
               ))}
@@ -427,7 +427,7 @@ export function TargetAreas() {
         backgroundColor: "transparent",
         padding: "clamp(88px, 11vw, 144px) 0",
         overflow: "hidden",
-        borderTop: "1px solid rgba(178,213,229,0.10)",
+        borderTop: "1px solid rgba(190,206,228,0.10)",
       }}
     >
       {/* background glow */}
@@ -441,7 +441,7 @@ export function TargetAreas() {
           width: "900px",
           height: "420px",
           background:
-            "radial-gradient(ellipse at center top, rgba(126,195,226,0.045) 0%, transparent 62%)",
+            "radial-gradient(ellipse at center top, rgba(108,180,240,0.045) 0%, transparent 62%)",
           filter: "blur(1px)",
           pointerEvents: "none",
         }}
@@ -462,7 +462,7 @@ export function TargetAreas() {
             borderRadius: "40px",
             overflow: "hidden",
             boxShadow: C.glassShadow,
-            border: "1px solid rgba(126,195,226,0.2)",
+            border: "1px solid rgba(108,180,240,0.2)",
           }}
         >
           <div
@@ -482,8 +482,8 @@ export function TargetAreas() {
               inset: 0,
               zIndex: 1,
               backgroundImage: `
-                linear-gradient(rgba(178,213,229,0.06) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(178,213,229,0.06) 1px, transparent 1px)
+                linear-gradient(rgba(190,206,228,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(190,206,228,0.06) 1px, transparent 1px)
               `,
               backgroundSize: "40px 40px",
               pointerEvents: "none",

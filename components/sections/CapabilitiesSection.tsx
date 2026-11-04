@@ -7,16 +7,16 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 
 // ── Design tokens (matching TargetMarkets) ─────────────────────────────────
 const C = {
-  accent: "#7EC3E2",
-  accentSoft: "#B2D5E5",
+  accent: "#6CB4F0",
+  accentSoft: "#BECEE4",
   textPrimary: "#e5f3e5",
   textMuted: "rgba(229,243,229,0.65)",
   cardBg: "#0d0d0c",
   cardBgHover: "#141413",
-  cardBorder: "rgba(178,213,229,0.10)",
-  cardBorderHover: "rgba(126,195,226,0.28)",
-  divider: "rgba(178,213,229,0.10)",
-  glowSpot: "rgba(126,195,226,0.08)",
+  cardBorder: "rgba(190,206,228,0.10)",
+  cardBorderHover: "rgba(108,180,240,0.28)",
+  divider: "rgba(190,206,228,0.10)",
+  glowSpot: "rgba(108,180,240,0.08)",
 } as const;
 
 interface Phase {
@@ -109,7 +109,7 @@ function PhaseBlock({
       ref={ref}
       id={`phase-${index}`}
       className={cn(
-        "phase-block relative min-h-[50vh] flex overflow-hidden rounded-2xl border border-[#7EC3E2]/20",
+        "phase-block relative min-h-[50vh] flex overflow-hidden rounded-2xl border border-[#6CB4F0]/20",
         "px-6 md:px-10 lg:px-14 mr-4 py-10 md:py-14",
         "items-center gap-8 lg:gap-12",
         // text-left → image right; text-right → image left
@@ -132,8 +132,8 @@ function PhaseBlock({
         className="absolute inset-0 z-[1] bg-black/65"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(126,195,226,${opacity}) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(126,195,226,${opacity}) 1px, transparent 1px)
+            linear-gradient(rgba(108,180,240,${opacity}) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(108,180,240,${opacity}) 1px, transparent 1px)
           `,
           backgroundSize: `${size}px ${size}px`,
         }}
@@ -141,7 +141,7 @@ function PhaseBlock({
 
       {/* Animated top rule */}
       <motion.div
-        className="absolute top-0 left-0 w-full h-px bg-[#7EC3E2]/30"
+        className="absolute top-0 left-0 w-full h-px bg-[#6CB4F0]/30"
         style={{ transformOrigin: "left" }}
         initial={isMobile ? false : { scaleX: 0 }}
         animate={{ scaleX: isMobile ? 1 : inView ? 1 : 0 }}
@@ -254,8 +254,8 @@ export function CapabilitiesSection() {
                 className={cn(
                   "flex items-center py-7 border-l-2 pl-5 cursor-pointer text-left transition-all duration-300 focus:outline-none",
                   activePhase === i
-                    ? "border-[#7EC3E2] text-[#e5f3e5]"
-                    : "border-[rgba(178,213,229,0.10)] text-[rgba(229,243,229,0.45)] hover:text-[rgba(229,243,229,0.8)] hover:border-[rgba(126,195,226,0.3)]"
+                    ? "border-[#6CB4F0] text-[#e5f3e5]"
+                    : "border-[rgba(190,206,228,0.10)] text-[rgba(229,243,229,0.45)] hover:text-[rgba(229,243,229,0.8)] hover:border-[rgba(108,180,240,0.3)]"
                 )}
               >
                 <span className="font-mono text-[11px] tracking-widest uppercase">

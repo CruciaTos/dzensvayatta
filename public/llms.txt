@@ -1,0 +1,37 @@
+# Svayatta
+
+> Custom software, AI agents and workflow automation for Indian businesses, from a Mumbai studio.
+
+Svayatta is a software and AI studio based in Mumbai, India. We design, build, and support production systems that run core business operations: custom ERPs, offline-first CRMs, AI agents, conversational assistants, and data workflows. We work on fixed milestones with real data and human review at every critical step.
+
+## Services
+
+- Agentic AI Systems: Autonomous agents for multi-agent workflows, tool integrations, and human handoff.
+- Conversational AI: WhatsApp and voice assistants for customer booking, queries, and operations.
+- Machine Learning & Analytics: Forecasting models, document intelligence, and executive reporting.
+- Custom Software & ERP: Local-first and cloud systems for payroll, finance, CRMs, and internal tools.
+- Web & Digital Presence: Fast, search-optimised websites, web applications, and digital platforms.
+- Content & Growth Marketing: Audience-focused brand positioning, performance content, and video production.
+
+## Products
+
+- CruSam (https://svayatta.in/projects/crusam): Desktop payroll and finance ERP with an embedded AI assistant, deployed in production at Aarti Enterprises.
+- Growmont CRM (https://svayatta.in/projects/growmont): Local-first CRM keeping client records, sales pipelines, and follow-ups in sync across desktop and mobile, with offline capability.
+- Growmont PMS (https://svayatta.in/projects/growmont-pms): Fund analysis and scoring platform for wealth managers, turning twenty years of mutual fund data into risk metrics and SEBI peer rankings (In development).
+
+## Pages
+
+- About: https://svayatta.in/about
+- Services: https://svayatta.in/services
+- Work: https://svayatta.in/projects
+- Book a Discovery Call: https://svayatta.in/discovery
+- Privacy Policy: https://svayatta.in/privacy
+- Terms of Use: https://svayatta.in/terms
+
+## Contact
+
+- Email: info@svayatta.in
+- WhatsApp: +91 91520 35526 (https://wa.me/919152035526)
+- Location: Mumbai, Maharashtra, India
+- Working Hours: 10:00–22:00 IST
+

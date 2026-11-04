@@ -1,119 +1,486 @@
-/* ─── Third-party imports ──────────────────────────────── */
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-
-/* ─── Tailwind directives ──────────────────────────────── */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Custom Selection ─────────────────────────────────── */
-::selection {
-  background: #8f7860;
-  color: #fafaf8;
+/* ─── Tokens (docs/redesign/02 §2.1) ───────────────────── */
+:root {
+  /* Palette from the brand poster (DZEN / Svayatta Intelligence): deep navy
+     into cobalt, a sky glow, blue-grey haze and a soft violet. */
+  /* light canvas */
+  --paper: #ffffff;
+  --surface: #f2f5fa;
+  --tint: #e6eefb;
+  /* ink: navy, not black */
+  --ink: #0a1830;
+  --ink-2: #38486a;
+  --ink-3: #5d6c88;
+  /* lines */
+  --line-soft: rgba(10, 24, 48, 0.06);
+  --line: rgba(10, 24, 48, 0.1);
+  --line-strong: rgba(10, 24, 48, 0.22);
+  /* brand */
+  --accent: #1e5bd6; /* cobalt */
+  --sky: #6cb4f0; /* the glow */
+  --sky-pale: #cfe4fb; /* the glow, lifted for the bright gradient */
+  --haze: #a7b7ce; /* blue-grey mist */
+  --violet: #7e78d4; /* the warm glow */
+  --night: #061a3d; /* deep navy */
+  --night-ink: #eaf1fb;
+  --night-muted: #9fb3cf;
+  --night-line: rgba(234, 241, 251, 0.16);
+  /* states */
+  --success: #1e8e5a;
+  --danger: #b42318;
+
+  /* the same colours as RGB channels, for Tailwind opacity modifiers */
+  --paper-rgb: 255 255 255;
+  --surface-rgb: 242 245 250;
+  --tint-rgb: 230 238 251;
+  --ink-rgb: 10 24 48;
+  --ink-2-rgb: 56 72 106;
+  --ink-3-rgb: 93 108 136;
+  --accent-rgb: 30 91 214;
+  --sky-rgb: 108 180 240;
+  --haze-rgb: 167 183 206;
+  --violet-rgb: 126 120 212;
+  --night-rgb: 6 26 61;
+  --night-ink-rgb: 234 241 251;
+  --night-muted-rgb: 159 179 207;
+  --success-rgb: 30 142 90;
+  --danger-rgb: 180 35 24;
+
+  /* The poster: navy at the foot, cobalt through the middle, a sky glow top
+     left, haze and violet on the right. Percentages, so it scales to any box. */
+  --poster:
+    radial-gradient(55% 45% at 0% 0%, rgba(108, 180, 240, 0.85), transparent 70%),
+    radial-gradient(60% 55% at 100% 15%, rgba(167, 183, 206, 0.95), transparent 72%),
+    radial-gradient(45% 40% at 88% 66%, rgba(126, 120, 212, 0.6), transparent 70%),
+    radial-gradient(45% 35% at 92% 100%, rgba(108, 180, 240, 0.65), transparent 70%),
+    radial-gradient(70% 60% at 45% 55%, rgba(47, 111, 228, 0.9), transparent 75%),
+    linear-gradient(165deg, #3f7fe0 0%, #1e5bd6 38%, #0d3485 70%, #061a3d 100%);
+  /* The same poster at night: navy-led, the glows pulled back (footer). */
+  --poster-deep:
+    radial-gradient(50% 60% at 0% 0%, rgba(108, 180, 240, 0.32), transparent 70%),
+    radial-gradient(55% 55% at 100% 0%, rgba(30, 91, 214, 0.5), transparent 72%),
+    radial-gradient(45% 50% at 100% 100%, rgba(126, 120, 212, 0.28), transparent 70%),
+    linear-gradient(180deg, #0b2a5e 0%, #061a3d 100%);
+  /* Film grain over it (an SVG noise tile). */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  /* motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 200ms;
+  --dur-med: 320ms;
+  --dur-slow: 700ms;
+  --dur-reveal: 1000ms;
+
+  color-scheme: light;
 }
 
-/* ─── Scrollbar (thin) ────────────────────────────────── */
-.scrollbar-thin::-webkit-scrollbar {
-  width: 4px;
-  height: 2px;
-  background: rgba(178, 213, 229, 0.06);
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  .on-night :focus-visible {
+    outline-color: var(--sky);
+  }
+
+  ::selection {
+    background: var(--sky);
+    color: var(--night);
+  }
 }
 
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(126, 195, 226, 0.35);
-  border-radius: 999px;
+@layer components {
+  /* Headings and display sizes use Schibsted Grotesk; body stays Host Grotesk. */
+  h1,
+  h2,
+  h3,
+  h4,
+  .text-display-xl,
+  .text-display-l,
+  .text-display-m,
+  .text-mega,
+  .text-title-l,
+  .text-title-m,
+  .text-title-s {
+    font-family: var(--font-display), var(--font-sans), sans-serif;
+  }
+
+  .font-mono {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The italic-serif emphasis: the core of the look (§2.2). */
+  .em,
+  h1 em,
+  h2 em,
+  h3 em {
+    font-family: var(--font-serif), Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    font-variation-settings: "SOFT" 0, "WONK" 0;
+    letter-spacing: -0.01em;
+    /* A different face gets a different colour: cobalt on light... */
+    color: var(--accent);
+  }
+
+  /* ...sky on navy... */
+  .on-night .em,
+  .on-night h1 em,
+  .on-night h2 em,
+  .on-night h3 em {
+    color: var(--sky);
+  }
+
+  /* ...and a pale sky on the bright poster gradient, where sky would sink. */
+  .bg-poster .em,
+  .bg-poster h1 em,
+  .bg-poster h2 em,
+  .bg-poster h3 em {
+    color: var(--sky-pale);
+  }
+
+  .em-inherit .em {
+    color: inherit;
+  }
+
+  /* Muted labels (night-muted) sink into the bright gradient: lift them to a
+     translucent white there. */
+  .bg-poster .text-night-muted {
+    color: rgb(var(--night-ink-rgb) / 0.78);
+  }
+
+  /* Importance in running text (markup: **key**, ~aside~). Prose that uses
+     them sets its base a step softer (ink-2), so the key phrases stand out in
+     full ink and the asides drop back. */
+  .key {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .aside {
+    color: var(--ink-3);
+  }
+
+  .on-night .key {
+    color: #ffffff;
+  }
+
+  .on-night .aside {
+    color: rgb(var(--night-muted-rgb) / 0.78);
+  }
+
+  /* None of the brand fonts (C:\Soham\Fonts) cover Devanagari, so स्वयत्ता
+     uses the visitor's own Devanagari font. */
+  .deva {
+    font-family: "Nirmala UI", "Kohinoor Devanagari", "Noto Sans Devanagari", "Mangal", sans-serif;
+    font-style: normal;
+    letter-spacing: 0;
+    font-size: 1.05em;
+  }
+
+  .section {
+    padding-block: 64px;
+  }
+
+  @media (min-width: 768px) {
+    .section {
+      padding-block: 96px;
+    }
+  }
+
+  .on-night {
+    background-color: var(--night);
+    color: var(--night-ink);
+  }
+
+  /* The poster gradient with film grain, for the big dark moments (process
+     stage, CTA band, footer, founders). Sits behind content: keep children positioned. */
+  .bg-poster {
+    background-color: var(--night);
+    background-image: var(--poster);
+    color: var(--night-ink);
+    isolation: isolate;
+  }
+
+  .bg-poster.poster-deep {
+    background-image: var(--poster-deep);
+  }
+
+  .bg-poster::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: var(--grain);
+    background-size: 160px 160px;
+    opacity: 0.22;
+    mix-blend-mode: overlay;
+  }
+
+  /* TypeText's caret: a bar in the text colour that adds no width (so lines
+     never shift), blinking while typing pauses. */
+  .type-caret {
+    display: inline-block;
+    width: 0.07em;
+    height: 0.95em;
+    margin-right: -0.07em;
+    vertical-align: -0.12em;
+    background: currentColor;
+    animation: caret-blink 1s steps(1, end) infinite;
+  }
 }
 
-/* ─── Noise texture overlay ───────────────────────────── */
-.noise-overlay {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-  background-size: 256px;
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
 }
 
-/* ─── Hero grid background ────────────────────────────── */
-.hero-grid-bg {
-  background-image:
-    linear-gradient(rgba(216, 211, 203, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(216, 211, 203, 0.08) 1px, transparent 1px);
-  background-size: 80px 80px;
+@layer utilities {
+  .text-stroke {
+    -webkit-text-stroke: 1px var(--line-strong);
+    color: transparent;
+  }
 }
 
-/* ─── Hero "noir fabric" background ───────────────────── */
-.hero-noir-bg {
-  background-color: #0c0a08;
-  background-image:
-    radial-gradient(ellipse 65% 55% at 80% 20%, rgba(184, 138, 86, 0.22) 0%, transparent 60%),
-    radial-gradient(ellipse 55% 50% at 10% 85%, rgba(120, 86, 52, 0.18) 0%, transparent 55%),
-    linear-gradient(165deg, #15110d 0%, #0c0a08 45%, #050403 100%);
+/* ─── Entrance (hero) ─────────────────────────────────── */
+/* CSS, not JS, so the headline paints before hydration (LCP). `rise` moves
+   only; `rise-fade` also fades. Delay with [animation-delay:250ms]. */
+@keyframes rise {
+  from {
+    transform: translate3d(0, var(--rise-from, 22px), 0);
+  }
+  to {
+    transform: none;
+  }
 }
 
-.hero-noir-folds {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
+@keyframes rise-fade {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--rise-from, 22px), 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
-.hero-noir-fold {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(90px);
-  mix-blend-mode: screen;
-  will-change: transform;
+.animate-rise {
+  animation: rise 0.9s var(--ease-out) both;
 }
 
-.hero-noir-fold-a {
-  width: 55%;
-  height: 150%;
-  top: -25%;
-  right: -8%;
-  background: linear-gradient(140deg, rgba(201, 160, 106, 0.3), rgba(120, 86, 52, 0.08) 55%, transparent 75%);
-  transform: rotate(-14deg);
+.animate-rise-fade {
+  animation: rise-fade 0.9s var(--ease-out) both;
 }
 
-.hero-noir-fold-b {
-  width: 42%;
-  height: 120%;
-  top: 5%;
-  right: 18%;
-  background: linear-gradient(140deg, rgba(168, 124, 72, 0.22), transparent 65%);
-  transform: rotate(-22deg);
+/* ─── Intro (components/motion/IntroLoader.tsx) ─────────── */
+/* <html data-intro> is set before first paint by INTRO_SCRIPT:
+   run → overlay up, hero entrance waits · move → overlay clears, hero rises
+   · done/absent → overlay gone. */
+#sv-intro {
+  display: none;
 }
 
-.hero-noir-fold-c {
-  width: 50%;
-  height: 110%;
-  bottom: -25%;
-  left: -8%;
-  background: linear-gradient(140deg, rgba(90, 62, 38, 0.28), transparent 60%);
-  transform: rotate(10deg);
+html[data-intro="run"] #sv-intro,
+html[data-intro="move"] #sv-intro {
+  display: flex;
 }
 
-.hero-noir-fold-d {
-  width: 32%;
-  height: 90%;
-  top: 35%;
-  left: 18%;
-  background: linear-gradient(140deg, rgba(64, 44, 28, 0.3), transparent 60%);
-  transform: rotate(-26deg);
+html[data-intro="run"] .animate-rise,
+html[data-intro="run"] .animate-rise-fade {
+  animation-play-state: paused;
 }
 
-.hero-noir-vignette {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(ellipse 90% 75% at 50% 38%, transparent 45%, rgba(0, 0, 0, 0.6) 100%);
+/* ─── Page transitions (docs/redesign/MOTION.md §3) ────── */
+/* Shared boxes (booking-card, work-media) grow from the clicked element into
+   the destination card in one 250ms leg. The rest of the page zooms (or, for
+   sibling pages, swipes): see NavigationEffects.tsx for the direction. */
+::view-transition-group(*) {
+  animation-duration: 250ms;
+  animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
 }
 
-.hero-noir-grid {
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 80px 80px;
+/* Default page change, a zoom: the old page sinks back into a rounded,
+   dimmed card while the new page zooms in over it. */
+::view-transition-old(.page) {
+  animation: vt-sink 520ms cubic-bezier(0.65, 0, 0.35, 1) both;
 }
 
-/* ─── Lenis Smooth Scroll ─────────────────────────────── */
+::view-transition-new(.page) {
+  animation: vt-zoom-in 620ms cubic-bezier(0.16, 1, 0.3, 1) 90ms both;
+}
+
+/* Sibling pages (product to product) swipe sideways instead. */
+html[data-vt="swipe-next"]::view-transition-old(.page) {
+  animation: vt-swipe-out-left 560ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+html[data-vt="swipe-next"]::view-transition-new(.page) {
+  animation: vt-swipe-in-right 560ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+html[data-vt="swipe-prev"]::view-transition-old(.page) {
+  animation: vt-swipe-out-right 560ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+html[data-vt="swipe-prev"]::view-transition-new(.page) {
+  animation: vt-swipe-in-left 560ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+/* A button growing into a card: the box itself (paper, rounded, soft shadow)
+   grows from the button's rectangle to the card's. The button's label stays
+   its own size and fades out early; the card's contents fade in over the
+   middle of the motion. Nothing is stretched. */
+::view-transition-group(booking-card) {
+  background: var(--paper);
+  border-radius: 20px;
+  overflow: clip;
+  box-shadow: 0 30px 60px -30px rgba(6,26,61, 0.35);
+}
+
+::view-transition-old(booking-card) {
+  animation: vt-label-out 250ms cubic-bezier(0.33, 1, 0.68, 1) both;
+  object-fit: none;
+  object-position: center;
+  height: 100%;
+  width: 100%;
+}
+
+::view-transition-new(booking-card) {
+  animation: vt-look-in 250ms cubic-bezier(0.33, 1, 0.68, 1) both;
+  height: 100%;
+  width: 100%;
+  object-fit: fill;
+}
+
+/* Image to image (a work card's media into the case-study hero): both looks
+   are drawn in the same moving rectangle and cross-fade. */
+::view-transition-old(work-media) {
+  animation: vt-look-out 250ms cubic-bezier(0.33, 1, 0.68, 1) both;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+::view-transition-new(work-media) {
+  animation: vt-look-in 250ms cubic-bezier(0.33, 1, 0.68, 1) both;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+/* The nav island and the WhatsApp pill stay put, above the moving page. */
+::view-transition-group(site-nav),
+::view-transition-group(contact-pill) {
+  z-index: 10;
+  animation: none;
+}
+
+::view-transition-old(site-nav),
+::view-transition-old(contact-pill) {
+  display: none;
+}
+
+::view-transition-new(site-nav),
+::view-transition-new(contact-pill) {
+  animation: none;
+}
+
+@keyframes vt-sink {
+  to {
+    transform: scale(0.88);
+    clip-path: inset(3% round 32px);
+    filter: brightness(0.55);
+    opacity: 0;
+  }
+}
+
+@keyframes vt-zoom-in {
+  from {
+    transform: scale(1.08);
+    opacity: 0;
+  }
+}
+
+@keyframes vt-swipe-out-left {
+  to {
+    transform: translate3d(-35%, 0, 0) scale(0.94);
+    filter: brightness(0.6);
+    opacity: 0.3;
+  }
+}
+@keyframes vt-swipe-in-right {
+  from {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+@keyframes vt-swipe-out-right {
+  to {
+    transform: translate3d(35%, 0, 0) scale(0.94);
+    filter: brightness(0.6);
+    opacity: 0.3;
+  }
+}
+@keyframes vt-swipe-in-left {
+  from {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+@keyframes vt-look-out {
+  0%,
+  15% {
+    opacity: 1;
+  }
+  85%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-label-out {
+  0% {
+    opacity: 1;
+  }
+  40%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-look-in {
+  0%,
+  15% {
+    opacity: 0;
+  }
+  85%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* ─── Lenis smooth scroll ──────────────────────────────── */
 html.lenis,
 html.lenis body {
   height: auto;
@@ -135,91 +502,14 @@ html.lenis body {
   pointer-events: none;
 }
 
-/* ─── Shadcn / Theme Layer ────────────────────────────── */
-@layer base {
-  .theme {
-    --font-heading: var(--font-sans);
-    --font-sans: var(--font-sans);
-  }
-
-  :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
-  }
-
-  .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
-  }
-
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
-
-  html {
-    @apply font-sans;
+/* ─── Reduced motion ───────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

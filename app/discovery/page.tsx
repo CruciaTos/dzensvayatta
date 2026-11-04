@@ -1,24 +1,35 @@
-import { Navbar } from "@/components/layout/Navbar";
-import { DiscoveryForm } from "@/components/sections/DiscoveryForm";
+import type { Metadata } from "next";
+import { em } from "@/lib/rich";
+import { DISCOVERY_CALL_MINUTES } from "@/lib/discovery/time";
+import { Container } from "@/components/ui/Container";
+import { Section } from "@/components/ui/Section";
+import { BookingCard } from "@/components/sections/discovery/BookingCard";
 
-export const metadata = {
-  title: "Request a Discovery Call | DZen",
-  description:
-    "Schedule a discovery call with us to discuss how we can integrate AI into your business operations.",
+export const metadata: Metadata = {
+  title: "Book a discovery call",
+  description: `A ${DISCOVERY_CALL_MINUTES}-minute call to understand your workflows and tell you plainly what we'd build first.`,
+  alternates: { canonical: "/discovery" },
 };
 
 export default function DiscoveryPage() {
   return (
     <>
-      <Navbar />
+      <section className="pb-14 pt-36 text-center md:pb-20 md:pt-44">
+        <Container>
+          <p className="inline-flex items-center gap-2 rounded-pill bg-tint px-3.5 py-1.5 font-mono text-[11.5px] font-medium uppercase tracking-[0.12em] text-accent">
+            <span aria-hidden="true" className="size-1.5 rounded-full bg-accent" />
+            {DISCOVERY_CALL_MINUTES}-minute discovery call
+          </p>
+          <h1 className="mt-7 text-display-l text-ink">{em("Tell us about\n*your business.*")}</h1>
+          <p className="mx-auto mt-6 max-w-[560px] text-body text-ink-2">
+            {em("**Pick a time that suits you.** We'll look at your current setup and tell you *plainly* what we'd tackle first.")}
+          </p>
+        </Container>
+      </section>
 
-      <main id="main-content" className="bg-black min-h-screen">
-        <div className="min-h-screen flex items-center justify-center pt-16 pb-16 px-6">
-          <div className="relative z-10 w-full max-w-[580px]">
-            <DiscoveryForm />
-          </div>
-        </div>
-      </main>
+      <Section tone="surface" className="pt-12 md:pt-16">
+        <BookingCard />
+      </Section>
     </>
   );
 }

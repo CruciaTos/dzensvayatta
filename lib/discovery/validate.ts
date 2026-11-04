@@ -1,15 +1,15 @@
 import type { DiscoveryPayload } from "./types";
+import {
+  BOOKING_END_HOUR,
+  BOOKING_START_HOUR,
+  MIN_LEAD_MINUTES,
+  isSlotBookable,
+  istToInstant,
+} from "./time";
 
 const EMAIL_RX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DATE_RX = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_RX = /^\d{2}:\d{2}$/;
-
-/** Working hours (IST) — 10:00 to 22:00 */
-const WORK_START_HOUR = 10;
-const WORK_END_HOUR = 22; // 10 PM
-
-/** Minimum lead time: 30 minutes */
-const MIN_LEAD_MS = 30 * 60 * 1000;
 
 function wordCount(text: string) {
   const trimmed = text.trim();
@@ -57,9 +57,9 @@ export function validateDiscoveryPayload(
   // meetTime must be >= 10:00 and the meeting must END by or at 22:00,
   // i.e. start time <= 22:00 exactly (we treat 22:00 as last allowed slot).
   if (
-    meetHour < WORK_START_HOUR ||
-    meetHour > WORK_END_HOUR ||
-    (meetHour === WORK_END_HOUR && meetMin > 0)
+    meetHour < BOOKING_START_HOUR ||
+    meetHour > BOOKING_END_HOUR ||
+    (meetHour === BOOKING_END_HOUR && meetMin > 0)
   ) {
     return {
       ok: false,
@@ -67,19 +67,16 @@ export function validateDiscoveryPayload(
     };
   }
 
-  // ── Minimum 30-minute lead time ────────────────────────────────────────────
-  const now = Date.now();
-  // Build a JS Date from the submitted date + time (treated as local / IST).
-  const meetDateTime = new Date(`${meetDate}T${meetTime}:00`);
-
-  if (isNaN(meetDateTime.getTime())) {
+  // ── Minimum lead time ──────────────────────────────────────────────────────
+  // The slot is IST; read it as IST explicitly, not in the server's zone.
+  if (isNaN(istToInstant(meetDate, meetTime).getTime())) {
     return { ok: false, error: "Invalid date/time combination." };
   }
 
-  if (meetDateTime.getTime() - now < MIN_LEAD_MS) {
+  if (!isSlotBookable(meetDate, meetTime)) {
     return {
       ok: false,
-      error: "Please schedule your meeting at least 30 minutes from now.",
+      error: `Please pick a time at least ${MIN_LEAD_MINUTES} minutes from now.`,
     };
   }
 

@@ -9,15 +9,15 @@ import { DeviceMockup, type MockupSlide, type MockupTheme } from "@/components/u
 import { useIsMobile } from "@/hooks/useIsMobile";
 
 const C = {
-  accent: "#7EC3E2",
-  accentSoft: "#B2D5E5",
+  accent: "#6CB4F0",
+  accentSoft: "#BECEE4",
   textPrimary: "#e5f3e5",
   textMuted: "rgba(229,243,229,0.65)",
-  textFaint: "rgba(178,213,229,0.35)",
-  divider: "rgba(178,213,229,0.10)",
-  hairline: "rgba(178,213,229,0.18)",
-  chipBg: "rgba(126,195,226,0.08)",
-  chipBorder: "rgba(178,213,229,0.16)",
+  textFaint: "rgba(190,206,228,0.35)",
+  divider: "rgba(190,206,228,0.10)",
+  hairline: "rgba(190,206,228,0.18)",
+  chipBg: "rgba(108,180,240,0.08)",
+  chipBorder: "rgba(190,206,228,0.16)",
   cardBg: "rgba(9,9,9,0.55)",
 } as const;
 
@@ -297,7 +297,7 @@ function ProjectCard({
             fontSize: "260px",
             fontFamily: "serif",
             lineHeight: 1,
-            color: "rgba(178,213,229,0.04)",
+            color: "rgba(190,206,228,0.04)",
             pointerEvents: "none",
             userSelect: "none",
             zIndex: 0,
@@ -401,6 +401,8 @@ function ProjectCard({
         <div
           className="project-card-media"
           style={{
+            // The hub card's media grows into this box on navigation (MOTION.md §3).
+            viewTransitionName: "work-media",
             position: "relative",
             width: "100%",
             height: "100%",
@@ -451,7 +453,7 @@ export function ProjectsShowcase({
           <div
             className="flex items-center gap-3 px-5 py-2 rounded-full"
             style={{
-              backgroundColor: "rgba(126,195,226,0.05)",
+              backgroundColor: "rgba(108,180,240,0.05)",
               border: `1px solid ${C.divider}`,
               color: C.textFaint,
               fontSize: "14px",
@@ -475,7 +477,7 @@ export function ProjectsShowcase({
           <Link
             href="/discovery"
             className="group inline-flex items-center gap-2 font-mono text-[13px] tracking-[0.15em] uppercase pb-1 border-b transition-colors duration-300"
-            style={{ color: C.accentSoft, borderColor: "rgba(178,213,229,0.25)" }}
+            style={{ color: C.accentSoft, borderColor: "rgba(190,206,228,0.25)" }}
           >
             Start your own project with us
             <span

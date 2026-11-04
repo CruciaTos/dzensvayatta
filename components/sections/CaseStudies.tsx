@@ -5,20 +5,20 @@ import { FadeIn } from "@/components/ui/FadeIn";
 
 /* ── Design tokens (identical to TargetAreas & TargetMarkets) ── */
 const C = {
-  bg: "#000b12ff",
-  accent: "#7EC3E2",
-  accentSoft: "#B2D5E5",
+  bg: "#061A3Dff",
+  accent: "#6CB4F0",
+  accentSoft: "#BECEE4",
   textPrimary: "#e5f3e5ff",
   textMuted: "rgba(229,243,229,0.65)",
   cardBg: "#0d0d0cff",
   cardBgHover: "#141413ff",
-  cardBorder: "rgba(178,213,229,0.10)",
-  cardBorderHover: "rgba(126,195,226,0.28)",
-  divider: "rgba(178,213,229,0.10)",
-  glowSpot: "rgba(126,195,226,0.08)",
+  cardBorder: "rgba(190,206,228,0.10)",
+  cardBorderHover: "rgba(108,180,240,0.28)",
+  divider: "rgba(190,206,228,0.10)",
+  glowSpot: "rgba(108,180,240,0.08)",
   glassBg: "rgba(9, 9, 9, 0.5)",
   glassHighlight: "rgba(255,255,255,0.06)",
-  glassBorder: "rgba(178,213,229,0.15)",
+  glassBorder: "rgba(190,206,228,0.15)",
   glassShadow: "0 12px 40px rgba(0,0,0,0.2)",
 } as const;
 
@@ -39,7 +39,7 @@ const CASES: RealCase[] = [
     headline: "₹19.25 Cr in contractor penalties recovered via AI site monitoring.",
     body: "AI flagged image reuse, missing videos, and code mismatches that manual audits missed. Penalties were deducted straight from contractor bills.",
     metrics: [{ value: "₹19.25Cr", label: "Penalties enforced" }, { value: "Real-time", label: "AI site monitoring" }, { value: "Zero", label: "Manual audit reliance" }],
-    accent: "#B2D5E5", source: "Hindustan Times — June 2025"
+    accent: "#BECEE4", source: "Hindustan Times — June 2025"
   },
   {
     id: "02", org: "Kerala Police", tag: "Law Enforcement AI",
@@ -47,7 +47,7 @@ const CASES: RealCase[] = [
     headline: "India's first AI system tracks CSAM perpetrators across the dark web.",
     body: "Katalyst cross-references victim signatures in hours instead of weeks, which speeds up identification and intervention.",
     metrics: [{ value: "#1", label: "First in India" }, { value: "Hours", label: "vs. Weeks (manual)" }, { value: "Katalyst", label: "AI tool deployed" }],
-    accent: "#7ec3e2", source: "The News Minute — 2025"
+    accent: "#6CB4F0", source: "The News Minute — 2025"
   },
   {
     id: "03", org: "FTITTP · Indian Airports", tag: "Biometric AI Systems",
@@ -114,7 +114,7 @@ function MarqueeExpandingCard({
           inset: 0,
           pointerEvents: "none",
           opacity: 0.4,
-          backgroundImage: "radial-gradient(circle, rgba(178,213,229,0.9) 1px, transparent 1px)",
+          backgroundImage: "radial-gradient(circle, rgba(190,206,228,0.9) 1px, transparent 1px)",
           backgroundSize: "22px 22px",
         }}
       />
@@ -126,7 +126,7 @@ function MarqueeExpandingCard({
           bottom: isExpanded ? "-36px" : "-18px",
           right: "-4px",
           fontSize: isExpanded ? "clamp(140px,16vw,260px)" : "clamp(110px,12vw,200px)",
-          color: "rgba(178,213,229,0.018)",
+          color: "rgba(190,206,228,0.018)",
           fontFamily: "serif",
           lineHeight: 1,
           letterSpacing: "-0.05em",
@@ -368,7 +368,7 @@ export function CaseStudies() {
             borderRadius: "40px",
             overflow: "hidden",
             boxShadow: C.glassShadow,
-            border: "1px solid rgba(126,195,226,0.2)",
+            border: "1px solid rgba(108,180,240,0.2)",
           }}
         >
           {/* Dark semi‑transparent blur layer */}
@@ -391,8 +391,8 @@ export function CaseStudies() {
               inset: 0,
               zIndex: 1,
               backgroundImage: `
-                linear-gradient(rgba(178,213,229,0.06) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(178,213,229,0.06) 1px, transparent 1px)
+                linear-gradient(rgba(190,206,228,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(190,206,228,0.06) 1px, transparent 1px)
               `,
               backgroundSize: "40px 40px",
               pointerEvents: "none",

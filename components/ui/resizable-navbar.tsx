@@ -83,7 +83,7 @@ interface MobileNavToggleProps {
   color?: string;
 }
 
-export function MobileNavToggle({ isOpen, onClick, color = "#B2D5E5" }: MobileNavToggleProps) {
+export function MobileNavToggle({ isOpen, onClick, color = "#BECEE4" }: MobileNavToggleProps) {
   return (
     <button
       onClick={onClick}
@@ -91,8 +91,8 @@ export function MobileNavToggle({ isOpen, onClick, color = "#B2D5E5" }: MobileNa
       aria-expanded={isOpen}
       className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border p-0 transition-colors duration-200"
       style={{
-        borderColor: "rgba(178,213,229,0.16)",
-        backgroundColor: isOpen ? "rgba(178,213,229,0.10)" : "rgba(178,213,229,0.04)",
+        borderColor: "rgba(190,206,228,0.16)",
+        backgroundColor: isOpen ? "rgba(190,206,228,0.10)" : "rgba(190,206,228,0.04)",
       }}
     >
       <span className="relative flex h-[13px] w-[18px] flex-col justify-between">
@@ -166,9 +166,9 @@ export function NavbarButton({
   const baseClasses =
     "group relative inline-flex cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full border font-sans text-[12px] uppercase tracking-[0.1em] transition-all duration-300";
   const primaryClasses =
-    "border-transparent text-[#04131c] shadow-[0_6px_18px_-6px_rgba(178,213,229,0.55)] hover:shadow-[0_10px_26px_-6px_rgba(178,213,229,0.7)]";
+    "border-transparent text-[#061A3D] shadow-[0_6px_18px_-6px_rgba(190,206,228,0.55)] hover:shadow-[0_10px_26px_-6px_rgba(190,206,228,0.7)]";
   const secondaryClasses =
-    "border-[rgba(178,213,229,0.22)] bg-transparent text-[rgba(178,213,229,0.75)] hover:border-[rgba(178,213,229,0.45)] hover:text-[#B2D5E5]";
+    "border-[rgba(190,206,228,0.22)] bg-transparent text-[rgba(190,206,228,0.75)] hover:border-[rgba(190,206,228,0.45)] hover:text-[#BECEE4]";
 
   return (
     <button

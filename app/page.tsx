@@ -1,57 +1,49 @@
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
-import { HeroSlideTransition } from "@/components/sections/HeroSlideTransition";
-import { TargetMarkets } from "@/components/sections/TargetMarkets";
-import { CapabilitiesSection } from "@/components/sections/CapabilitiesSection";
-import FoundingPrinciples from "@/components/sections/FoundingPrinciples";
-import { TargetAreas, Testimonials } from "@/components/sections";
-import { WhyUs } from "@/components/sections/WhyUs";
-import { CTA } from "@/components/sections/CTA";
-import { SectionTransition } from "@/components/sections/SectionTransition";
+import type { Viewport } from "next";
+import { HOME_FAQ } from "@/lib/faq";
+import { Hero } from "@/components/sections/Hero";
+import { ValuesMarquee } from "@/components/sections/ValuesMarquee";
+import { WeAreSvayatta } from "@/components/sections/WeAreSvayatta";
+import { Process } from "@/components/sections/Process";
+import { ServicesTrack } from "@/components/sections/ServicesTrack";
+import { ClientVoices } from "@/components/sections/ClientVoices";
+import { FAQSection } from "@/components/sections/FAQSection";
+import { ClosingScene } from "@/components/sections/ClosingScene";
+import { HeroDepth } from "@/components/motion/HeroDepth";
 
+// Match the mobile browser bar to the night hero.
+export const viewport: Viewport = {
+  themeColor: "#061A3D",
+};
+
+// Section order: docs/redesign/02 §6. Motion: docs/redesign/MOTION.md.
+// Antigravity sections are wired in as they land (see the comments).
 export default function HomePage() {
   return (
     <>
-      <Navbar />
+      {/* Depth: the hero stays pinned and settles back while the paper sheet slides over it. */}
+      <HeroDepth hero={<Hero />}>
+        <ValuesMarquee />
+        {/* Pinned scroll scene: "We are Svayatta" decodes, turns white on the footage, then the
+            camera flies into the "t" and lands on the manifesto's split (panel left, page right). */}
+        <WeAreSvayatta />
+      </HeroDepth>
 
-      <main id="main-content">
-        {/* Hero + PPT-slide transition into CaseStudies — untouched, it
-            already owns its own cinematic scroll transition. */}
-        <HeroSlideTransition />
+      {/* H4 <ClientCells />: Antigravity B2 */}
+      {/* Products live on /projects only, not on the home scroll (owner, 4 Nov). */}
+      {/* Services on React Bits' Flex Carousel: drag or flick the cards through a liquid lens.
+          It fades in as the manifesto's panel wipes to white, so the two read as one page. */}
+      <ServicesTrack handoff />
 
+      {/* Same box: a small night card grows into the process stage. */}
+      <Process />
 
-        {/* "WE ARE DZEN" scroll-scramble reveal — untouched, it already
-            owns its own sticky scroll-progress mechanic. */}
-        <FoundingPrinciples />
+      {/* Stacked cards: each testimonial slides over the last, which recedes. */}
+      <ClientVoices />
 
-        <SectionTransition>
-          <TargetMarkets />
-        </SectionTransition>
-        <SectionTransition>
-          <TargetAreas />
-        </SectionTransition>
+      <FAQSection items={HOME_FAQ} />
 
-        {/* 2. Target Markets — now follows Case Studies */}
-        <SectionTransition>
-          <CapabilitiesSection />    {/* 3. Methodology (6 Phase) */}
-        </SectionTransition>
-        {/* 4. Connected Systems */}
-        <SectionTransition>
-          <Testimonials />
-        </SectionTransition>
-        <SectionTransition>
-          <WhyUs />
-        </SectionTransition>
-        <SectionTransition>
-          <CTA />
-        </SectionTransition>
-
-
-
-
-      </main>
-
-      <Footer />                   {/* 8. Footer */}
+      {/* Same box: "We build. You scale." grows into the closing band. */}
+      <ClosingScene />
     </>
   );
 }

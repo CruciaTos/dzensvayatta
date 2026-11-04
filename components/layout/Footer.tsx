@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
+import Link from "next/link";
 import { siInstagram } from "simple-icons";
 
 // ── Design tokens (identical to TargetAreas, TargetMarkets, CaseStudies) ──
 const C = {
-  bg: "#000b12ff",
+  bg: "#000B12ff",
   accent: "#7EC3E2",
   accentSoft: "#B2D5E5",
   textPrimary: "#e5f3e5ff",
@@ -134,10 +135,12 @@ function GhostWatermark() {
   return (
     <span
       aria-hidden="true"
-      className="block w-full text-center font-zaslia text-transparent ghost-shine"
+      className="block w-full text-center not-italic [font-family:var(--font-fraunces)] text-transparent ghost-shine"
       style={{
         WebkitTextStroke: "1px rgba(178,213,229,0.35)",
-        fontSize: "clamp(6rem, 50vw, 60rem)",
+        fontSize: "39vw", // upright Fraunces: DZEN runs nearly edge to edge (about 2.4% of the width clear each side)
+        // D and N carry uneven side space, so the ink sits ~0.02em right of centre.
+        transform: "translateX(-0.02em) scaleY(1.25)", // stretched 25% taller
         letterSpacing: "-0.02em",
         lineHeight: 0.86,
         fontWeight: 500,
@@ -164,9 +167,11 @@ function SpotlightAccent() {
       className="absolute inset-0 z-10 pointer-events-none overflow-hidden flex items-center justify-center"
     >
       <span
-        className="block w-full text-center font-zaslia"
+        className="block w-full text-center not-italic [font-family:var(--font-fraunces)]"
         style={{
-          fontSize: "clamp(6rem, 50vw, 60rem)",
+          fontSize: "39vw", // upright Fraunces: DZEN runs nearly edge to edge (about 2.4% of the width clear each side)
+        // D and N carry uneven side space, so the ink sits ~0.02em right of centre.
+        transform: "translateX(-0.02em) scaleY(1.25)", // stretched 25% taller
           letterSpacing: "-0.02em",
           lineHeight: 0.86,
           fontWeight: 500,
@@ -238,8 +243,8 @@ function FooterCTA() {
 function FooterLinks() {
   const contactLinks = [
     { label: "info@svayatta.in", href: "mailto:info@svayatta.in" },
-    { label: "+91 91520 35526", href: "https://wa.me/9152035526", external: true },
-    { label: "+91 91520 35527", href: "https://wa.me/9152035527", external: true },
+    { label: "+91 93215 59182", href: "https://wa.me/919321559182", external: true },
+    { label: "+91 93249 76982", href: "https://wa.me/919324976982", external: true },
   ];
 
   return (
@@ -258,7 +263,7 @@ function FooterLinks() {
         >
           <BrandIcon
             path={siLinkedin.path}
-            className="w-[24px] h-[24px] transition-colors duration-200 group-hover:text-[#7ec3e2ff]"
+            className="w-[24px] h-[24px] transition-colors duration-200 group-hover:text-[#7EC3E2ff]"
             style={{ color: C.textMuted }}
           />
           <span
@@ -277,7 +282,7 @@ function FooterLinks() {
         >
           <BrandIcon
             path={siInstagram.path}
-            className="w-[24px] h-[24px] transition-colors duration-200 group-hover:text-[#7ec3e2ff]"
+            className="w-[24px] h-[24px] transition-colors duration-200 group-hover:text-[#7EC3E2ff]"
             style={{ color: C.textMuted }}
           />
           <span
@@ -296,7 +301,7 @@ function FooterLinks() {
         >
           <BrandIcon
             path={siInstagram.path}
-            className="w-[24px] h-[24px] transition-colors duration-200 group-hover:text-[#7ec3e2ff]"
+            className="w-[24px] h-[24px] transition-colors duration-200 group-hover:text-[#7EC3E2ff]"
             style={{ color: C.textMuted }}
           />
           <span
@@ -344,7 +349,7 @@ function FooterLinks() {
 function FooterBottomBar() {
   return (
     <div
-      className="flex items-center justify-center py-7"
+      className="flex flex-wrap items-center justify-between gap-4 py-7 max-sm:justify-center"
       style={{ borderTop: `1px solid ${C.cardBorder}` }}
     >
       <span
@@ -353,6 +358,21 @@ function FooterBottomBar() {
       >
         © 2026 Svayatta Intelligence
       </span>
+      <nav aria-label="Legal" className="flex gap-6">
+        {[
+          { href: "/privacy", label: "Privacy" },
+          { href: "/terms", label: "Terms" },
+        ].map((l) => (
+          <Link
+            key={l.href}
+            href={l.href}
+            className="[font-family:var(--font-mono)] text-[10px] uppercase tracking-[0.14em] transition-colors hover:text-[#7EC3E2]"
+            style={{ color: C.textMuted }}
+          >
+            {l.label}
+          </Link>
+        ))}
+      </nav>
     </div>
   );
 }
@@ -396,13 +416,9 @@ export function Footer() {
     <footer
       id="contact"
       ref={footerRef}
-      className="relative overflow-hidden"
-      style={{
-        backgroundColor: C.bg,
-        borderTop: `1px solid ${C.cardBorder}`,
-        "--mx": "-9999px",
-        "--my": "-9999px",
-      } as React.CSSProperties}
+      // Static styles as classes, not an inline style object: the object's
+      // colours serialised differently on server and client (hydration warning).
+      className="relative overflow-hidden border-t border-[rgba(178,213,229,0.10)] bg-[#000B12] [--mx:-9999px] [--my:-9999px]"
     >
       {/* LAYER 0: ghost DZEN outline – only a soft gradient sliver appears */}
       <div
@@ -410,9 +426,9 @@ export function Footer() {
         className="absolute inset-0 z-0 pointer-events-none overflow-hidden flex items-center justify-center"
         style={{
           WebkitMaskImage:
-            "linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)",
+            "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
           maskImage:
-            "linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)",
+            "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
         }}
       >
         <GhostWatermark />

@@ -12,12 +12,12 @@ if (typeof window !== "undefined") {
 }
 
 const C = {
-  accent: "#7EC3E2",
-  accentSoft: "#B2D5E5",
+  accent: "#6CB4F0",
+  accentSoft: "#BECEE4",
   textPrimary: "#e5f3e5",
   textMuted: "rgba(229,243,229,0.68)",
-  textFaint: "rgba(178,213,229,0.4)",
-  divider: "rgba(178,213,229,0.10)",
+  textFaint: "rgba(190,206,228,0.4)",
+  divider: "rgba(190,206,228,0.10)",
   textMutedDark: "rgba(229,243,229,0.18)",
 } as const;
 
@@ -206,7 +206,7 @@ export function WhyUs() {
             <Link
               href="/discovery"
               className="group inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.15em] uppercase pb-1 border-b transition-colors duration-300"
-              style={{ color: C.accentSoft, borderColor: "rgba(178,213,229,0.25)" }}
+              style={{ color: C.accentSoft, borderColor: "rgba(190,206,228,0.25)" }}
             >
               Start a conversation
               <span

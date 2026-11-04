@@ -4,11 +4,11 @@ import { useState } from "react";
 
 // Mirrors the palette in ProjectsShowcase, since this renders inside its card.
 const C = {
-  accent: "#7EC3E2",
-  accentSoft: "#B2D5E5",
+  accent: "#6CB4F0",
+  accentSoft: "#BECEE4",
   textPrimary: "#e5f3e5",
   textMuted: "rgba(229,243,229,0.65)",
-  divider: "rgba(178,213,229,0.10)",
+  divider: "rgba(190,206,228,0.10)",
   danger: "#E4948B",
   success: "#8FD6A8",
 } as const;
@@ -105,7 +105,7 @@ export function GrowmontDownload() {
           className="cursor-pointer whitespace-nowrap rounded-full px-6 py-3 font-sans text-[12px] uppercase tracking-[0.1em] transition-opacity duration-200 disabled:cursor-not-allowed disabled:opacity-60"
           style={{
             background: "linear-gradient(180deg, #C6E1EE 0%, #A5CCDE 100%)",
-            color: "#04131c",
+            color: "#061A3D",
             border: "none",
             fontWeight: 500,
           }}

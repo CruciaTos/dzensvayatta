@@ -2,16 +2,19 @@ import { randomUUID } from "crypto";
 import { createEvent } from "ics";
 import { Resend } from "resend";
 import type { DiscoveryPayload, DiscoveryResult } from "./types";
+import { DISCOVERY_CALL_MINUTES, formatIstSlot, istToInstant } from "./time";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "info@svayatta.in";
 const FROM_NAME = process.env.RESEND_FROM_NAME || "Svayatta";
 const NOTIFY_EMAIL = process.env.DZEN_NOTIFICATION_EMAIL;
-const DURATION_MINUTES = Number(process.env.CALENDAR_EVENT_DURATION_MINUTES || 30);
+// One length everywhere (the site copy says 30 minutes). This used to read
+// CALENDAR_EVENT_DURATION_MINUTES, which could drift from the copy.
+const DURATION_MINUTES = DISCOVERY_CALL_MINUTES;
 
 function buildConfirmationHtml(payload: DiscoveryPayload) {
-  const when = `${payload.meetDate} at ${payload.meetTime}`;
+  const when = formatIstSlot(payload.meetDate, payload.meetTime);
   return `
     <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.6;">
       <p>Hi,</p>
@@ -26,13 +29,13 @@ function buildConfirmationHtml(payload: DiscoveryPayload) {
 
 function buildTeamNotificationText(payload: DiscoveryPayload) {
   return [
-    "New discovery call request from the DZen website.",
+    "New discovery call request from the Svayatta website.",
     "",
     `Company:  ${payload.companyName}`,
     `Industry: ${payload.companyField || "Not provided"}`,
     `Email:    ${payload.email}`,
     `Contact:  ${payload.contactNo || "Not provided"}`,
-    `Date:     ${payload.meetDate} at ${payload.meetTime}`,
+    `When:     ${formatIstSlot(payload.meetDate, payload.meetTime)}`,
     "",
     "About:",
     payload.description || "Not provided",
@@ -42,15 +45,18 @@ function buildTeamNotificationText(payload: DiscoveryPayload) {
 export async function scheduleDiscoveryCall(
   payload: DiscoveryPayload
 ): Promise<DiscoveryResult> {
-  const [year, month, day] = payload.meetDate.split("-").map(Number);
-  const [hour, minute] = payload.meetTime.split(":").map(Number);
+  const when = formatIstSlot(payload.meetDate, payload.meetTime);
 
-  // Build ICS calendar invite
+  // Build the invite from the exact instant (IST converted to UTC). Passing
+  // [y, m, d, h, min] would be read in the server's zone, which is UTC on
+  // Vercel, and a 10:00 IST call would arrive as 15:30 IST.
   const { error: icsError, value: icsContent } = createEvent({
     uid: `${randomUUID()}@svayatta.in`,
     title: `Discovery Call with ${payload.companyName}`,
     description: buildTeamNotificationText(payload),
-    start: [year, month, day, hour, minute],
+    start: istToInstant(payload.meetDate, payload.meetTime).getTime(),
+    startInputType: "utc",
+    startOutputType: "utc",
     duration: { minutes: DURATION_MINUTES },
     organizer: { name: FROM_NAME, email: FROM_EMAIL },
     attendees: [{ name: payload.companyName, email: payload.email, rsvp: true }],
@@ -74,7 +80,7 @@ export async function scheduleDiscoveryCall(
     from: `${FROM_NAME} <${FROM_EMAIL}>`,
     to: [payload.email],
     ...(NOTIFY_EMAIL ? { bcc: [NOTIFY_EMAIL] } : {}),
-    subject: `Discovery Call Confirmed — ${payload.meetDate} at ${payload.meetTime}`,
+    subject: `Discovery call confirmed: ${when}`,
     html: buildConfirmationHtml(payload),
     attachments: icsAttachment,
   });
@@ -89,7 +95,7 @@ export async function scheduleDiscoveryCall(
     await resend.emails.send({
       from: `${FROM_NAME} <${FROM_EMAIL}>`,
       to: [NOTIFY_EMAIL],
-      subject: `[Discovery Call] ${payload.companyName} | ${payload.meetDate} ${payload.meetTime}`,
+      subject: `[Discovery call] ${payload.companyName} | ${when}`,
       text: buildTeamNotificationText(payload),
       attachments: icsAttachment,
     });

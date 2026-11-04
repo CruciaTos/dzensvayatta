@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://svayatta.in";
+export const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL ?? "https://svayatta.in";
 
 export const siteMetadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -8,47 +9,49 @@ export const siteMetadata: Metadata = {
     google: "Z43gnpcBFpd17f-oAg8wk084P",
   },
   title: {
-    default: "Dzen Svayatta - Quality with Clarity",
-    template: "%s | DZen",
+    default: "Svayatta | Custom software, AI & automation for Indian businesses",
+    template: "%s · Svayatta",
   },
   description:
-    "We build the infrastructure behind how your business scales.",
+    "Custom software, AI agents and workflow automation for Indian businesses, from a Mumbai studio. Scoped with you, shipped in small steps.",
   keywords: [
-    "workflow integration",
+    "custom software India",
+    "AI agents",
+    "WhatsApp automation",
+    "payroll software",
+    "ERP",
+    "CRM",
+    "workflow automation",
+    "Mumbai software studio",
+    "local-first software",
     "enterprise AI",
-    "process automation",
-    "ERP integration",
-    "CRM orchestration",
-    "operational intelligence",
-    "business automation",
   ],
-  authors: [{ name: "DZen, Inc." }],
-  creator: "DZen, Inc.",
-  publisher: "DZen, Inc.",
+  authors: [{ name: "Svayatta" }], // Switch to "Svayatta Intelligence Private Limited" once incorporation completes
+  creator: "Svayatta",
+  publisher: "Svayatta",
   openGraph: {
     type: "website",
-    locale: "en_US",
+    locale: "en_IN",
     url: BASE_URL,
-    siteName: "DZen",
-    title: "Dzen Svayatta - Quality with Clarity",
+    siteName: "Svayatta",
+    title: "Svayatta | Custom software, AI & automation for Indian businesses",
     description:
-      "We build the infrastructure behind how your business scales.",
+      "Custom software, AI agents and workflow automation for Indian businesses, from a Mumbai studio. Scoped with you, shipped in small steps.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Dzen Svayatta - Quality with Clarity",
+        alt: "Svayatta — Custom software, AI & automation for Indian businesses",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dzen Svayatta - Quality with Clarity",
+    title: "Svayatta | Custom software, AI & automation for Indian businesses",
     description:
-      "We build the infrastructure behind how your business scales.",
+      "Custom software, AI agents and workflow automation for Indian businesses, from a Mumbai studio. Scoped with you, shipped in small steps.",
     images: ["/og-image.png"],
-    creator: "@DZenSvayatta_io",
   },
   robots: {
     index: true,
@@ -75,27 +78,38 @@ export const siteMetadata: Metadata = {
 export const structuredData = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "DZenSvayatta",
+  name: "Svayatta",
+  legalName: "Svayatta Intelligence Private Limited", // [confirm once incorporated]
   url: BASE_URL,
   logo: `${BASE_URL}/logo.png`,
-  description:
-    "We build the infrastructure behind how your business scales.",
+  email: "info@svayatta.in",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Mumbai",
+    addressRegion: "MH",
+    addressCountry: "IN",
+  },
+  sameAs: [
+    "https://www.linkedin.com/company/dzen-svayatta/",
+    "https://instagram.com/dzensvayatta", // [confirm handle]
+  ],
   founder: [
     {
       "@type": "Person",
       name: "Soham Boridkar",
-      telephone: "+919321559182",
+      jobTitle: "Co-founder",
+      // [confirm] add personal telephone only if founders want it public
     },
     {
       "@type": "Person",
       name: "Smit Mhatre",
-      telephone: "+919324976982",
+      jobTitle: "Co-founder",
+      // [confirm] add personal telephone only if founders want it public
     },
   ],
   contactPoint: {
     "@type": "ContactPoint",
-    email: "hello@svayatta.in",
+    email: "info@svayatta.in",
     contactType: "customer service",
   },
-  sameAs: ["https://linkedin.com/company/dzen-svayatta"],
 };

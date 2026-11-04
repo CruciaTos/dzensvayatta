@@ -1,20 +1,17 @@
-import { type ReactNode } from "react";
+import { type ElementType, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 interface ContainerProps {
   children: ReactNode;
   className?: string;
+  as?: ElementType;
 }
 
-export function Container({ children, className }: ContainerProps) {
+/** min(88vw, 1280px), with a 20px side gutter below 640px. */
+export function Container({ children, className, as: Tag = "div" }: ContainerProps) {
   return (
-    <div
-      className={cn(
-        "max-w-content mx-auto px-12 max-md:px-6",
-        className
-      )}
-    >
+    <Tag className={cn("mx-auto w-full px-5 sm:w-[min(88vw,1280px)] sm:px-0", className)}>
       {children}
-    </div>
+    </Tag>
   );
 }

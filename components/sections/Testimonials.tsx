@@ -8,17 +8,17 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
 const C = {
-  accent: "#7EC3E2",
-  accentSoft: "#B2D5E5",
+  accent: "#6CB4F0",
+  accentSoft: "#BECEE4",
   textPrimary: "#e5f3e5",
   textMuted: "rgba(229,243,229,0.65)",
-  textFaint: "rgba(178,213,229,0.35)",
-  divider: "rgba(178,213,229,0.10)",
-  hairline: "rgba(178,213,229,0.18)",
-  thumbBg: "rgba(178,213,229,0.06)",
-  chipBg: "rgba(126,195,226,0.08)",
-  chipBorder: "rgba(178,213,229,0.16)",
-  markBg: "rgba(126,195,226,0.10)",
+  textFaint: "rgba(190,206,228,0.35)",
+  divider: "rgba(190,206,228,0.10)",
+  hairline: "rgba(190,206,228,0.18)",
+  thumbBg: "rgba(190,206,228,0.06)",
+  chipBg: "rgba(108,180,240,0.08)",
+  chipBorder: "rgba(190,206,228,0.16)",
+  markBg: "rgba(108,180,240,0.10)",
 } as const;
 
 interface Testimonial {
@@ -265,7 +265,7 @@ export function Testimonials() {
                       className="relative w-full h-full rounded-2xl overflow-hidden transition-shadow duration-500"
                       style={{
                         border: isActive ? `2px solid ${C.accent}` : `1px solid ${C.hairline}`,
-                        boxShadow: isActive ? "0 8px 24px -8px rgba(126,195,226,0.35)" : "none",
+                        boxShadow: isActive ? "0 8px 24px -8px rgba(108,180,240,0.35)" : "none",
                       }}
                     >
                       {t.avatar ? (
@@ -283,7 +283,7 @@ export function Testimonials() {
                           style={{
                             fontSize: "clamp(26px, 5vw, 34px)",
                             background: isActive
-                              ? "radial-gradient(circle at 30% 20%, rgba(126,195,226,0.28), rgba(126,195,226,0.08))"
+                              ? "radial-gradient(circle at 30% 20%, rgba(108,180,240,0.28), rgba(108,180,240,0.08))"
                               : C.thumbBg,
                             color: isActive ? C.accentSoft : C.textFaint,
                           }}
