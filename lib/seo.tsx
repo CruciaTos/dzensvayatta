@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { plain } from "@/lib/rich";
+import { SITE_NAME, SITE_TITLE } from "@/lib/metadata";
 
 export const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL ?? "https://svayatta.in";
@@ -140,9 +141,7 @@ export function pageMetadata(path: string, overrides?: Metadata): Metadata {
   };
   const url = `${BASE_URL}${path === "/" ? "" : path}`;
 
-  const defaultFullTitle =
-    "Svayatta | Custom software, AI & automation for Indian businesses";
-  const ogTitle = seo.title ? `${seo.title} · Svayatta` : defaultFullTitle;
+  const ogTitle = seo.title ? `${seo.title} | ${SITE_NAME}` : SITE_TITLE;
 
   const base: Metadata = {
     title: seo.title,
@@ -154,7 +153,7 @@ export function pageMetadata(path: string, overrides?: Metadata): Metadata {
       title: ogTitle,
       description: seo.description,
       url,
-      siteName: "Svayatta",
+      siteName: SITE_NAME,
       locale: "en_IN",
       type: "website",
       images: [
@@ -162,7 +161,7 @@ export function pageMetadata(path: string, overrides?: Metadata): Metadata {
           url: "/og-image.png",
           width: 1200,
           height: 630,
-          alt: seo.title ? `${seo.title} · Svayatta` : "Svayatta",
+          alt: ogTitle,
         },
       ],
     },

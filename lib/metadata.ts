@@ -3,14 +3,18 @@ import type { Metadata } from "next";
 export const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL ?? "https://svayatta.in";
 
+/** The site's title and name, kept from the original site: don't change. */
+export const SITE_TITLE = "Dzen Svayatta - Quality with Clarity";
+export const SITE_NAME = "DZen";
+
 export const siteMetadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   verification: {
     google: "Z43gnpcBFpd17f-oAg8wk084P",
   },
   title: {
-    default: "Svayatta | Custom software, AI & automation for Indian businesses",
-    template: "%s · Svayatta",
+    default: SITE_TITLE,
+    template: `%s | ${SITE_NAME}`,
   },
   description:
     "Custom software, AI agents and workflow automation for Indian businesses, from a Mumbai studio. Scoped with you, shipped in small steps.",
@@ -33,8 +37,8 @@ export const siteMetadata: Metadata = {
     type: "website",
     locale: "en_IN",
     url: BASE_URL,
-    siteName: "Svayatta",
-    title: "Svayatta | Custom software, AI & automation for Indian businesses",
+    siteName: SITE_NAME,
+    title: SITE_TITLE,
     description:
       "Custom software, AI agents and workflow automation for Indian businesses, from a Mumbai studio. Scoped with you, shipped in small steps.",
     images: [
@@ -42,13 +46,13 @@ export const siteMetadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Svayatta — Custom software, AI & automation for Indian businesses",
+        alt: SITE_TITLE,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Svayatta | Custom software, AI & automation for Indian businesses",
+    title: SITE_TITLE,
     description:
       "Custom software, AI agents and workflow automation for Indian businesses, from a Mumbai studio. Scoped with you, shipped in small steps.",
     images: ["/og-image.png"],
