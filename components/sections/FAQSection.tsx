@@ -1,10 +1,9 @@
 import { em, plain } from "@/lib/rich";
+import { SITE } from "@/lib/site";
 import type { FaqItem } from "@/types/content";
 import { Accordion } from "@/components/ui/Accordion";
 import { Section } from "@/components/ui/Section";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-
-const WHATSAPP_HREF = "https://wa.me/919152035526";
 
 interface FAQSectionProps {
   items: FaqItem[];
@@ -22,7 +21,7 @@ export function FAQSection({
   items,
   eyebrow,
   title = "Frequently\n*asked*",
-  action = { label: "Got questions?", href: WHATSAPP_HREF },
+  action = { label: "Got questions?", href: SITE.whatsapp.href },
   id = "faq",
   jsonLd = true,
 }: FAQSectionProps) {

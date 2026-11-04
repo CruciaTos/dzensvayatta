@@ -21,9 +21,9 @@ export interface SiteConfig {
   email: string; // "info@svayatta.in"
   founders: { name: string; role: string; email: string; linkedin?: string }[];
   whatsapp: {
-    display: string; // "+91 91520 35526"
-    e164: string; // "919152035526"
-    href: string; // "https://wa.me/919152035526"
+    display: string; // "+91 93215 59182"
+    e164: string; // "919321559182"
+    href: string; // "https://wa.me/919321559182"
     chatHref: string; // same, with the prefilled ?text=
   };
   socials: { label: string; href: string }[];

@@ -22,11 +22,11 @@ export const SITE: SiteConfig = {
     },
   ],
   whatsapp: {
-    display: "+91 91520 35526",
-    e164: "919152035526",
-    href: "https://wa.me/919152035526",
+    display: "+91 93215 59182",
+    e164: "919321559182",
+    href: "https://wa.me/919321559182",
     chatHref:
-      "https://wa.me/919152035526?text=Hi%20Svayatta%2C%20I%27d%20like%20to%20talk%20about%20a%20project.",
+      "https://wa.me/919321559182?text=Hi%20Svayatta%2C%20I%27d%20like%20to%20talk%20about%20a%20project.",
   },
   socials: [
     {
