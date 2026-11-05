@@ -5,7 +5,8 @@ import { PillButton } from "@/components/ui/PillButton";
 import { TextLink } from "@/components/ui/TextLink";
 import { HeroVideo } from "./HeroVideo";
 import { HeroBackdrop } from "./HeroBackdrop";
-import DitherVeilWord, { type VeilWord } from "@/components/reactbits/DitherVeilWord";
+import type { VeilWord } from "@/components/reactbits/DitherVeilWord";
+import { HeroName } from "./HeroName";
 
 type HeroMedia =
   | { type: "image"; src: string; alt?: string }
@@ -19,6 +20,45 @@ interface HeroProps {
    * The bottom-left 55% of the frame must stay calm so the headline reads.
    */
   media?: HeroMedia;
+  /**
+   * Leave the background out (photo, video or slats, and the readability
+   * shade): the page draws <HeroBackground> itself, behind the hero, so it can
+   * stay full-bleed while the hero settles back (HeroDepth's `backdrop`).
+   */
+  detachedBackground?: boolean;
+}
+
+/**
+ * The hero's background: photo, video or the moving slats on the night
+ * gradient, the film grain, and the shade that keeps the headline readable.
+ */
+export function HeroBackground({ media }: { media?: HeroMedia }) {
+  return (
+    <div className="on-night bg-poster absolute inset-0 overflow-hidden">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 scale-[1.02] transition-transform duration-[12000ms] ease-expo [@media(hover:hover)]:group-hover/hero:scale-[1.06]"
+      >
+        {media?.type === "image" && (
+          <Image src={media.src} alt="" fill priority sizes="100vw" className="object-cover" />
+        )}
+        {media?.type === "video" && (
+          <HeroVideo src={media.src} poster={media.poster} className="absolute inset-0 size-full object-cover" />
+        )}
+        {!media && (
+          <>
+            <div className="absolute inset-0 bg-night bg-[radial-gradient(ellipse_60%_55%_at_80%_12%,rgba(108,180,240,0.16),transparent_62%),radial-gradient(ellipse_55%_45%_at_96%_88%,rgba(11,92,130,0.28),transparent_70%),radial-gradient(ellipse_70%_60%_at_0%_100%,rgba(11,92,130,0.18),transparent_70%)]" />
+            <HeroBackdrop />
+          </>
+        )}
+      </div>
+      {/* Keeps the headline readable over the photo, video or slats. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(6,26,61,0.45)_0%,rgba(6,26,61,0.15)_38%,rgba(6,26,61,0.70)_76%,rgba(6,26,61,0.94)_100%)]"
+      />
+    </div>
+  );
 }
 
 const SOCIALS = [
@@ -46,35 +86,17 @@ const NAME_WORDS: VeilWord[] = [
  * thing. The offer (a small H1), two small CTAs and the meta bar sit quietly
  * along the bottom.
  */
-export function Hero({ media }: HeroProps) {
+export function Hero({ media, detachedBackground = false }: HeroProps) {
   return (
     <section
       aria-labelledby="hero-title"
-      className="on-night bg-poster group/hero relative isolate h-[100svh] min-h-[640px] max-h-[960px] overflow-hidden"
+      className={cn(
+        "on-night bg-poster group/hero relative isolate h-[100svh] min-h-[640px] max-h-[960px] overflow-hidden",
+        // The background is drawn behind it: keep the poster's text colours, drop its paint and grain.
+        detachedBackground && "bg-transparent bg-none after:hidden"
+      )}
     >
-      {/* Background */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 scale-[1.02] transition-transform duration-[12000ms] ease-expo [@media(hover:hover)]:group-hover/hero:scale-[1.06]"
-      >
-        {media?.type === "image" && (
-          <Image src={media.src} alt="" fill priority sizes="100vw" className="object-cover" />
-        )}
-        {media?.type === "video" && (
-          <HeroVideo src={media.src} poster={media.poster} className="absolute inset-0 size-full object-cover" />
-        )}
-        {!media && (
-          <>
-            <div className="absolute inset-0 bg-night bg-[radial-gradient(ellipse_60%_55%_at_80%_12%,rgba(108,180,240,0.16),transparent_62%),radial-gradient(ellipse_55%_45%_at_96%_88%,rgba(11,92,130,0.28),transparent_70%),radial-gradient(ellipse_70%_60%_at_0%_100%,rgba(11,92,130,0.18),transparent_70%)]" />
-            <HeroBackdrop />
-          </>
-        )}
-      </div>
-      {/* Keeps the headline readable over the photo, video or slats. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(6,26,61,0.45)_0%,rgba(6,26,61,0.15)_38%,rgba(6,26,61,0.70)_76%,rgba(6,26,61,0.94)_100%)]"
-      />
+      {!detachedBackground && <HeroBackground media={media} />}
 
       {/* The name, big in the middle: every few seconds it swaps between
           English and Marathi, a burst sweeping across and the letters
@@ -83,7 +105,7 @@ export function Hero({ media }: HeroProps) {
         aria-hidden="true"
         className={cn("pointer-events-none absolute inset-x-0 top-1/2 flex -translate-y-1/2 justify-center", GUTTER)}
       >
-        <DitherVeilWord words={NAME_WORDS} inkOpacity={0.94} className="h-[min(19vw,34svh)] w-full" />
+        <HeroName words={NAME_WORDS} inkOpacity={0.94} className="h-[min(19vw,34svh)] w-full" />
       </div>
 
       {/* Everything else stays small and quiet, on one line above the meta bar. */}

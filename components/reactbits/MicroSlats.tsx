@@ -64,6 +64,8 @@ export interface MicroSlatsProps extends Partial<WaveValues> {
   intro?: boolean;
   introDuration?: number;
   paused?: boolean;
+  /** Svayatta: cap on frames per second after the intro (0 = every display refresh). */
+  maxFps?: number;
   mask?: SlatMask;
   maskStrength?: number;
   /** A soft band of light that crosses left to right on a loop (0 = off). */
@@ -91,6 +93,7 @@ interface Settings extends WaveValues {
   intro: boolean;
   introDuration: number;
   paused: boolean;
+  maxFps: number;
   maskStrength: number;
   sweep: number;
   sweepPeriod: number;
@@ -510,6 +513,7 @@ const MicroSlats = ({
   intro = true,
   introDuration = 1.5,
   paused = false,
+  maxFps = 0,
   mask,
   maskStrength = 0.6,
   sweep = 0,
@@ -561,6 +565,7 @@ const MicroSlats = ({
       intro,
       introDuration,
       paused,
+      maxFps,
       maskStrength,
       sweep,
       sweepPeriod
@@ -930,6 +935,12 @@ const MicroSlats = ({
       raf = 0;
       if (!alive) return;
       const s = settingsRef.current;
+      // Svayatta: at most `maxFps` frames a second once the intro is over (a
+      // slow swell doesn't need every display refresh; half the GPU work at 30).
+      if (s && s.maxFps > 0 && introClock >= 1 && now - last < 1000 / s.maxFps - 4) {
+        raf = requestAnimationFrame(frame);
+        return;
+      }
       const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
       last = now;
       if (!s) return;

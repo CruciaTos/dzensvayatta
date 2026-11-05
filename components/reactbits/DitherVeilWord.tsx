@@ -39,6 +39,8 @@ export interface DitherVeilWordProps {
   swapMs?: number;
   introMs?: number;
   className?: string;
+  /** Svayatta: hold still (as if off screen), e.g. while something covers it. */
+  paused?: boolean;
 }
 
 const vertex = `#version 300 es
@@ -162,9 +164,18 @@ export default function DitherVeilWord({
   swapMs = 1600,
   introMs = 1200,
   className = "",
+  paused = false,
 }: DitherVeilWordProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [fallback, setFallback] = useState(false);
+  const pausedRef = useRef(paused);
+  // Set by the effect below: re-checks whether it should be running.
+  const syncRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    pausedRef.current = paused;
+    syncRef.current?.();
+  }, [paused]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -307,10 +318,12 @@ export default function DitherVeilWord({
       raf = requestAnimationFrame(tick);
     };
 
-    // Pause off screen; when it comes back, wait out a fresh hold before the next swap.
-    const io = new IntersectionObserver(([entry]) => {
+    // Pause off screen (or when paused); when it comes back, wait out a fresh
+    // hold before the next swap.
+    let onScreen = true;
+    const sync = () => {
       const was = visible;
-      visible = entry.isIntersecting;
+      visible = onScreen && !pausedRef.current;
       if (visible === was) return;
       if (!visible) {
         clearTimers();
@@ -328,8 +341,13 @@ export default function DitherVeilWord({
       } else if (started && phase === "hold") {
         enterHold(performance.now());
       }
+    };
+    const io = new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+      sync();
     });
     io.observe(container);
+    syncRef.current = sync;
 
     const ro = new ResizeObserver(layout);
     ro.observe(container);
@@ -362,6 +380,7 @@ export default function DitherVeilWord({
     });
 
     return () => {
+      syncRef.current = null;
       clearTimers();
       io.disconnect();
       ro.disconnect();

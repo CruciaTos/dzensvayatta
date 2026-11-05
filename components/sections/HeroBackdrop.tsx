@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { useHeroCovered } from "@/lib/heroCover";
 
 // WebGL (ogl); loaded after the page is idle so it never delays the headline.
 const MicroSlats = dynamic(() => import("@/components/reactbits/MicroSlats"), { ssr: false });
@@ -33,6 +34,8 @@ const DZEN_MASK = {
 export function HeroBackdrop({ className }: { className?: string }) {
   const [ready, setReady] = useState(false);
   const [shown, setShown] = useState(false);
+  // Stop drawing while the sheet covers the hero.
+  const covered = useHeroCovered();
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -72,6 +75,9 @@ export function HeroBackdrop({ className }: { className?: string }) {
         slatHeight={24}
         gap={3}
         interactive={false}
+        paused={covered}
+        // A slow swell: 30 frames a second is plenty, and half the GPU work.
+        maxFps={30}
         mask={DZEN_MASK}
         maskStrength={0.8}
         sweep={0.8}

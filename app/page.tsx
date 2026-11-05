@@ -1,6 +1,6 @@
 import type { Viewport } from "next";
 import { HOME_FAQ } from "@/lib/faq";
-import { Hero } from "@/components/sections/Hero";
+import { Hero, HeroBackground } from "@/components/sections/Hero";
 import { ValuesMarquee } from "@/components/sections/ValuesMarquee";
 import { WeAreSvayatta } from "@/components/sections/WeAreSvayatta";
 import { Process } from "@/components/sections/Process";
@@ -20,8 +20,9 @@ export const viewport: Viewport = {
 export default function HomePage() {
   return (
     <>
-      {/* Depth: the hero stays pinned and settles back while the paper sheet slides over it. */}
-      <HeroDepth hero={<Hero />}>
+      {/* Depth: the hero stays pinned and settles back while the paper sheet slides over it.
+          Its background (the slats) sits behind it, full-bleed, so it reaches the edges throughout. */}
+      <HeroDepth hero={<Hero detachedBackground />} backdrop={<HeroBackground />}>
         <ValuesMarquee />
         {/* Pinned scroll scene: "We are Svayatta" decodes, turns white on the footage, then the
             camera flies into the "t" and lands on the manifesto's split (panel left, page right). */}
@@ -38,7 +39,7 @@ export default function HomePage() {
       <Process />
 
       {/* Stacked cards: each testimonial slides over the last, which recedes. */}
-      <ClientVoices />
+      <ClientVoices overBackdrop />
 
       <FAQSection items={HOME_FAQ} />
 
