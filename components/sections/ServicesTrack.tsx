@@ -389,6 +389,7 @@ export function ServicesTrack({ handoff = false }: { handoff?: boolean }) {
             fit="portrait"
             cardHeight={CARD_HEIGHT}
             centerScale={CENTER_SCALE}
+            sideScale={0.8}
             centerMinWidth={CENTER_MIN_WIDTH}
             anchorLeft
             centerY={CENTER_Y}
@@ -396,7 +397,7 @@ export function ServicesTrack({ handoff = false }: { handoff?: boolean }) {
             // at the other, and their shadows need space to fade.
             bleedTop={180}
             bleedBottom={140}
-            bend={0.24}
+            bend={0.18}
             // The side cards bend a little sooner, in true colour: no rainbow
             // split at their edges (the card glass carries the effect).
             lensWidth={0.66}
