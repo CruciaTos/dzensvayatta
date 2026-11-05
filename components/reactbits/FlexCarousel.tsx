@@ -285,8 +285,6 @@ uniform vec3 uPlaceholder;
 // Svayatta: 0 = the card, 1 = its soft shadow (drawn first, on a larger quad).
 uniform float uMode;
 uniform vec2 uResolution;
-// Svayatta: a per-card number (0–1) that picks where its rainbow glints sit.
-uniform float uSeed;
 in vec2 vUv;
 in vec2 vLocal;
 out vec4 fragColor;
@@ -303,6 +301,22 @@ float shadowFalloff(float d, float blur) {
 // Lightens toward white without clipping (a screen blend).
 vec3 lighten(vec3 c, float amount) {
   return c + (1.0 - c) * clamp(amount, 0.0, 1.0);
+}
+
+// Outward normal of the rounded box at p (for the glass rim's slope).
+vec2 boxNormal(vec2 p, vec2 b, float r) {
+  vec2 q = abs(p) - b + r;
+  vec2 n = (q.x > 0.0 && q.y > 0.0) ? normalize(q) : (q.x > q.y ? vec2(1.0, 0.0) : vec2(0.0, 1.0));
+  return n * sign(p + 1e-6);
+}
+
+// The card's artwork at a point (px, from the card centre).
+vec3 cardAt(vec2 p, vec2 scale) {
+  vec2 l = p / uSize + 0.5;
+  vec2 uv = vec2(l.x, 1.0 - l.y);
+  uv = (uv - 0.5) * scale + 0.5;
+  uv.x += uShift * (1.0 - scale.x) * 0.5;
+  return mix(uPlaceholder, texture(tMap, uv).rgb, uReady);
 }
 
 void main() {
@@ -333,51 +347,37 @@ void main() {
   vec3 image = texture(tMap, uv).rgb;
   vec3 color = mix(uPlaceholder, image, uReady);
 
-  // Svayatta: a thick glass slab, after Apple's glass icons. The edge is a
-  // rounded bevel (bright lip, a darker band of glass depth, then the face),
-  // and light enters at two opposite corners: a white-hot core along the bevel
-  // with saturated colour fanning out on either side, cool at one corner and
-  // warm at the other, glowing into the pane. On a light card the colour (not
-  // a white glow) has to carry it. Which corners depends on the card.
+  // Svayatta: clear glass, like React Bits' Fluid Glass lens. The card is a
+  // slab whose rounded rim refracts what's under it: towards the edge the
+  // surface tilts away, so the rim shows the artwork pulled in from further
+  // inside, squeezed and split into thin red/blue fringes. Then a crisp dark
+  // edge, a Fresnel brightening and two small highlights where the light hits.
   float inside = -sd;
-  float B = clamp(min(uSize.x, uSize.y) * 0.05, 10.0, 22.0);
-  float lip = exp(-pow((inside - 0.9) / 0.9, 2.0));
-  float depthBand = exp(-pow((inside - B * 0.85) / (B * 0.45), 2.0));
-  // The whole bevel reads a shade deeper (thick glass), so light on it shows.
-  float bevel = 1.0 - smoothstep(B * 0.9, B * 1.4, inside);
-  color = mix(color, color * vec3(0.86, 0.90, 0.97), bevel * 0.45);
-  color = lighten(color, lip * 0.55);
-  color *= 1.0 - depthBand * 0.08;
-  color *= 1.0 - (1.0 - smoothstep(0.0, 1.0, inside)) * 0.12;
-
-  float k = floor(uSeed * 4.0);
-  vec2 cdir = vec2(mod(k, 2.0) < 0.5 ? 1.0 : -1.0, k < 1.5 ? -1.0 : 1.0);
-  vec2 apex = cdir * (uSize * 0.5 - vec2(r * 0.3));
-  float L = min(uSize.x, uSize.y) * 0.62;
-  float d1 = length(vLocal - apex) / L;
-  float d2 = length(vLocal + apex) / (L * 0.85);
-  float lit1 = exp(-d1 * d1 * 3.0);
-  float lit2 = exp(-d2 * d2 * 3.2) * 0.9;
-  // Across the bevel: a wide white-hot core, with colour only as thin fringes
-  // either side of it (as light splits at the edge of thick glass).
-  float x = (inside - B * 0.45) / B;
-  float core = exp(-x * x * 15.0);
-  float fringeIn = exp(-pow((x - 0.46) / 0.21, 2.0));
-  float fringeOut = exp(-pow((x + 0.30) / 0.15, 2.0));
-  vec3 coolIn = mix(vec3(0.30, 0.86, 1.0), vec3(0.22, 0.48, 1.0), smoothstep(0.0, 0.9, d1));
-  vec3 coolOut = vec3(1.0, 0.42, 0.76);
-  vec3 warmIn = mix(vec3(1.0, 0.86, 0.30), vec3(1.0, 0.52, 0.18), smoothstep(0.0, 0.9, d2));
-  vec3 warmOut = vec3(0.58, 0.40, 1.0);
-  color = mix(color, coolIn, clamp(lit1 * fringeIn * 1.0, 0.0, 1.0));
-  color = mix(color, coolOut, clamp(lit1 * fringeOut * 0.85, 0.0, 1.0));
-  color = mix(color, warmIn, clamp(lit2 * fringeIn * 1.0, 0.0, 1.0));
-  color = mix(color, warmOut, clamp(lit2 * fringeOut * 0.85, 0.0, 1.0));
-  color = mix(color, vec3(1.0), clamp((lit1 + lit2) * core * 0.96, 0.0, 1.0));
-  // The light glows into the glass from those corners, white with a tint.
-  float bleed = exp(-inside / (B * 6.0));
-  color = lighten(color, (lit1 + lit2 * 0.8) * bleed * 0.5);
-  color = mix(color, vec3(0.50, 0.82, 1.0), lit1 * bleed * 0.16);
-  color = mix(color, vec3(1.0, 0.74, 0.50), lit2 * bleed * 0.13);
+  float B = clamp(min(uSize.x, uSize.y) * 0.05, 12.0, 22.0);
+  float t = clamp(1.0 - inside / B, 0.0, 1.0);
+  vec2 n = boxNormal(vLocal, uSize * 0.5, r);
+  if (t > 0.0) {
+    // The rim bends the artwork towards the edge, kept just short of where
+    // it would fold over (bend rate < 1): past that, text near the edge
+    // shows up mirrored and duplicated, which reads as a glitch on a card.
+    float bend = B * 0.47 * t * t;
+    float split = 0.38 * t;
+    float rc = cardAt(vLocal - n * bend * (1.0 - split), scale).r;
+    float gc = cardAt(vLocal - n * bend, scale).g;
+    float bc = cardAt(vLocal - n * bend * (1.0 + split), scale).b;
+    color = vec3(rc, gc, bc);
+  }
+  // Fresnel: glass brightens as it turns edge-on.
+  color = lighten(color, pow(t, 3.0) * 0.38);
+  // The rim's far side, seen edge-on, sits darker; plus a crisp outline.
+  color *= 1.0 - exp(-pow((t - 0.9) / 0.07, 2.0)) * 0.10;
+  color *= 1.0 - (1.0 - smoothstep(0.0, 1.3, inside)) * 0.28;
+  // Highlights on the rim where it faces the light (top-left), and a fainter
+  // bounce opposite.
+  float rimBand = exp(-pow((t - 0.5) / 0.24, 2.0));
+  float key = pow(max(dot(n, normalize(vec2(-0.55, -0.85))), 0.0), 8.0);
+  float bounce = pow(max(dot(n, normalize(vec2(0.55, 0.85))), 0.0), 10.0);
+  color = lighten(color, rimBand * (key * 0.75 + bounce * 0.3));
 
   float alpha = mask * uAlpha;
   fragColor = vec4(color * alpha, alpha);
@@ -613,8 +613,7 @@ const FlexCarousel = ({
         uShift: { value: 0 },
         uDpr: { value: 1 },
         uPlaceholder: { value: [0.5, 0.5, 0.5] },
-        uMode: { value: 0 },
-        uSeed: { value: 0 }
+        uMode: { value: 0 }
       }
     });
     cardProgram.setBlendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
@@ -1204,11 +1203,8 @@ const FlexCarousel = ({
           if (cleanCentre && draw === centre) continue;
           drawShadow(draw, draw.alpha, true);
         }
-        // Each card's glints sit at their own corners (golden-ratio spread).
-        const seedOf = (i: number) => (i * 0.618034 + 0.13) % 1;
         for (const draw of draws) {
           const slot = slots[draw.i];
-          cardProgram.uniforms.uSeed.value = seedOf(draw.i);
           if (cleanCentre && draw === centre) {
             instances.push({
               index: draw.i,
@@ -1269,7 +1265,6 @@ const FlexCarousel = ({
         if (centre && cleanCentre) {
           const slot = slots[centre.i];
           drawShadow(centre, centre.alpha * effects.sceneAlpha, false);
-          cardProgram.uniforms.uSeed.value = seedOf(centre.i);
           cardProgram.uniforms.tMap.value = slot.texture;
           cardProgram.uniforms.uRect.value = [centre.x, centre.y, centre.cw + 2, centre.ch + 2];
           cardProgram.uniforms.uSize.value = [centre.cw, centre.ch];
