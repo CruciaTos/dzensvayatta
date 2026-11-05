@@ -156,14 +156,23 @@ function drawCard(service: Service, i: number, fonts: { display: string; serif: 
   }
   y -= 26;
 
-  // The service name: the first thing anyone reads.
-  ctx.font = `600 108px ${fonts.display}`;
-  ctx.letterSpacing = "-3px";
+  // The service name: the first thing anyone reads, so as big as it can go.
+  // Starts large and steps down only until its longest word fits the column
+  // and the whole name fits in three lines.
   ctx.fillStyle = "#0a1830";
-  const title = wrap(ctx, service.title, textW, 3);
+  let size = 140;
+  let title: string[] = [];
+  for (; size >= 96; size -= 4) {
+    ctx.font = `600 ${size}px ${fonts.display}`;
+    ctx.letterSpacing = `${-Math.round(size / 36)}px`;
+    const longest = Math.max(...service.title.split(/\s+/).map((w) => ctx.measureText(w).width));
+    title = wrap(ctx, service.title, textW, 3);
+    if (longest <= textW && wrap(ctx, service.title, textW, 99).length <= 3) break;
+  }
+  const lead = Math.round(size * 0.98);
   for (let k = title.length - 1; k >= 0; k--) {
     ctx.fillText(title[k], PAD, y);
-    y -= 108;
+    y -= lead;
   }
 
   // The right part, seen only on the wider centre card: what it covers.
@@ -288,7 +297,7 @@ export function ServicesTrack({ handoff = false }: { handoff?: boolean }) {
     }
 
     Promise.all([
-      document.fonts?.load(`600 108px ${fonts.display}`),
+      document.fonts?.load(`600 140px ${fonts.display}`),
       document.fonts?.load(`800 86px ${fonts.display}`),
       document.fonts?.load(`italic 400 50px ${fonts.serif}`),
       document.fonts?.load(`400 37px ${fonts.sans}`),
