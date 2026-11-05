@@ -60,8 +60,6 @@ export interface FlexCarouselProps extends Partial<PresetValues> {
   centerScale?: number;
   /** The centred card is at least this share of the carousel's width (0–1). */
   centerMinWidth?: number;
-  /** Size of the cards away from the centre relative to their natural size (1 = unchanged). */
-  sideScale?: number;
   /** Frame every card's artwork from its left edge (instead of the centre, with parallax). */
   anchorLeft?: boolean;
   /** Svayatta: where the row of cards sits, top to bottom, as a share of the height (0.5 = centred). */
@@ -92,7 +90,6 @@ interface Settings extends PresetValues {
   captureWheel: boolean;
   centerScale: number;
   centerMinWidth: number;
-  sideScale: number;
   anchorLeft: boolean;
   centerY: number;
   bleedTop: number;
@@ -534,7 +531,6 @@ const FlexCarousel = ({
   ariaLabel = 'Image carousel',
   centerScale = 1,
   centerMinWidth = 0,
-  sideScale = 1,
   anchorLeft = false,
   centerY = 0.5,
   bleedTop = 0,
@@ -586,7 +582,6 @@ const FlexCarousel = ({
       captureWheel,
       centerScale,
       centerMinWidth,
-      sideScale,
       anchorLeft,
       centerY,
       bleedTop,
@@ -1173,7 +1168,7 @@ const FlexCarousel = ({
         // Svayatta: the centred card widens as it arrives (its height stays),
         // to at least `centerMinWidth` of the carousel, and every other card is
         // pushed aside by the extra width so nothing overlaps.
-        const placed: { i: number; rel: number; w: number; widen: number; extra: number; side: number }[] = [];
+        const placed: { i: number; rel: number; w: number; widen: number; extra: number }[] = [];
         for (let i = 0; i < n; i++) {
           const w = m.widths[i];
           const baseRel = wrap(m.centers[i] - pos, m.loop);
@@ -1183,13 +1178,11 @@ const FlexCarousel = ({
             const near = 1 - clamp01(Math.abs(rel) / (w + s.gap));
             const target = Math.max(s.centerScale, (width * s.centerMinWidth) / w);
             const widen = 1 + (target - 1) * easeInOut(near);
-            // Cards away from the centre are drawn smaller, so only the centre one is big.
-            const side = 1 - (1 - s.sideScale) * (1 - easeInOut(near));
-            placed.push({ i, rel, w, widen, extra: (w * shrink * (widen - 1)) / 2, side });
+            placed.push({ i, rel, w, widen, extra: (w * shrink * (widen - 1)) / 2 });
           }
         }
         for (const c of placed) {
-          const { i, rel, w, widen, side } = c;
+          const { i, rel, w, widen } = c;
           let push = 0;
           for (const d of placed) {
             if (d === c || d.extra <= 0) continue;
@@ -1198,7 +1191,7 @@ const FlexCarousel = ({
           {
             const fx = effects.card ? effects.card(rel) : null;
             let x = homeX + rel + push + (fx ? fx.x : 0);
-            let scale = shrink * side * (fx ? fx.scale : 1);
+            let scale = shrink * (fx ? fx.scale : 1);
             let alpha = fx ? fx.alpha : 1;
             if (focusAmount > 0) {
               if (i === focus.index && Math.abs(rel) < w) {
