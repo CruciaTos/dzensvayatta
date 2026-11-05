@@ -285,8 +285,8 @@ uniform vec3 uPlaceholder;
 // Svayatta: 0 = the card, 1 = its soft shadow (drawn first, on a larger quad).
 uniform float uMode;
 uniform vec2 uResolution;
-// Svayatta: progress of a shine sweeping across the card, 0–1; outside that, none.
-uniform float uShine;
+// Svayatta: a per-card number (0–1) that picks where its rainbow glints sit.
+uniform float uSeed;
 in vec2 vUv;
 in vec2 vLocal;
 out vec4 fragColor;
@@ -348,22 +348,24 @@ void main() {
   float gloss = (1.0 - smoothstep(0.0, 0.42, local.y)) * 0.10;
   gloss += exp(-pow((local.x - 0.18) / 0.32, 2.0) - pow((local.y - 0.04) / 0.10, 2.0)) * 0.16;
   color = lighten(color, gloss);
-  // Now and then a shine sweeps across on a slant.
-  if (uShine >= 0.0 && uShine <= 1.0) {
-    float t = uShine * uShine * (3.0 - 2.0 * uShine);
-    float u = local.x * cardAspect + (1.0 - local.y) * 0.55;
-    float c = mix(-0.6, cardAspect + 1.1, t);
-    float fade = sin(3.14159 * uShine);
-    // On light glass a white wash barely shows, so the shine is a glint: a
-    // bright core that lights up whatever it crosses, with a faint prism on
-    // either side (sky ahead, lavender behind).
-    float d = u - c;
-    float core = exp(-pow(d / 0.05, 2.0));
-    float glow = exp(-pow(d / 0.22, 2.0));
-    color = mix(color, color * vec3(0.86, 0.93, 1.0), exp(-pow((d - 0.16) / 0.07, 2.0)) * 0.55 * fade);
-    color = mix(color, color * vec3(0.95, 0.89, 1.0), exp(-pow((d + 0.16) / 0.07, 2.0)) * 0.45 * fade);
-    color = lighten(color, (core * 0.6 + glow * 0.22) * fade);
-  }
+  // Iridescent edge, like light split by thick glass: rainbow glints that
+  // sit on the rim, gathered at two opposite corners (which two depends on
+  // the card), fading inward. Still, not animated.
+  float k = floor(uSeed * 4.0);
+  vec2 corner = vec2(mod(k, 2.0) < 0.5 ? 1.0 : -1.0, k < 1.5 ? -1.0 : 1.0) * uSize * 0.5;
+  float span = min(uSize.x, uSize.y) * 0.72;
+  float near1 = length(vLocal - corner) / span;
+  float near2 = length(vLocal + corner) / (span * 0.8);
+  float atCorner = exp(-near1 * near1 * 2.2) + 0.7 * exp(-near2 * near2 * 2.6);
+  // Hue runs around the rim and shifts a little with depth, so it bands like a prism.
+  float hue = atan(vLocal.y, vLocal.x) / 6.28318 * 1.6 + inside / 30.0 + uSeed * 2.7;
+  vec3 spectrum = 0.5 + 0.5 * cos(6.28318 * (hue + vec3(0.0, 0.33, 0.67)));
+  spectrum = mix(spectrum, vec3(1.0), 0.18);
+  float onRim = exp(-inside / 6.5);
+  float spill = exp(-inside / 26.0);
+  color = mix(color, spectrum, clamp(atCorner * (onRim * 0.8 + spill * 0.12), 0.0, 1.0));
+  // A white-hot line right at the edge where the colour is strongest.
+  color = lighten(color, atCorner * exp(-inside / 1.4) * 0.55);
 
   float alpha = mask * uAlpha;
   fragColor = vec4(color * alpha, alpha);
@@ -600,7 +602,7 @@ const FlexCarousel = ({
         uDpr: { value: 1 },
         uPlaceholder: { value: [0.5, 0.5, 0.5] },
         uMode: { value: 0 },
-        uShine: { value: -1 }
+        uSeed: { value: 0 }
       }
     });
     cardProgram.setBlendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
@@ -653,22 +655,6 @@ const FlexCarousel = ({
     let mode = 'spring';
     let wheelAt = 0;
     let raf = 0;
-    // Svayatta: each card gets a shine now and then, at random times.
-    const SHINE_DURATION = 1.4;
-    const shineAt: number[] = [];
-    let shineTimer: ReturnType<typeof setTimeout> | undefined;
-    let shiningFlag = false;
-    const nextShine = (now: number) => now / 1000 + 3 + Math.random() * 6;
-    const shineOf = (i: number, now: number) => {
-      if (reducedMotion) return -1;
-      if (shineAt[i] === undefined) shineAt[i] = nextShine(now) - 2;
-      const p = (now / 1000 - shineAt[i]) / SHINE_DURATION;
-      if (p > 1) {
-        shineAt[i] = nextShine(now);
-        return -1;
-      }
-      return p;
-    };
     let last = performance.now();
     let visible = true;
     let alive = true;
@@ -676,6 +662,9 @@ const FlexCarousel = ({
     let activeIndex = -1;
     let interactedAt = -Infinity;
     let autoplayAt = performance.now();
+    // Svayatta: while idle between autoplay steps, sleep on a timer instead of
+    // redrawing every frame just to watch the clock.
+    let autoplayTimer: ReturnType<typeof setTimeout> | undefined;
     let hasFocus = false;
     let deform = 0;
     let deformVel = 0;
@@ -1052,7 +1041,6 @@ const FlexCarousel = ({
         autoplayAt = now;
         step(m, 1);
       }
-      if (s.autoplay && !reducedMotion) animating = true;
 
       const travel = Math.abs(pos - lastPos) / dt;
       lastPos = pos;
@@ -1204,12 +1192,11 @@ const FlexCarousel = ({
           if (cleanCentre && draw === centre) continue;
           drawShadow(draw, draw.alpha, true);
         }
-        let shining = false;
+        // Each card's glints sit at their own corners (golden-ratio spread).
+        const seedOf = (i: number) => (i * 0.618034 + 0.13) % 1;
         for (const draw of draws) {
           const slot = slots[draw.i];
-          const shine = shineOf(draw.i, now);
-          if (shine >= 0) shining = true;
-          cardProgram.uniforms.uShine.value = shine;
+          cardProgram.uniforms.uSeed.value = seedOf(draw.i);
           if (cleanCentre && draw === centre) {
             instances.push({
               index: draw.i,
@@ -1238,7 +1225,6 @@ const FlexCarousel = ({
             y1: draw.y + draw.ch / 2
           });
         }
-        shiningFlag = shining;
         if (first) {
           renderer.bindFramebuffer(target);
           gl.viewport(0, 0, target.width, target.height);
@@ -1271,7 +1257,7 @@ const FlexCarousel = ({
         if (centre && cleanCentre) {
           const slot = slots[centre.i];
           drawShadow(centre, centre.alpha * effects.sceneAlpha, false);
-          cardProgram.uniforms.uShine.value = shineOf(centre.i, now);
+          cardProgram.uniforms.uSeed.value = seedOf(centre.i);
           cardProgram.uniforms.tMap.value = slot.texture;
           cardProgram.uniforms.uRect.value = [centre.x, centre.y, centre.cw + 2, centre.ch + 2];
           cardProgram.uniforms.uSize.value = [centre.cw, centre.ch];
@@ -1298,22 +1284,13 @@ const FlexCarousel = ({
         else container.removeAttribute('data-hover');
       }
 
-      // Svayatta: keep drawing while a shine is crossing a card; when idle,
-      // wake up in time for the next one.
-      const nowS = now / 1000;
-      const shiningNow = shiningFlag;
-      if (visible && (animating || waiting || dirty || pointer.down || shiningNow)) {
-        if (shiningNow) dirty = true;
+      clearTimeout(autoplayTimer);
+      if (visible && (animating || waiting || dirty || pointer.down)) {
         raf = requestAnimationFrame(frame);
-      } else if (visible && !reducedMotion && shineAt.length) {
-        clearTimeout(shineTimer);
-        const soonest = Math.min(...shineAt.filter((t) => t > nowS));
-        if (Number.isFinite(soonest)) {
-          shineTimer = setTimeout(() => {
-            dirty = true;
-            start();
-          }, Math.max(16, (soonest - nowS) * 1000));
-        }
+      } else if (visible && s.autoplay && !reducedMotion) {
+        // Nothing moving: wake up when the next autoplay step is due.
+        const due = Math.max(autoplayAt + s.interval * 1000, interactedAt + 3000);
+        autoplayTimer = setTimeout(start, Math.max(60, due - now + 20));
       }
     };
 
@@ -1548,7 +1525,7 @@ const FlexCarousel = ({
 
     return () => {
       alive = false;
-      clearTimeout(shineTimer);
+      clearTimeout(autoplayTimer);
       visible = false;
       engineRef.current = null;
       cancelAnimationFrame(raf);

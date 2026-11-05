@@ -313,13 +313,25 @@ export function ServicesTrack({ handoff = false }: { handoff?: boolean }) {
         setItems(generateCards());
       });
 
+    // Redrawing six large posters is expensive, so only do it when the centre
+    // card's shape really changes (not when a phone's address bar slides in
+    // and out while scrolling, which also fires resize).
+    const artWidth = () => {
+      const stage = stageRef.current;
+      const cw = stage?.clientWidth || window.innerWidth;
+      const ch = stage?.clientHeight || window.innerHeight * 0.86;
+      return Math.max(SAFE, Math.round(H * Math.max(0.75 * CENTER_SCALE, (CENTER_MIN_WIDTH * cw) / (CARD_HEIGHT * ch))));
+    };
+    let drawnWidth = artWidth();
     let resizeTimer: ReturnType<typeof setTimeout>;
     const handleResize = () => {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
-        if (!cancelled) {
-          setItems(generateCards());
-        }
+        if (cancelled) return;
+        const next = artWidth();
+        if (Math.abs(next - drawnWidth) / drawnWidth < 0.04) return;
+        drawnWidth = next;
+        setItems(generateCards());
       }, 250);
     };
     window.addEventListener("resize", handleResize);
