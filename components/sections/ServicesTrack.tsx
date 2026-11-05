@@ -388,10 +388,10 @@ export function ServicesTrack({ handoff = false }: { handoff?: boolean }) {
             anchorLeft
             centerY={CENTER_Y}
             bend={0.24}
-            // A little more glass on the side cards: the lens starts closer in
-            // and splits colour more at the edges (the centre card stays clean).
+            // The side cards bend a little sooner, in true colour: no rainbow
+            // split at their edges (the card glass carries the effect).
             lensWidth={0.66}
-            dispersion={0.6}
+            dispersion={0}
             gap={28}
             radius={24}
             captions={false}
