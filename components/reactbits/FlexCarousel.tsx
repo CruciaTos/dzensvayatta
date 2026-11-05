@@ -353,22 +353,24 @@ void main() {
   // inside, squeezed and split into thin red/blue fringes. Then a crisp dark
   // edge, a Fresnel brightening and two small highlights where the light hits.
   float inside = -sd;
-  float B = clamp(min(uSize.x, uSize.y) * 0.05, 12.0, 22.0);
+  // Sized from the height, so the narrower side cards get the same rim.
+  float B = clamp(min(uSize.y * 0.085, uSize.x * 0.14), 18.0, 40.0);
   float t = clamp(1.0 - inside / B, 0.0, 1.0);
   vec2 n = boxNormal(vLocal, uSize * 0.5, r);
   if (t > 0.0) {
     // The rim bends the artwork towards the edge, kept just short of where
     // it would fold over (bend rate < 1): past that, text near the edge
     // shows up mirrored and duplicated, which reads as a glitch on a card.
-    float bend = B * 0.47 * t * t;
-    // Split into a rainbow: six samples across the spectrum, red bent least,
-    // violet most, each feeding the channels it belongs to. Red can drop to
-    // almost no bend, so the fan is wide without anything folding over.
+    float bend = B * 0.4 * pow(t, 1.5);
+    // Dispersion: split into a rainbow with six samples across the spectrum,
+    // red not bent at all and violet bent 1.6× as far. Each sample's shift
+    // grows slower than the rim itself (rate 1.5 × 0.4 × 1.6 < 1), so nothing
+    // ever folds over into a mirrored copy, however wide the fan.
     vec3 sum = vec3(0.0);
     vec3 weight = vec3(0.0);
     for (int i = 0; i < 6; i++) {
       float k = (float(i) + 0.5) / 6.0;
-      float f = mix(1.0 - 0.95 * t, 1.0 + 0.55 * t, k);
+      float f = 1.6 * k;
       vec3 w = max(1.0 - abs(vec3(k) - vec3(0.12, 0.5, 0.88)) * 2.4, 0.0);
       sum += cardAt(vLocal - n * bend * f, scale) * w;
       weight += w;

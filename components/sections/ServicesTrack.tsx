@@ -44,6 +44,9 @@ const ZOOM = 1.08;
 const SAFE = 880;
 const PAD = 64;
 const PAD_Y = 96;
+// The words stack up from the foot; they start higher than PAD_Y so the last
+// line sits clear of the glass rim's strongest bend (the rim splits colour).
+const PAD_B = 150;
 
 const cssFont = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || "sans-serif";
 
@@ -118,25 +121,27 @@ function drawCard(service: Service, i: number, fonts: { display: string; serif: 
   ctx.font = `600 30px ${fonts.sans}`;
   ctx.letterSpacing = "4px";
   ctx.fillStyle = "#1e5bd6";
-  ctx.fillText(`${service.index} / ${GROUP_LABEL[service.group].toUpperCase()}`, PAD, PAD_Y + 30);
+  // Top label and arrow sit a little lower than PAD_Y, clear of the rim's bend.
+  const TOP = PAD_Y + 26;
+  ctx.fillText(`${service.index} / ${GROUP_LABEL[service.group].toUpperCase()}`, PAD, TOP + 30);
   ctx.fillStyle = "#1e5bd6";
   ctx.beginPath();
-  ctx.arc(SAFE - PAD - 34, PAD_Y + 20, 34, 0, Math.PI * 2);
+  ctx.arc(SAFE - PAD - 34, TOP + 20, 34, 0, Math.PI * 2);
   ctx.fill();
   ctx.strokeStyle = "#ffffff";
   ctx.lineWidth = 3;
   ctx.lineCap = "round";
   ctx.beginPath();
-  ctx.moveTo(SAFE - PAD - 46, PAD_Y + 32);
-  ctx.lineTo(SAFE - PAD - 22, PAD_Y + 8);
-  ctx.moveTo(SAFE - PAD - 40, PAD_Y + 8);
-  ctx.lineTo(SAFE - PAD - 22, PAD_Y + 8);
-  ctx.lineTo(SAFE - PAD - 22, PAD_Y + 26);
+  ctx.moveTo(SAFE - PAD - 46, TOP + 32);
+  ctx.lineTo(SAFE - PAD - 22, TOP + 8);
+  ctx.moveTo(SAFE - PAD - 40, TOP + 8);
+  ctx.lineTo(SAFE - PAD - 22, TOP + 8);
+  ctx.lineTo(SAFE - PAD - 22, TOP + 26);
   ctx.stroke();
 
   // The words, stacked up from the foot: summary, tagline, title.
   const textW = SAFE - PAD * 2;
-  let y = H - PAD_Y;
+  let y = H - PAD_B;
 
   // Supporting line: readable, but quieter than the title and the list.
   ctx.font = `400 37px ${fonts.sans}`;
@@ -197,7 +202,7 @@ function drawCard(service: Service, i: number, fonts: { display: string; serif: 
   const numW = 78;
   const lineH = 52;
   const rows = service.painPoints.map((point) => wrap(ctx, point, colW - numW, 2));
-  let rowBottom = H - PAD_Y;
+  let rowBottom = H - PAD_B;
   const placed: { lines: string[]; base: number }[] = [];
   for (let k = rows.length - 1; k >= 0; k--) {
     const lines = rows[k];
