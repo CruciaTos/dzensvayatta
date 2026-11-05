@@ -19,8 +19,8 @@ import { edgeGone, edgeMask, manifestoEdge, manifestoHandoff, setMask, type Wipe
  * keys, and the cards bend through a liquid lens as they pass the edges. It
  * moves on by itself every few seconds when left alone. The centred card is
  * wider than the rest (at least 30% of the width), always clear (no bend),
- * and its extra width reveals what that service covers. Clicking it opens that service. Each card is a poster drawn in the browser (the
- * brand gradient, index, title, tagline, summary); an "Open …" link under the
+ * and its extra width reveals what that service covers. Clicking it opens that service. Each card is a poster drawn in the browser (a
+ * light surface with blue accents, index, title, tagline, summary); an "Open …" link under the
  * carousel follows the centred card, and screen readers get a plain list.
  */
 
@@ -67,7 +67,10 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, width: number, maxLin
   return lines;
 }
 
-/** One service as a poster: navy-to-cobalt gradient with the palette's glows, then the words. */
+/**
+ * One service as a poster: a pale surface (not a blue fill) with soft cobalt
+ * and sky glows, a faint blue index, and the words in ink with blue accents.
+ */
 function drawCard(service: Service, i: number, fonts: { display: string; serif: string; sans: string }, W: number): string {
   const canvas = document.createElement("canvas");
   canvas.width = W;
@@ -75,11 +78,11 @@ function drawCard(service: Service, i: number, fonts: { display: string; serif: 
   const ctx = canvas.getContext("2d");
   if (!ctx) return "";
 
+  // Light base, a touch deeper than the page's white so the card still reads as a card.
   const base = ctx.createLinearGradient(0, 0, W * 0.4, H);
-  base.addColorStop(0, "#3f7fe0");
-  base.addColorStop(0.38, "#1e5bd6");
-  base.addColorStop(0.7, "#0d3485");
-  base.addColorStop(1, "#061a3d");
+  base.addColorStop(0, "#f7faff");
+  base.addColorStop(0.55, "#eef4fc");
+  base.addColorStop(1, "#e6eefb");
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, W, H);
 
@@ -90,39 +93,36 @@ function drawCard(service: Service, i: number, fonts: { display: string; serif: 
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
   };
-  // The glows swap sides from card to card, so the row reads as one long poster.
+  // Blue lives in the light, not the fill. The glows swap sides from card to
+  // card, so the row reads as one long poster.
   const flip = i % 2 === 1;
-  glow(flip ? SAFE : 0, 0, SAFE * 0.95, "108,180,240", 0.8);
-  glow(flip ? 0 : SAFE, H * 0.18, SAFE * 0.85, "167,183,206", 0.55);
-  glow(SAFE * (flip ? 0.2 : 0.85), H * 0.66, SAFE * 0.6, "126,120,212", 0.45);
-  glow(W * 0.85, H * 0.3, W * 0.45, "108,180,240", 0.35);
-  // Darker toward the foot, where the words sit.
-  const foot = ctx.createLinearGradient(0, H * 0.4, 0, H);
-  foot.addColorStop(0, "rgba(6,26,61,0)");
-  foot.addColorStop(1, "rgba(6,26,61,0.82)");
-  ctx.fillStyle = foot;
-  ctx.fillRect(0, 0, W, H);
+  glow(flip ? SAFE : 0, 0, SAFE * 0.95, "108,180,240", 0.32);
+  glow(flip ? 0 : SAFE, H * 0.18, SAFE * 0.8, "30,91,214", 0.12);
+  glow(SAFE * (flip ? 0.2 : 0.85), H * 0.7, SAFE * 0.6, "108,180,240", 0.18);
+  glow(W * 0.85, H * 0.3, W * 0.45, "30,91,214", 0.08);
 
   ctx.textBaseline = "alphabetic";
 
-  // Big faint index.
+  // Big faint index, in cobalt.
   ctx.font = `800 ${Math.round(H * 0.4)}px ${fonts.display}`;
   ctx.letterSpacing = "-24px";
   ctx.textAlign = "right";
-  ctx.fillStyle = "rgba(255,255,255,0.1)";
+  ctx.fillStyle = "rgba(30,91,214,0.09)";
   ctx.fillText(service.index, SAFE - 36, H * 0.44);
   ctx.textAlign = "left";
 
   // Top label and arrow.
   ctx.font = `600 26px ${fonts.sans}`;
   ctx.letterSpacing = "4px";
-  ctx.fillStyle = "rgba(234,241,251,0.78)";
+  ctx.fillStyle = "#1e5bd6";
   ctx.fillText(`${service.index} / ${GROUP_LABEL[service.group].toUpperCase()}`, PAD, PAD_Y + 30);
-  ctx.strokeStyle = "rgba(234,241,251,0.7)";
-  ctx.lineWidth = 2.5;
+  ctx.fillStyle = "#1e5bd6";
   ctx.beginPath();
   ctx.arc(SAFE - PAD - 34, PAD_Y + 20, 34, 0, Math.PI * 2);
-  ctx.stroke();
+  ctx.fill();
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 3;
+  ctx.lineCap = "round";
   ctx.beginPath();
   ctx.moveTo(SAFE - PAD - 46, PAD_Y + 32);
   ctx.lineTo(SAFE - PAD - 22, PAD_Y + 8);
@@ -137,7 +137,7 @@ function drawCard(service: Service, i: number, fonts: { display: string; serif: 
 
   ctx.font = `400 31px ${fonts.sans}`;
   ctx.letterSpacing = "0px";
-  ctx.fillStyle = "rgba(234,241,251,0.8)";
+  ctx.fillStyle = "#38486a";
   const summary = wrap(ctx, service.summary, textW, 3);
   for (let k = summary.length - 1; k >= 0; k--) {
     ctx.fillText(summary[k], PAD, y);
@@ -146,7 +146,7 @@ function drawCard(service: Service, i: number, fonts: { display: string; serif: 
   y -= 18;
 
   ctx.font = `italic 400 42px ${fonts.serif}`;
-  ctx.fillStyle = "#cfe4fb";
+  ctx.fillStyle = "#1e5bd6";
   const tagline = wrap(ctx, service.tagline.join(" · "), textW, 2);
   for (let k = tagline.length - 1; k >= 0; k--) {
     ctx.fillText(tagline[k], PAD, y);
@@ -156,7 +156,7 @@ function drawCard(service: Service, i: number, fonts: { display: string; serif: 
 
   ctx.font = `600 86px ${fonts.display}`;
   ctx.letterSpacing = "-2px";
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = "#0a1830";
   const title = wrap(ctx, service.title, textW, 3);
   for (let k = title.length - 1; k >= 0; k--) {
     ctx.fillText(title[k], PAD, y);
@@ -169,7 +169,7 @@ function drawCard(service: Service, i: number, fonts: { display: string; serif: 
   // cropped: keep the column inside what the centre card really shows.
   const colW = W / ZOOM - colX - PAD;
   if (colW < 220) return canvas.toDataURL("image/jpeg", 0.9);
-  ctx.strokeStyle = "rgba(234,241,251,0.18)";
+  ctx.strokeStyle = "rgba(10,24,48,0.12)";
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(SAFE, PAD_Y);
@@ -177,20 +177,20 @@ function drawCard(service: Service, i: number, fonts: { display: string; serif: 
   ctx.stroke();
   ctx.font = `600 26px ${fonts.sans}`;
   ctx.letterSpacing = "4px";
-  ctx.fillStyle = "rgba(234,241,251,0.7)";
+  ctx.fillStyle = "#5d6c88";
   ctx.fillText("WHAT IT COVERS", colX, H - PAD_Y - service.painPoints.length * 96 - 40);
   ctx.font = `500 36px ${fonts.sans}`;
   ctx.letterSpacing = "0px";
   service.painPoints.forEach((point, k) => {
     const rowY = H - PAD_Y - (service.painPoints.length - 1 - k) * 96;
-    ctx.strokeStyle = "rgba(234,241,251,0.18)";
+    ctx.strokeStyle = "rgba(10,24,48,0.1)";
     ctx.beginPath();
     ctx.moveTo(colX, rowY - 66);
     ctx.lineTo(colX + colW, rowY - 66);
     ctx.stroke();
-    ctx.fillStyle = "#6cb4f0";
+    ctx.fillStyle = "#1e5bd6";
     ctx.fillText(String(k + 1).padStart(2, "0"), colX, rowY - 14);
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = "#0a1830";
     ctx.fillText(wrap(ctx, point, colW - 70, 1)[0], colX + 70, rowY - 14);
   });
 
