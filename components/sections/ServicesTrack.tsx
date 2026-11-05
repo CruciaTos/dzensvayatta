@@ -33,7 +33,10 @@ const GROUP_LABEL =Object.fromEntries(SERVICE_GROUPS.map((g) => [g.id, g.label])
 // set to exactly what the centre card shows on this screen.
 const H = 1280;
 // Carousel settings the artwork has to match.
-const CARD_HEIGHT = 0.675;
+const CARD_HEIGHT = 0.63;
+// The cards sit a little above the middle: the room under them is for their
+// shadows (and the bend), and the gap under the heading stays tight.
+const CENTER_Y = 0.466;
 const CENTER_SCALE = 1.7;
 const CENTER_MIN_WIDTH = 0.45;
 // The card shader zooms the artwork 8%; side cards (3:4) show this much of it.
@@ -361,7 +364,7 @@ export function ServicesTrack({ handoff = false }: { handoff?: boolean }) {
       {/* Just tall enough that cards bent by the lens at the sides don't get
           clipped, without a big empty band between the heading and the cards.
           Cards are CARD_HEIGHT of this, so they keep their size. */}
-      <div ref={stageRef} className="relative mt-2 h-[clamp(540px,82vh,830px)] md:mt-3">
+      <div ref={stageRef} className="relative mt-2 h-[clamp(580px,88vh,890px)] md:mt-3">
         {items && (
           <FlexCarousel
             items={items}
@@ -371,7 +374,12 @@ export function ServicesTrack({ handoff = false }: { handoff?: boolean }) {
             centerScale={CENTER_SCALE}
             centerMinWidth={CENTER_MIN_WIDTH}
             anchorLeft
-            bend={0.2}
+            centerY={CENTER_Y}
+            bend={0.24}
+            // A little more glass on the side cards: the lens starts closer in
+            // and splits colour more at the edges (the centre card stays clean).
+            lensWidth={0.66}
+            dispersion={0.6}
             gap={28}
             radius={24}
             captions={false}

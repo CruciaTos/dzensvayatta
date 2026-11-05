@@ -62,6 +62,8 @@ export interface FlexCarouselProps extends Partial<PresetValues> {
   centerMinWidth?: number;
   /** Frame every card's artwork from its left edge (instead of the centre, with parallax). */
   anchorLeft?: boolean;
+  /** Svayatta: where the row of cards sits, top to bottom, as a share of the height (0.5 = centred). */
+  centerY?: number;
   onChange?: (index: number, item: FlexCarouselItem) => void;
   onSelect?: (index: number, item: FlexCarouselItem) => void;
   className?: string;
@@ -82,6 +84,7 @@ interface Settings extends PresetValues {
   centerScale: number;
   centerMinWidth: number;
   anchorLeft: boolean;
+  centerY: number;
 }
 
 interface Slot {
@@ -279,6 +282,11 @@ uniform float uReady;
 uniform float uShift;
 uniform float uDpr;
 uniform vec3 uPlaceholder;
+// Svayatta: 0 = the card, 1 = its soft shadow (drawn first, on a larger quad).
+uniform float uMode;
+uniform vec2 uResolution;
+// Svayatta: progress of a shine sweeping across the card, 0–1; outside that, none.
+uniform float uShine;
 in vec2 vUv;
 in vec2 vLocal;
 out vec4 fragColor;
@@ -288,8 +296,31 @@ float roundedBox(vec2 p, vec2 b, float r) {
   return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
 }
 
+float shadowFalloff(float d, float blur) {
+  return 1.0 - smoothstep(-blur * 0.5, blur, d);
+}
+
+// Lightens toward white without clipping (a screen blend).
+vec3 lighten(vec3 c, float amount) {
+  return c + (1.0 - c) * clamp(amount, 0.0, 1.0);
+}
+
 void main() {
-  float sd = roundedBox(vLocal, uSize * 0.5, min(uRadius, min(uSize.x, uSize.y) * 0.5));
+  float r = min(uRadius, min(uSize.x, uSize.y) * 0.5);
+  if (uMode > 0.5) {
+    // Two layers, cool navy: a wide, low ambient shadow, and a tight contact
+    // shadow right under the card, so it reads as lifted off the white.
+    float ambient = shadowFalloff(roundedBox(vLocal, uSize * 0.5 - vec2(8.0, 0.0), r), 40.0);
+    float contact = shadowFalloff(roundedBox(vLocal + vec2(0.0, 10.0), uSize * 0.5 - vec2(2.0, 2.0), r), 10.0);
+    float a = (ambient * 0.12 + contact * 0.10) * uAlpha;
+    // Fade out near the top and bottom of the canvas, so a shadow is never
+    // cut off in a hard line where the carousel's box ends.
+    float yPx = gl_FragCoord.y / uDpr;
+    a *= smoothstep(0.0, 72.0, yPx) * smoothstep(0.0, 72.0, uResolution.y - yPx);
+    fragColor = vec4(vec3(0.04, 0.10, 0.26) * a, a);
+    return;
+  }
+  float sd = roundedBox(vLocal, uSize * 0.5, r);
   float mask = clamp(0.5 - sd * uDpr, 0.0, 1.0);
   vec2 local = vLocal / uSize + 0.5;
   float cardAspect = uSize.x / uSize.y;
@@ -301,6 +332,39 @@ void main() {
   uv.x += uShift * (1.0 - scale.x) * 0.5;
   vec3 image = texture(tMap, uv).rgb;
   vec3 color = mix(uPlaceholder, image, uReady);
+
+  // Svayatta: a glass finish, like light on a pane.
+  float inside = -sd;
+  vec2 dir = normalize(vLocal / uSize + 1e-5);
+  float toLight = dot(dir, normalize(vec2(-0.6, -1.0)));
+  // A crisp bright rim right at the edge, strongest where the light hits
+  // (top-left), with a faint frosted glow just inside it.
+  float rim = smoothstep(0.0, 0.8, inside) * (1.0 - smoothstep(1.2, 2.6, inside));
+  float frost = 1.0 - smoothstep(0.0, 18.0, inside);
+  color = lighten(color, rim * (0.45 + 0.4 * toLight) + frost * 0.10);
+  // The far edge sits in a touch of shade, so the pane has thickness.
+  color *= 1.0 - rim * 0.10 * max(0.0, -toLight);
+  // A soft reflection across the top of the pane.
+  float gloss = (1.0 - smoothstep(0.0, 0.42, local.y)) * 0.10;
+  gloss += exp(-pow((local.x - 0.18) / 0.32, 2.0) - pow((local.y - 0.04) / 0.10, 2.0)) * 0.16;
+  color = lighten(color, gloss);
+  // Now and then a shine sweeps across on a slant.
+  if (uShine >= 0.0 && uShine <= 1.0) {
+    float t = uShine * uShine * (3.0 - 2.0 * uShine);
+    float u = local.x * cardAspect + (1.0 - local.y) * 0.55;
+    float c = mix(-0.6, cardAspect + 1.1, t);
+    float fade = sin(3.14159 * uShine);
+    // On light glass a white wash barely shows, so the shine is a glint: a
+    // bright core that lights up whatever it crosses, with a faint prism on
+    // either side (sky ahead, lavender behind).
+    float d = u - c;
+    float core = exp(-pow(d / 0.05, 2.0));
+    float glow = exp(-pow(d / 0.22, 2.0));
+    color = mix(color, color * vec3(0.86, 0.93, 1.0), exp(-pow((d - 0.16) / 0.07, 2.0)) * 0.55 * fade);
+    color = mix(color, color * vec3(0.95, 0.89, 1.0), exp(-pow((d + 0.16) / 0.07, 2.0)) * 0.45 * fade);
+    color = lighten(color, (core * 0.6 + glow * 0.22) * fade);
+  }
+
   float alpha = mask * uAlpha;
   fragColor = vec4(color * alpha, alpha);
 }
@@ -435,6 +499,7 @@ const FlexCarousel = ({
   centerScale = 1,
   centerMinWidth = 0,
   anchorLeft = false,
+  centerY = 0.5,
   onChange,
   onSelect,
   className = '',
@@ -482,7 +547,8 @@ const FlexCarousel = ({
       captureWheel,
       centerScale,
       centerMinWidth,
-      anchorLeft
+      anchorLeft,
+      centerY
     };
     engineRef.current?.wake();
   });
@@ -532,7 +598,9 @@ const FlexCarousel = ({
         uReady: { value: 0 },
         uShift: { value: 0 },
         uDpr: { value: 1 },
-        uPlaceholder: { value: [0.5, 0.5, 0.5] }
+        uPlaceholder: { value: [0.5, 0.5, 0.5] },
+        uMode: { value: 0 },
+        uShine: { value: -1 }
       }
     });
     cardProgram.setBlendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
@@ -585,6 +653,22 @@ const FlexCarousel = ({
     let mode = 'spring';
     let wheelAt = 0;
     let raf = 0;
+    // Svayatta: each card gets a shine now and then, at random times.
+    const SHINE_DURATION = 1.4;
+    const shineAt: number[] = [];
+    let shineTimer: ReturnType<typeof setTimeout> | undefined;
+    let shiningFlag = false;
+    const nextShine = (now: number) => now / 1000 + 3 + Math.random() * 6;
+    const shineOf = (i: number, now: number) => {
+      if (reducedMotion) return -1;
+      if (shineAt[i] === undefined) shineAt[i] = nextShine(now) - 2;
+      const p = (now / 1000 - shineAt[i]) / SHINE_DURATION;
+      if (p > 1) {
+        shineAt[i] = nextShine(now);
+        return -1;
+      }
+      return p;
+    };
     let last = performance.now();
     let visible = true;
     let alive = true;
@@ -1005,7 +1089,7 @@ const FlexCarousel = ({
       const effects = introEffects();
 
       const homeX = width / 2;
-      const homeY = height / 2;
+      const homeY = height * s.centerY;
       const follow = s.followCursor && pointer.over && !pointer.dragging && !pointer.touch && focus.target === 0;
       const aimX = follow ? pointer.x : homeX;
       const aimY = follow ? pointer.y : homeY;
@@ -1099,8 +1183,33 @@ const FlexCarousel = ({
         // under the clean one mid-swipe (a smeared second line of its text).
         const cleanCentre = !!centre && Math.abs(centre.rel) < m.widths[centre.i] && effects.sceneAlpha > 0;
         let first = true;
+        // Svayatta: a soft shadow under a card, on a quad wide enough for its blur.
+        const SHADOW_PAD = 64;
+        const SHADOW_DROP = 14;
+        const drawShadow = (d: { x: number; y: number; cw: number; ch: number }, alpha: number, toTarget: boolean) => {
+          cardProgram.uniforms.uMode.value = 1;
+          cardProgram.uniforms.uRect.value = [d.x, d.y + SHADOW_DROP, d.cw + SHADOW_PAD * 2, d.ch + SHADOW_PAD * 2];
+          cardProgram.uniforms.uSize.value = [d.cw, d.ch];
+          cardProgram.uniforms.uAlpha.value = alpha;
+          if (toTarget) {
+            renderer.render({ scene: cardMesh, target, clear: first });
+            first = false;
+          } else {
+            renderer.render({ scene: cardMesh, clear: false });
+          }
+          cardProgram.uniforms.uMode.value = 0;
+        };
+        // Shadows first, all of them, so no card's shadow falls on a neighbour.
+        for (const draw of draws) {
+          if (cleanCentre && draw === centre) continue;
+          drawShadow(draw, draw.alpha, true);
+        }
+        let shining = false;
         for (const draw of draws) {
           const slot = slots[draw.i];
+          const shine = shineOf(draw.i, now);
+          if (shine >= 0) shining = true;
+          cardProgram.uniforms.uShine.value = shine;
           if (cleanCentre && draw === centre) {
             instances.push({
               index: draw.i,
@@ -1129,6 +1238,7 @@ const FlexCarousel = ({
             y1: draw.y + draw.ch / 2
           });
         }
+        shiningFlag = shining;
         if (first) {
           renderer.bindFramebuffer(target);
           gl.viewport(0, 0, target.width, target.height);
@@ -1160,6 +1270,8 @@ const FlexCarousel = ({
         // so the lens never bends or splits it.
         if (centre && cleanCentre) {
           const slot = slots[centre.i];
+          drawShadow(centre, centre.alpha * effects.sceneAlpha, false);
+          cardProgram.uniforms.uShine.value = shineOf(centre.i, now);
           cardProgram.uniforms.tMap.value = slot.texture;
           cardProgram.uniforms.uRect.value = [centre.x, centre.y, centre.cw + 2, centre.ch + 2];
           cardProgram.uniforms.uSize.value = [centre.cw, centre.ch];
@@ -1186,7 +1298,23 @@ const FlexCarousel = ({
         else container.removeAttribute('data-hover');
       }
 
-      if (visible && (animating || waiting || dirty || pointer.down)) raf = requestAnimationFrame(frame);
+      // Svayatta: keep drawing while a shine is crossing a card; when idle,
+      // wake up in time for the next one.
+      const nowS = now / 1000;
+      const shiningNow = shiningFlag;
+      if (visible && (animating || waiting || dirty || pointer.down || shiningNow)) {
+        if (shiningNow) dirty = true;
+        raf = requestAnimationFrame(frame);
+      } else if (visible && !reducedMotion && shineAt.length) {
+        clearTimeout(shineTimer);
+        const soonest = Math.min(...shineAt.filter((t) => t > nowS));
+        if (Number.isFinite(soonest)) {
+          shineTimer = setTimeout(() => {
+            dirty = true;
+            start();
+          }, Math.max(16, (soonest - nowS) * 1000));
+        }
+      }
     };
 
     const start = () => {
@@ -1420,6 +1548,7 @@ const FlexCarousel = ({
 
     return () => {
       alive = false;
+      clearTimeout(shineTimer);
       visible = false;
       engineRef.current = null;
       cancelAnimationFrame(raf);
