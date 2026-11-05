@@ -17,15 +17,13 @@ const LOADER_DELAY_MS = 220;
 
 /**
  * The floating white island (§5.1): logo, email, "Book a call", MENU.
- * Always on screen; whatever scrolls behind it is heavily frosted (a thin
- * white over a 40px blur). While a page is loading, the lattice loader takes
+ * Always on screen, on a fully solid fill so nothing shows through from behind. While a page is loading, the lattice loader takes
  * the email's place. It keeps the same
  * view-transition-name on every page, so page transitions never touch it.
  */
 export function Navbar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const pending = useNavPending();
   const [showLoader, setShowLoader] = useState(false);
@@ -42,21 +40,6 @@ export function Navbar() {
     return () => window.clearTimeout(id);
   }, [pending]);
 
-  useEffect(() => {
-    let ticking = false;
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        setScrolled(window.scrollY > 30);
-        ticking = false;
-      });
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   return (
     <>
       <header
@@ -66,9 +49,7 @@ export function Navbar() {
         <nav
           aria-label="Main"
           className={cn(
-            "flex w-full max-w-[1360px] items-center justify-between rounded-[12px] py-2 pl-4 pr-2 shadow-[0_28px_64px_-14px_rgba(6,26,61,0.42),0_8px_20px_-6px_rgba(6,26,61,0.26),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-[40px] backdrop-saturate-[1.8] transition-[background-color] duration-med ease-expo md:w-[min(92vw,1360px)] md:rounded-island md:pl-6",
-            // Thin enough for the blur to show through; solid while the menu hangs from it.
-            menuOpen ? "bg-paper/95" : scrolled ? "bg-paper/60" : "bg-paper/75"
+            "flex w-full max-w-[1360px] items-center justify-between rounded-[12px] py-2 pl-4 pr-2 shadow-[0_28px_64px_-14px_rgba(6,26,61,0.42),0_8px_20px_-6px_rgba(6,26,61,0.26),inset_0_1px_0_rgba(255,255,255,0.9)] bg-paper md:w-[min(92vw,1360px)] md:rounded-island md:pl-6",
           )}
         >
           <Link href="/" aria-label={`${SITE.name}, home`} data-intro-target className="flex items-center gap-2.5">
