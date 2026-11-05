@@ -60,7 +60,7 @@ export interface FlexCarouselProps extends Partial<PresetValues> {
   centerScale?: number;
   /** The centred card is at least this share of the carousel's width (0–1). */
   centerMinWidth?: number;
-  /** Size of the cards away from the centre relative to their natural size (1 = unchanged). */
+  /** Width of the cards away from the centre relative to their natural width (1 = unchanged); height is kept. */
   sideScale?: number;
   /** Frame every card's artwork from its left edge (instead of the centre, with parallax). */
   anchorLeft?: boolean;
@@ -1183,7 +1183,7 @@ const FlexCarousel = ({
             const near = 1 - clamp01(Math.abs(rel) / (w + s.gap));
             const target = Math.max(s.centerScale, (width * s.centerMinWidth) / w);
             const widen = 1 + (target - 1) * easeInOut(near);
-            // Cards away from the centre are drawn smaller, so only the centre one is big.
+            // Cards away from the centre are drawn narrower (same height), so only the centre one is big.
             const side = 1 - (1 - s.sideScale) * (1 - easeInOut(near));
             placed.push({ i, rel, w, widen, extra: (w * shrink * (widen - 1)) / 2, side });
           }
@@ -1198,7 +1198,7 @@ const FlexCarousel = ({
           {
             const fx = effects.card ? effects.card(rel) : null;
             let x = homeX + rel + push + (fx ? fx.x : 0);
-            let scale = shrink * side * (fx ? fx.scale : 1);
+            let scale = shrink * (fx ? fx.scale : 1);
             let alpha = fx ? fx.alpha : 1;
             if (focusAmount > 0) {
               if (i === focus.index && Math.abs(rel) < w) {
@@ -1210,7 +1210,7 @@ const FlexCarousel = ({
                 alpha *= 1 - part;
               }
             }
-            const cw = w * scale * widen;
+            const cw = w * scale * side * widen;
             if (alpha <= 0.001 || x + cw / 2 < -40 || x - cw / 2 > width + 40) continue;
             draws.push({ i, rel, x, y: homeY + (fx ? fx.y : 0), cw, ch: cardH * scale, alpha });
           }
