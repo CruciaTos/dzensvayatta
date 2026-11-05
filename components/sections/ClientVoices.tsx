@@ -142,7 +142,7 @@ export function ClientVoices({ overBackdrop = false }: { overBackdrop?: boolean 
     <section
       id={CLIENT_VOICES_ID}
       aria-labelledby="voices-title"
-      className={cn("section on-night bg-poster relative", overBackdrop && "bg-transparent bg-none after:hidden")}
+      className={cn("section on-night bg-poster relative", overBackdrop && "paint-none")}
     >
       <Container>
         <div className="mb-10 md:mb-14">

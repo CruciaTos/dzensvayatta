@@ -93,7 +93,7 @@ export function Hero({ media, detachedBackground = false }: HeroProps) {
       className={cn(
         "on-night bg-poster group/hero relative isolate h-[100svh] min-h-[640px] max-h-[960px] overflow-hidden",
         // The background is drawn behind it: keep the poster's text colours, drop its paint and grain.
-        detachedBackground && "bg-transparent bg-none after:hidden"
+        detachedBackground && "paint-none"
       )}
     >
       {!detachedBackground && <HeroBackground media={media} />}

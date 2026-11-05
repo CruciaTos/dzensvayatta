@@ -256,6 +256,16 @@
     -webkit-text-stroke: 1px var(--line-strong);
     color: transparent;
   }
+
+  /* Keeps a tone's text colours (on-night, bg-poster's colour rules) but
+     paints nothing: for boxes whose background is drawn by another layer.
+     A class of its own so cn()/tailwind-merge never drops bg-poster for it. */
+  .paint-none {
+    background: none;
+  }
+  .paint-none::after {
+    display: none;
+  }
 }
 
 /* ─── Entrance (hero) ─────────────────────────────────── */

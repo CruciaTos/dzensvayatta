@@ -121,6 +121,7 @@ export function SameBoxScene({
   const frameRef = useRef<HTMLDivElement>(null);
   const restRef = useRef<HTMLDivElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
+  const bgRef = useRef<HTMLDivElement>(null);
   const sourceRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const cloneRef = useRef<HTMLDivElement>(null);
@@ -184,11 +185,16 @@ export function SameBoxScene({
       const grown = lerpBox(g.rest, g.stage, ease(t));
       const b = u > 0 ? lerpBox(g.stage, g.full, easeInOutSine(u)) : grown;
 
-      box.style.left = `${b.x}px`;
-      box.style.top = `${b.y}px`;
-      box.style.width = `${b.w}px`;
-      box.style.height = `${b.h}px`;
-      box.style.borderRadius = `${b.r}px`;
+      // Light to animate: nothing here changes size or lays out again. The box
+      // spans the frame and is clipped to the growing shape (a clip the
+      // compositor applies); its background is painted once at full size and
+      // only scaled into that shape, so it looks the same as a background sized
+      // to the box; the source and content move by transforms.
+      const W = g.full.w;
+      const H = g.full.h;
+      box.style.clipPath = `inset(${b.y}px ${W - b.x - b.w}px ${H - b.y - b.h}px ${b.x}px round ${b.r}px)`;
+      const bg = bgRef.current;
+      if (bg) bg.style.transform = `translate3d(${b.x}px, ${b.y}px, 0) scale(${b.w / W}, ${b.h / H})`;
       // Full screen: the box now matches the pinned backdrop exactly, so it drops
       // its own background and the backdrop shows through. Its content then
       // scrolls away over a background that stays still.
@@ -196,7 +202,7 @@ export function SameBoxScene({
         const full = u >= 0.999;
         if (full !== fullRef.current) {
           fullRef.current = full;
-          box.toggleAttribute("data-full", full);
+          if (bg) bg.style.visibility = full ? "hidden" : "";
           placeBackdrop();
         }
       }
@@ -205,6 +211,8 @@ export function SameBoxScene({
         const o = 1 - range(t, 0, 0.25);
         sourceRef.current.style.opacity = String(o);
         sourceRef.current.style.visibility = o === 0 ? "hidden" : "visible";
+        // Sized to the box at rest, kept centred in the growing box.
+        sourceRef.current.style.transform = `translate3d(${b.x + (b.w - g.rest.w) / 2}px, ${b.y + (b.h - g.rest.h) / 2}px, 0)`;
       }
 
       // Destination content is scaled with the box (never cut off) and fades
@@ -213,7 +221,7 @@ export function SameBoxScene({
       const s = Math.min(1, b.w / g.stage.w, b.h / g.stage.h);
       const dx = (b.w - g.stage.w * s) / 2;
       const dy = (b.h - g.stage.h * s) / 2;
-      content.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(${s})`;
+      content.style.transform = `translate3d(${b.x + dx}px, ${b.y + dy}px, 0) scale(${s})`;
       const o = range(t, 0.55, 0.95);
       content.style.opacity = String(o);
       content.style.visibility = o === 0 ? "hidden" : "visible";
@@ -261,6 +269,10 @@ export function SameBoxScene({
 
     const restBox = boxOf(rest, frame, sourceRadius);
     geo.current = { rest: restBox, stage, full: { x: 0, y: 0, w: W, h: H, r: 0 } };
+    if (sourceRef.current) {
+      sourceRef.current.style.width = `${restBox.w}px`;
+      sourceRef.current.style.height = `${restBox.h}px`;
+    }
     // Growing from the centre: the box rests in the middle of the frame, and the
     // scene is pulled up so the box still sits where it would at the top
     // (START_PAD down). The frame then pins exactly when the box's centre meets
@@ -274,7 +286,8 @@ export function SameBoxScene({
     const clone = cloneRef.current;
     if (real && clone) {
       apply(1);
-      content.style.transform = "none";
+      // The stage at rest, unscaled (content sits at the stage's corner).
+      content.style.transform = `translate3d(${stage.x}px, ${stage.y}px, 0)`;
       const titleTo = boxOf(real, frame);
       clone.style.left = `${titleTo.x}px`;
       clone.style.top = `${titleTo.y}px`;
@@ -326,10 +339,7 @@ export function SameBoxScene({
   useLayoutEffect(() => {
     modeRef.current = mode;
     if (!pinned) return;
-    if (mode === "static") {
-      fullRef.current = false;
-      boxRef.current?.removeAttribute("data-full");
-    }
+    if (mode === "static") fullRef.current = false;
     placeBackdrop();
     window.addEventListener("resize", placeBackdrop);
     return () => window.removeEventListener("resize", placeBackdrop);
@@ -338,7 +348,7 @@ export function SameBoxScene({
   // Clear every inline style when leaving scroll mode, so the static layout is clean.
   useLayoutEffect(() => {
     if (mode !== "static") return;
-    for (const el of [boxRef.current, contentRef.current, sourceRef.current]) el?.removeAttribute("style");
+    for (const el of [boxRef.current, bgRef.current, contentRef.current, sourceRef.current]) el?.removeAttribute("style");
     sceneRef.current?.style.removeProperty("margin-top");
     contentRef.current
       ?.querySelector<HTMLElement>("[data-sb-title]")
@@ -389,25 +399,37 @@ export function SameBoxScene({
         <div
           ref={boxRef}
           className={cn(
+            // The tone's text colours (and the poster's colour rules) on the box;
+            // its paint is on the background layer below.
             TONE[tone],
-            "overflow-hidden",
-            scroll ? "pointer-events-auto absolute left-0 top-0 will-change-[width,height,left,top]" : cn("relative", !expandToFull && "rounded-[28px]"),
-            // Over the pinned backdrop: no background of its own (keeps the tone's text colours).
-            pinned &&
-              (scroll
-                ? "data-[full]:bg-transparent data-[full]:bg-none data-[full]:after:hidden"
-                : "bg-transparent bg-none after:hidden"),
+            "paint-none",
+            scroll
+              ? "pointer-events-auto absolute inset-0"
+              : cn("relative overflow-hidden", !expandToFull && "rounded-[28px]"),
             stageClassName
           )}
         >
+          {/* The background, painted once: scaled into the growing box (scroll
+              mode), or simply behind the content. Over the pinned backdrop it
+              steps aside (static), or once the stage fills the screen (scroll). */}
+          <div
+            ref={bgRef}
+            aria-hidden="true"
+            className={cn(
+              TONE[tone],
+              "pointer-events-none absolute left-0 top-0 h-full w-full",
+              scroll && "origin-top-left will-change-transform",
+              pinned && !scroll && "hidden"
+            )}
+          />
           {scroll && (
-            <div ref={sourceRef} className="absolute inset-0 flex items-center justify-center">
+            <div ref={sourceRef} className="absolute left-0 top-0 flex items-center justify-center will-change-transform">
               {source}
             </div>
           )}
           <div
             ref={contentRef}
-            className={cn(scroll ? "absolute left-0 top-0 origin-top-left" : "relative")}
+            className={cn(scroll ? "absolute left-0 top-0 origin-top-left will-change-transform" : "relative")}
           >
             {children}
           </div>
