@@ -396,7 +396,7 @@ export function ServicesTrack({ handoff = false }: { handoff?: boolean }) {
             // at the other, and their shadows need space to fade.
             bleedTop={180}
             bleedBottom={140}
-            bend={0.24}
+            bend={0.13}
             // The side cards bend a little sooner, in true colour: no rainbow
             // split at their edges (the card glass carries the effect).
             lensWidth={0.66}
