@@ -361,11 +361,19 @@ void main() {
     // it would fold over (bend rate < 1): past that, text near the edge
     // shows up mirrored and duplicated, which reads as a glitch on a card.
     float bend = B * 0.47 * t * t;
-    float split = 0.38 * t;
-    float rc = cardAt(vLocal - n * bend * (1.0 - split), scale).r;
-    float gc = cardAt(vLocal - n * bend, scale).g;
-    float bc = cardAt(vLocal - n * bend * (1.0 + split), scale).b;
-    color = vec3(rc, gc, bc);
+    // Split into a rainbow: six samples across the spectrum, red bent least,
+    // violet most, each feeding the channels it belongs to. Red can drop to
+    // almost no bend, so the fan is wide without anything folding over.
+    vec3 sum = vec3(0.0);
+    vec3 weight = vec3(0.0);
+    for (int i = 0; i < 6; i++) {
+      float k = (float(i) + 0.5) / 6.0;
+      float f = mix(1.0 - 0.95 * t, 1.0 + 0.55 * t, k);
+      vec3 w = max(1.0 - abs(vec3(k) - vec3(0.12, 0.5, 0.88)) * 2.4, 0.0);
+      sum += cardAt(vLocal - n * bend * f, scale) * w;
+      weight += w;
+    }
+    color = sum / weight;
   }
   // Fresnel: glass brightens as it turns edge-on.
   color = lighten(color, pow(t, 3.0) * 0.38);
