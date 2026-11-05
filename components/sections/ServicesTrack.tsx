@@ -112,7 +112,7 @@ function drawCard(service: Service, i: number, fonts: { display: string; serif: 
   ctx.textAlign = "left";
 
   // Top label and arrow.
-  ctx.font = `600 26px ${fonts.sans}`;
+  ctx.font = `600 30px ${fonts.sans}`;
   ctx.letterSpacing = "4px";
   ctx.fillStyle = "#1e5bd6";
   ctx.fillText(`${service.index} / ${GROUP_LABEL[service.group].toUpperCase()}`, PAD, PAD_Y + 30);
@@ -135,32 +135,35 @@ function drawCard(service: Service, i: number, fonts: { display: string; serif: 
   const textW = SAFE - PAD * 2;
   let y = H - PAD_Y;
 
-  ctx.font = `400 31px ${fonts.sans}`;
+  // Supporting line: readable, but quieter than the title and the list.
+  ctx.font = `400 37px ${fonts.sans}`;
   ctx.letterSpacing = "0px";
   ctx.fillStyle = "#38486a";
   const summary = wrap(ctx, service.summary, textW, 3);
   for (let k = summary.length - 1; k >= 0; k--) {
     ctx.fillText(summary[k], PAD, y);
-    y -= 44;
-  }
-  y -= 18;
-
-  ctx.font = `italic 400 42px ${fonts.serif}`;
-  ctx.fillStyle = "#1e5bd6";
-  const tagline = wrap(ctx, service.tagline.join(" · "), textW, 2);
-  for (let k = tagline.length - 1; k >= 0; k--) {
-    ctx.fillText(tagline[k], PAD, y);
     y -= 52;
   }
   y -= 22;
 
-  ctx.font = `600 86px ${fonts.display}`;
-  ctx.letterSpacing = "-2px";
+  // Keywords people scan for (WhatsApp, voice, dashboards…).
+  ctx.font = `italic 400 50px ${fonts.serif}`;
+  ctx.fillStyle = "#1e5bd6";
+  const tagline = wrap(ctx, service.tagline.join(" · "), textW, 2);
+  for (let k = tagline.length - 1; k >= 0; k--) {
+    ctx.fillText(tagline[k], PAD, y);
+    y -= 60;
+  }
+  y -= 26;
+
+  // The service name: the first thing anyone reads.
+  ctx.font = `600 108px ${fonts.display}`;
+  ctx.letterSpacing = "-3px";
   ctx.fillStyle = "#0a1830";
   const title = wrap(ctx, service.title, textW, 3);
   for (let k = title.length - 1; k >= 0; k--) {
     ctx.fillText(title[k], PAD, y);
-    y -= 90;
+    y -= 108;
   }
 
   // The right part, seen only on the wider centre card: what it covers.
@@ -175,24 +178,38 @@ function drawCard(service: Service, i: number, fonts: { display: string; serif: 
   ctx.moveTo(SAFE, PAD_Y);
   ctx.lineTo(SAFE, H - PAD_Y);
   ctx.stroke();
-  ctx.font = `600 26px ${fonts.sans}`;
-  ctx.letterSpacing = "4px";
-  ctx.fillStyle = "#5d6c88";
-  ctx.fillText("WHAT IT COVERS", colX, H - PAD_Y - service.painPoints.length * 96 - 40);
-  ctx.font = `500 36px ${fonts.sans}`;
+  // What it covers: the concrete answer to "do you do X?", so it is set
+  // nearly as large as the summary's lead and wraps rather than cutting off.
+  ctx.font = `500 42px ${fonts.sans}`;
   ctx.letterSpacing = "0px";
-  service.painPoints.forEach((point, k) => {
-    const rowY = H - PAD_Y - (service.painPoints.length - 1 - k) * 96;
+  const numW = 78;
+  const lineH = 52;
+  const rows = service.painPoints.map((point) => wrap(ctx, point, colW - numW, 2));
+  let rowBottom = H - PAD_Y;
+  const placed: { lines: string[]; base: number }[] = [];
+  for (let k = rows.length - 1; k >= 0; k--) {
+    const lines = rows[k];
+    placed[k] = { lines, base: rowBottom - (lines.length - 1) * lineH };
+    rowBottom -= lines.length * lineH + 50;
+  }
+  placed.forEach(({ lines, base }, k) => {
+    const top = base - 72;
     ctx.strokeStyle = "rgba(10,24,48,0.1)";
     ctx.beginPath();
-    ctx.moveTo(colX, rowY - 66);
-    ctx.lineTo(colX + colW, rowY - 66);
+    ctx.moveTo(colX, top);
+    ctx.lineTo(colX + colW, top);
     ctx.stroke();
+    ctx.font = `600 42px ${fonts.sans}`;
     ctx.fillStyle = "#1e5bd6";
-    ctx.fillText(String(k + 1).padStart(2, "0"), colX, rowY - 14);
+    ctx.fillText(String(k + 1).padStart(2, "0"), colX, base - 14);
+    ctx.font = `500 42px ${fonts.sans}`;
     ctx.fillStyle = "#0a1830";
-    ctx.fillText(wrap(ctx, point, colW - 70, 1)[0], colX + 70, rowY - 14);
+    lines.forEach((line, j) => ctx.fillText(line, colX + numW, base - 14 + j * lineH));
   });
+  ctx.font = `600 30px ${fonts.sans}`;
+  ctx.letterSpacing = "4px";
+  ctx.fillStyle = "#5d6c88";
+  ctx.fillText("WHAT IT COVERS", colX, placed[0].base - 72 - 34);
 
   return canvas.toDataURL("image/jpeg", 0.9);
 }
@@ -271,11 +288,12 @@ export function ServicesTrack({ handoff = false }: { handoff?: boolean }) {
     }
 
     Promise.all([
-      document.fonts?.load(`600 86px ${fonts.display}`),
+      document.fonts?.load(`600 108px ${fonts.display}`),
       document.fonts?.load(`800 86px ${fonts.display}`),
-      document.fonts?.load(`italic 400 42px ${fonts.serif}`),
-      document.fonts?.load(`400 31px ${fonts.sans}`),
-      document.fonts?.load(`600 26px ${fonts.sans}`),
+      document.fonts?.load(`italic 400 50px ${fonts.serif}`),
+      document.fonts?.load(`400 37px ${fonts.sans}`),
+      document.fonts?.load(`600 30px ${fonts.sans}`),
+      document.fonts?.load(`500 42px ${fonts.sans}`),
     ])
       .catch(() => [])
       .then(() => {
