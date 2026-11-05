@@ -426,6 +426,10 @@ uniform float uCurl;
 uniform float uDispersion;
 uniform float uStrength;
 uniform float uSceneAlpha;
+// Svayatta: how far from the centre (as a share of half the width) the lens
+// leaves the artwork flat: the centred card's own width. The bend eases in
+// from there, so a card bends smoothly as it leaves the centre.
+uniform float uFlat;
 out vec4 fragColor;
 
 void main() {
@@ -448,7 +452,7 @@ void main() {
   float ramp = t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
   float slope = 16.0 * t * t * (1.0 - t) * (1.0 - t);
   float reachX = rel.x / (uResolution.x * 0.5);
-  float side = smoothstep(0.02, 0.3, abs(reachX)) * (uCurl == 0.0 ? sign(reachX) : uCurl);
+  float side = smoothstep(uFlat + 0.02, uFlat + 0.3, abs(reachX)) * (uCurl == 0.0 ? sign(reachX) : uCurl);
   float lift = ramp * side * uFlow * uStrength;
   vec2 swirl = along * along.y * side * slope * uFlow * uStrength * 0.35;
   vec2 drift = vec2(0.0, -lift) - swirl;
@@ -668,7 +672,8 @@ const FlexCarousel = ({
       uCurl: { value: 0 },
       uDispersion: { value: 0 },
       uStrength: { value: 0 },
-      uSceneAlpha: { value: 0 }
+      uSceneAlpha: { value: 0 },
+      uFlat: { value: 0 }
     };
     const lensMesh = new Mesh(gl, {
       geometry: new Triangle(gl),
@@ -1209,11 +1214,12 @@ const FlexCarousel = ({
           }
         }
         draws.sort((a, b) => Math.abs(b.rel) - Math.abs(a.rel));
-        const centre = draws.length ? draws[draws.length - 1] : null;
-        // Svayatta: the centred card is drawn clean on top after the lens pass,
-        // so leave it out of the lens scene. Otherwise its bent copy peeks out
-        // under the clean one mid-swipe (a smeared second line of its text).
-        const cleanCentre = !!centre && Math.abs(centre.rel) < m.widths[centre.i] && effects.sceneAlpha > 0;
+        // Svayatta: every card goes through the lens, so a card bends the same
+        // way wherever it is on screen, and the bend eases in as it moves out
+        // of the centre (the lens leaves the centre card's own width flat: see
+        // uFlat). Before, the centred card was drawn flat on top and only the
+        // others bent, so mid-swipe the card leaving snapped from flat to bent
+        // and the one arriving from bent to flat.
         let first = true;
         // Svayatta: a soft shadow under a card, on a quad wide enough for its blur.
         const SHADOW_PAD = 64;
@@ -1232,22 +1238,9 @@ const FlexCarousel = ({
           cardProgram.uniforms.uMode.value = 0;
         };
         // Shadows first, all of them, so no card's shadow falls on a neighbour.
-        for (const draw of draws) {
-          if (cleanCentre && draw === centre) continue;
-          drawShadow(draw, draw.alpha, true);
-        }
+        for (const draw of draws) drawShadow(draw, draw.alpha, true);
         for (const draw of draws) {
           const slot = slots[draw.i];
-          if (cleanCentre && draw === centre) {
-            instances.push({
-              index: draw.i,
-              x0: draw.x - draw.cw / 2,
-              x1: draw.x + draw.cw / 2,
-              y0: draw.y - bleedTop - draw.ch / 2,
-              y1: draw.y - bleedTop + draw.ch / 2
-            });
-            continue;
-          }
           cardProgram.uniforms.tMap.value = slot.texture;
           cardProgram.uniforms.uRect.value = [draw.x, draw.y, draw.cw + 2, draw.ch + 2];
           cardProgram.uniforms.uSize.value = [draw.cw, draw.ch];
@@ -1291,23 +1284,13 @@ const FlexCarousel = ({
         lensUniforms.uDispersion.value = s.dispersion * 0.12 * (1 + Math.abs(deform) * liquidAmount * 1.2);
         lensUniforms.uStrength.value = effects.strength * (1 - focusEase);
         lensUniforms.uSceneAlpha.value = effects.sceneAlpha;
+        // The centred card's width at rest, as a share of half the width: an
+        // edge at x px from the centre sits at x / (width / 2) in the shader,
+        // so the flat zone ends at the card's own edge.
+        const restW = Math.max(s.centerScale * m.widths[current], width * s.centerMinWidth);
+        lensUniforms.uFlat.value = s.centerScale > 1 || s.centerMinWidth > 0 ? restW / width : 0;
         renderer.render({ scene: lensMesh });
 
-        // Svayatta: draw the centred card once more, straight to the screen,
-        // so the lens never bends or splits it.
-        if (centre && cleanCentre) {
-          const slot = slots[centre.i];
-          drawShadow(centre, centre.alpha * effects.sceneAlpha, false);
-          cardProgram.uniforms.tMap.value = slot.texture;
-          cardProgram.uniforms.uRect.value = [centre.x, centre.y, centre.cw + 2, centre.ch + 2];
-          cardProgram.uniforms.uSize.value = [centre.cw, centre.ch];
-          cardProgram.uniforms.uImage.value = slot.image;
-          cardProgram.uniforms.uAlpha.value = centre.alpha * effects.sceneAlpha;
-          cardProgram.uniforms.uReady.value = slot.ready;
-          cardProgram.uniforms.uShift.value = s.anchorLeft ? -1 : 0;
-          cardProgram.uniforms.uPlaceholder.value = slot.color;
-          renderer.render({ scene: cardMesh, clear: false });
-        }
       }
 
       let nextHover = '';

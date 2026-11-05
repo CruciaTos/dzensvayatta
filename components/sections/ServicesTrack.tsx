@@ -18,8 +18,8 @@ import { edgeGone, edgeMask, manifestoEdge, manifestoHandoff, setMask, type Wipe
  * Services (§H6) on React Bits' Flex Carousel: drag, flick or use the arrow
  * keys, and the cards bend through a liquid lens as they pass the edges. It
  * moves on by itself every few seconds when left alone. The centred card is
- * wider than the rest (at least 30% of the width), always clear (no bend),
- * and its extra width reveals what that service covers. Clicking it opens that service. Each card is a poster drawn in the browser (a
+ * wider than the rest (at least 30% of the width), clear (no bend) at rest and
+ * easing into the bend as it moves off, and its extra width reveals what that service covers. Clicking it opens that service. Each card is a poster drawn in the browser (a
  * light surface with blue accents, index, title, tagline, summary); an "Open …" link under the
  * carousel follows the centred card, and screen readers get a plain list.
  */
