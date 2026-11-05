@@ -352,12 +352,12 @@ export function ServicesTrack({ handoff = false }: { handoff?: boolean }) {
     <section
       ref={sectionRef}
       aria-labelledby="services-title"
-      className={`section relative overflow-hidden text-ink !pb-4 md:!pb-6 ${
+      className={`section relative overflow-x-clip text-ink !pb-4 md:!pb-6 ${
         // On the hand-off it rides up over the manifesto's pinned stage: above it, and see-through.
         handoff ? "z-20" : "bg-paper"
       }`}
     >
-      <div ref={headRef} className="flex flex-col gap-5 px-[clamp(16px,4vw,48px)] sm:flex-row sm:items-end sm:justify-between">
+      <div ref={headRef} className="relative z-10 flex flex-col gap-5 px-[clamp(16px,4vw,48px)] sm:flex-row sm:items-end sm:justify-between">
         <div>
           <Eyebrow className="mb-5">What we build</Eyebrow>
           {handoff ? (
@@ -392,6 +392,10 @@ export function ServicesTrack({ handoff = false }: { handoff?: boolean }) {
             centerMinWidth={CENTER_MIN_WIDTH}
             anchorLeft
             centerY={CENTER_Y}
+            // Room to draw past the box: bent cards lift at one side and dip
+            // at the other, and their shadows need space to fade.
+            bleedTop={180}
+            bleedBottom={140}
             bend={0.24}
             // The side cards bend a little sooner, in true colour: no rainbow
             // split at their edges (the card glass carries the effect).
@@ -410,7 +414,7 @@ export function ServicesTrack({ handoff = false }: { handoff?: boolean }) {
         )}
       </div>
 
-      <div ref={footRef} className="mt-2 flex justify-center px-[clamp(16px,4vw,48px)]">
+      <div ref={footRef} className="relative z-10 mt-2 flex justify-center px-[clamp(16px,4vw,48px)]">
         <TextLink href="/discovery" className="font-mono text-meta uppercase">
           Not sure where you fit? Book a call
         </TextLink>

@@ -64,6 +64,13 @@ export interface FlexCarouselProps extends Partial<PresetValues> {
   anchorLeft?: boolean;
   /** Svayatta: where the row of cards sits, top to bottom, as a share of the height (0.5 = centred). */
   centerY?: number;
+  /**
+   * Svayatta: extra px the canvas draws above and below the box, so cards the
+   * lens lifts or drops (and their shadows) aren't cut off at its edges. Clicks
+   * in that extra area pass through to whatever is underneath.
+   */
+  bleedTop?: number;
+  bleedBottom?: number;
   onChange?: (index: number, item: FlexCarouselItem) => void;
   onSelect?: (index: number, item: FlexCarouselItem) => void;
   className?: string;
@@ -85,6 +92,8 @@ interface Settings extends PresetValues {
   centerMinWidth: number;
   anchorLeft: boolean;
   centerY: number;
+  bleedTop: number;
+  bleedBottom: number;
 }
 
 interface Slot {
@@ -524,6 +533,8 @@ const FlexCarousel = ({
   centerMinWidth = 0,
   anchorLeft = false,
   centerY = 0.5,
+  bleedTop = 0,
+  bleedBottom = 0,
   onChange,
   onSelect,
   className = '',
@@ -572,7 +583,9 @@ const FlexCarousel = ({
       centerScale,
       centerMinWidth,
       anchorLeft,
-      centerY
+      centerY,
+      bleedTop,
+      bleedBottom
     };
     engineRef.current?.wake();
   });
@@ -600,6 +613,10 @@ const FlexCarousel = ({
     gl.clearColor(0, 0, 0, 0);
     const canvas = gl.canvas;
     canvas.style.display = 'block';
+    canvas.style.position = 'absolute';
+    canvas.style.left = '0';
+    canvas.style.top = '0';
+    canvas.style.pointerEvents = 'none';
     canvas.style.width = '100%';
     canvas.style.height = '100%';
     canvas.setAttribute('aria-hidden', 'true');
@@ -670,6 +687,9 @@ const FlexCarousel = ({
     let slots: Slot[] = [];
     let width = 1;
     let height = 1;
+    // Svayatta: the canvas is the box plus the bleed above and below it.
+    let canvasH = 1;
+    let bleedTop = 0;
     let pos = 0;
     let vel = 0;
     let goal = 0;
@@ -947,9 +967,12 @@ const FlexCarousel = ({
     const resize = () => {
       width = Math.max(1, container.clientWidth);
       height = Math.max(1, container.clientHeight);
-      renderer.dpr = Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(PIXEL_BUDGET / (width * height)));
-      renderer.setSize(width, height);
-      target.setSize(Math.max(2, Math.round(width * renderer.dpr)), Math.max(2, Math.round(height * renderer.dpr)));
+      bleedTop = settingsRef.current?.bleedTop ?? 0;
+      canvasH = height + bleedTop + (settingsRef.current?.bleedBottom ?? 0);
+      renderer.dpr = Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(PIXEL_BUDGET / (width * canvasH)));
+      renderer.setSize(width, canvasH);
+      canvas.style.top = `${-bleedTop}px`;
+      target.setSize(Math.max(2, Math.round(width * renderer.dpr)), Math.max(2, Math.round(canvasH * renderer.dpr)));
       lensUniforms.tScene.value = target.texture;
       dirty = true;
       start();
@@ -1098,10 +1121,10 @@ const FlexCarousel = ({
       const effects = introEffects();
 
       const homeX = width / 2;
-      const homeY = height * s.centerY;
+      const homeY = bleedTop + height * s.centerY;
       const follow = s.followCursor && pointer.over && !pointer.dragging && !pointer.touch && focus.target === 0;
       const aimX = follow ? pointer.x : homeX;
-      const aimY = follow ? pointer.y : homeY;
+      const aimY = follow ? pointer.y + bleedTop : homeY;
       if (!lens.ready) {
         lens.x = homeX;
         lens.y = homeY;
@@ -1137,7 +1160,7 @@ const FlexCarousel = ({
         dirty = false;
         instances = [];
         const dpr = renderer.dpr;
-        cardProgram.uniforms.uResolution.value = [width, height];
+        cardProgram.uniforms.uResolution.value = [width, canvasH];
         cardProgram.uniforms.uDpr.value = dpr;
         cardProgram.uniforms.uRadius.value = s.radius;
         const shrink = 1 - clamp01(s.squeeze) * energy;
@@ -1220,8 +1243,8 @@ const FlexCarousel = ({
               index: draw.i,
               x0: draw.x - draw.cw / 2,
               x1: draw.x + draw.cw / 2,
-              y0: draw.y - draw.ch / 2,
-              y1: draw.y + draw.ch / 2
+              y0: draw.y - bleedTop - draw.ch / 2,
+              y1: draw.y - bleedTop + draw.ch / 2
             });
             continue;
           }
@@ -1239,8 +1262,8 @@ const FlexCarousel = ({
             index: draw.i,
             x0: draw.x - draw.cw / 2,
             x1: draw.x + draw.cw / 2,
-            y0: draw.y - draw.ch / 2,
-            y1: draw.y + draw.ch / 2
+            y0: draw.y - bleedTop - draw.ch / 2,
+            y1: draw.y - bleedTop + draw.ch / 2
           });
         }
         if (first) {
@@ -1252,7 +1275,7 @@ const FlexCarousel = ({
         target.texture.bind();
         gl.generateMipmap(gl.TEXTURE_2D);
 
-        lensUniforms.uResolution.value = [width, height];
+        lensUniforms.uResolution.value = [width, canvasH];
         lensUniforms.uDpr.value = dpr;
         lensUniforms.uCenter.value = [lensX, lens.y];
         lensUniforms.uHalf.value = [Math.max(halfW, 1), Math.max(halfH, 1)];
@@ -1571,7 +1594,7 @@ const FlexCarousel = ({
   return (
     <div
       ref={containerRef}
-      className={`relative h-full w-full cursor-grab touch-pan-y select-none overflow-hidden overscroll-contain outline-none [-webkit-tap-highlight-color:transparent] focus-visible:shadow-[inset_0_0_0_2px_rgba(128,128,140,0.55)] data-[hover=open]:cursor-zoom-in data-[hover=close]:cursor-zoom-out data-[dragging]:cursor-grabbing ${className}`.trim()}
+      className={`relative h-full w-full cursor-grab touch-pan-y select-none overscroll-contain outline-none [-webkit-tap-highlight-color:transparent] focus-visible:shadow-[inset_0_0_0_2px_rgba(128,128,140,0.55)] data-[hover=open]:cursor-zoom-in data-[hover=close]:cursor-zoom-out data-[dragging]:cursor-grabbing ${className}`.trim()}
       style={{ ...style, '--flex-carousel-half': `${Math.min(Math.max(cardHeight, 0.05), 1) * 50}%` } as CSSProperties}
       role="region"
       aria-roledescription="carousel"
