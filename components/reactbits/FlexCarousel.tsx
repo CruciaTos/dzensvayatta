@@ -333,39 +333,51 @@ void main() {
   vec3 image = texture(tMap, uv).rgb;
   vec3 color = mix(uPlaceholder, image, uReady);
 
-  // Svayatta: a glass finish, like light on a pane.
+  // Svayatta: a thick glass slab, after Apple's glass icons. The edge is a
+  // rounded bevel (bright lip, a darker band of glass depth, then the face),
+  // and light enters at two opposite corners: a white-hot core along the bevel
+  // with saturated colour fanning out on either side, cool at one corner and
+  // warm at the other, glowing into the pane. On a light card the colour (not
+  // a white glow) has to carry it. Which corners depends on the card.
   float inside = -sd;
-  vec2 dir = normalize(vLocal / uSize + 1e-5);
-  float toLight = dot(dir, normalize(vec2(-0.6, -1.0)));
-  // A crisp bright rim right at the edge, strongest where the light hits
-  // (top-left), with a faint frosted glow just inside it.
-  float rim = smoothstep(0.0, 0.8, inside) * (1.0 - smoothstep(1.2, 2.6, inside));
-  float frost = 1.0 - smoothstep(0.0, 18.0, inside);
-  color = lighten(color, rim * (0.45 + 0.4 * toLight) + frost * 0.10);
-  // The far edge sits in a touch of shade, so the pane has thickness.
-  color *= 1.0 - rim * 0.10 * max(0.0, -toLight);
-  // A soft reflection across the top of the pane.
-  float gloss = (1.0 - smoothstep(0.0, 0.42, local.y)) * 0.10;
-  gloss += exp(-pow((local.x - 0.18) / 0.32, 2.0) - pow((local.y - 0.04) / 0.10, 2.0)) * 0.16;
-  color = lighten(color, gloss);
-  // Iridescent edge, like light split by thick glass: rainbow glints that
-  // sit on the rim, gathered at two opposite corners (which two depends on
-  // the card), fading inward. Still, not animated.
+  float B = clamp(min(uSize.x, uSize.y) * 0.05, 10.0, 22.0);
+  float lip = exp(-pow((inside - 0.9) / 0.9, 2.0));
+  float depthBand = exp(-pow((inside - B * 0.85) / (B * 0.45), 2.0));
+  // The whole bevel reads a shade deeper (thick glass), so light on it shows.
+  float bevel = 1.0 - smoothstep(B * 0.9, B * 1.4, inside);
+  color = mix(color, color * vec3(0.86, 0.90, 0.97), bevel * 0.45);
+  color = lighten(color, lip * 0.55);
+  color *= 1.0 - depthBand * 0.08;
+  color *= 1.0 - (1.0 - smoothstep(0.0, 1.0, inside)) * 0.12;
+
   float k = floor(uSeed * 4.0);
-  vec2 corner = vec2(mod(k, 2.0) < 0.5 ? 1.0 : -1.0, k < 1.5 ? -1.0 : 1.0) * uSize * 0.5;
-  float span = min(uSize.x, uSize.y) * 0.72;
-  float near1 = length(vLocal - corner) / span;
-  float near2 = length(vLocal + corner) / (span * 0.8);
-  float atCorner = exp(-near1 * near1 * 2.2) + 0.7 * exp(-near2 * near2 * 2.6);
-  // Hue runs around the rim and shifts a little with depth, so it bands like a prism.
-  float hue = atan(vLocal.y, vLocal.x) / 6.28318 * 1.6 + inside / 30.0 + uSeed * 2.7;
-  vec3 spectrum = 0.5 + 0.5 * cos(6.28318 * (hue + vec3(0.0, 0.33, 0.67)));
-  spectrum = mix(spectrum, vec3(1.0), 0.18);
-  float onRim = exp(-inside / 6.5);
-  float spill = exp(-inside / 26.0);
-  color = mix(color, spectrum, clamp(atCorner * (onRim * 0.8 + spill * 0.12), 0.0, 1.0));
-  // A white-hot line right at the edge where the colour is strongest.
-  color = lighten(color, atCorner * exp(-inside / 1.4) * 0.55);
+  vec2 cdir = vec2(mod(k, 2.0) < 0.5 ? 1.0 : -1.0, k < 1.5 ? -1.0 : 1.0);
+  vec2 apex = cdir * (uSize * 0.5 - vec2(r * 0.3));
+  float L = min(uSize.x, uSize.y) * 0.62;
+  float d1 = length(vLocal - apex) / L;
+  float d2 = length(vLocal + apex) / (L * 0.85);
+  float lit1 = exp(-d1 * d1 * 3.0);
+  float lit2 = exp(-d2 * d2 * 3.2) * 0.9;
+  // Across the bevel: a wide white-hot core, with colour only as thin fringes
+  // either side of it (as light splits at the edge of thick glass).
+  float x = (inside - B * 0.45) / B;
+  float core = exp(-x * x * 15.0);
+  float fringeIn = exp(-pow((x - 0.46) / 0.21, 2.0));
+  float fringeOut = exp(-pow((x + 0.30) / 0.15, 2.0));
+  vec3 coolIn = mix(vec3(0.30, 0.86, 1.0), vec3(0.22, 0.48, 1.0), smoothstep(0.0, 0.9, d1));
+  vec3 coolOut = vec3(1.0, 0.42, 0.76);
+  vec3 warmIn = mix(vec3(1.0, 0.86, 0.30), vec3(1.0, 0.52, 0.18), smoothstep(0.0, 0.9, d2));
+  vec3 warmOut = vec3(0.58, 0.40, 1.0);
+  color = mix(color, coolIn, clamp(lit1 * fringeIn * 1.0, 0.0, 1.0));
+  color = mix(color, coolOut, clamp(lit1 * fringeOut * 0.85, 0.0, 1.0));
+  color = mix(color, warmIn, clamp(lit2 * fringeIn * 1.0, 0.0, 1.0));
+  color = mix(color, warmOut, clamp(lit2 * fringeOut * 0.85, 0.0, 1.0));
+  color = mix(color, vec3(1.0), clamp((lit1 + lit2) * core * 0.96, 0.0, 1.0));
+  // The light glows into the glass from those corners, white with a tint.
+  float bleed = exp(-inside / (B * 6.0));
+  color = lighten(color, (lit1 + lit2 * 0.8) * bleed * 0.5);
+  color = mix(color, vec3(0.50, 0.82, 1.0), lit1 * bleed * 0.16);
+  color = mix(color, vec3(1.0, 0.74, 0.50), lit2 * bleed * 0.13);
 
   float alpha = mask * uAlpha;
   fragColor = vec4(color * alpha, alpha);
