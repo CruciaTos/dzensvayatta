@@ -24,6 +24,8 @@ export function Process() {
       sourceAlign="start"
       // Grow outward from mid-screen, in place and at an even pace.
       growFromCentre
+      // After the hold, the stage opens out to the full screen; Client voices continues on it.
+      expandToFull
       title={em(TITLE)}
       titleClassName={TITLE_CLASS}
       tone="night"

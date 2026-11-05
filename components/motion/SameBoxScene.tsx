@@ -49,6 +49,14 @@ interface SameBoxSceneProps {
    * even pace, so the box never drifts. Off: it grows once the scene pins.
    */
   growFromCentre?: boolean;
+  /**
+   * After the hold, the stage keeps growing until it fills the whole screen
+   * (no inset, no rounded corners), so the section that follows can carry on
+   * the same background. Also drops the frame padding on small screens.
+   */
+  expandToFull?: boolean;
+  /** Scroll distance for that final expansion, in viewport heights. */
+  expandVh?: number;
   /** Destination content, laid out inside the stage. */
   children: ReactNode;
   className?: string;
@@ -89,6 +97,8 @@ export function SameBoxScene({
   morphVh = 90,
   holdVh = 35,
   growFromCentre = false,
+  expandToFull = false,
+  expandVh = 40,
   children,
   className,
   stageClassName,
@@ -104,25 +114,32 @@ export function SameBoxScene({
   const contentRef = useRef<HTMLDivElement>(null);
   const cloneRef = useRef<HTMLDivElement>(null);
 
-  const geo = useRef<{ rest: Box; stage: Box; titleFrom?: Box; titleTo?: Box } | null>(null);
+  const geo = useRef<{ rest: Box; stage: Box; full: Box; titleFrom?: Box; titleTo?: Box } | null>(null);
   const tRef = useRef(0);
+  // Progress of the final expansion to full screen (0 = stage at rest).
+  const uRef = useRef(0);
+  const extraVh = expandToFull ? expandVh : 0;
 
   const { scrollYProgress } = useScroll({ target: sceneRef, offset: ["start start", "end end"] });
 
   const apply = useCallback(
-    (t: number) => {
+    (t: number, u = 0) => {
       const g = geo.current;
       const box = boxRef.current;
       const content = contentRef.current;
       if (!g || !box || !content) return;
       const ease = growFromCentre ? easeInOutSine : easeOutCubic;
-      const b = lerpBox(g.rest, g.stage, ease(t));
+      const grown = lerpBox(g.rest, g.stage, ease(t));
+      const b = u > 0 ? lerpBox(g.stage, g.full, easeInOutSine(u)) : grown;
 
       box.style.left = `${b.x}px`;
       box.style.top = `${b.y}px`;
       box.style.width = `${b.w}px`;
       box.style.height = `${b.h}px`;
       box.style.borderRadius = `${b.r}px`;
+      // Once it opens out to full screen, its background is held to the screen so
+      // the next section can carry on the identical (fixed) background with no seam.
+      box.style.backgroundAttachment = u > 0 ? "fixed" : "";
 
       if (sourceRef.current) {
         const o = 1 - range(t, 0, 0.25);
@@ -132,7 +149,8 @@ export function SameBoxScene({
 
       // Destination content is scaled with the box (never cut off) and fades
       // in once the box is mostly open.
-      const s = Math.min(b.w / g.stage.w, b.h / g.stage.h);
+      // (Never scaled up past its laid-out size: past the stage it stays centred.)
+      const s = Math.min(1, b.w / g.stage.w, b.h / g.stage.h);
       const dx = (b.w - g.stage.w * s) / 2;
       const dy = (b.h - g.stage.h * s) / 2;
       content.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(${s})`;
@@ -182,7 +200,7 @@ export function SameBoxScene({
     content.style.height = `${stage.h}px`;
 
     const restBox = boxOf(rest, frame, sourceRadius);
-    geo.current = { rest: restBox, stage };
+    geo.current = { rest: restBox, stage, full: { x: 0, y: 0, w: W, h: H, r: 0 } };
     // Growing from the centre: the box rests in the middle of the frame, and the
     // scene is pulled up so the box still sits where it would at the top
     // (START_PAD down). The frame then pins exactly when the box's centre meets
@@ -213,10 +231,9 @@ export function SameBoxScene({
         geo.current = { ...geo.current, titleFrom: boxOf(slot, frame), titleTo };
       }
     }
-    apply(tRef.current);
+    apply(tRef.current, uRef.current);
     return true;
   }, [apply, growFromCentre, inset, radius, sourceRadius]);
-
   // Decide the mode after hydration (the server always renders "static").
   useEffect(() => {
     const wide = window.matchMedia("(min-width: 1024px)");
@@ -257,9 +274,12 @@ export function SameBoxScene({
 
   useMotionValueEvent(scrollYProgress, "change", (p) => {
     if (mode !== "scroll") return;
-    const t = Math.min(1, (p * (morphVh + holdVh)) / morphVh);
+    const travelled = p * (morphVh + holdVh + extraVh);
+    const t = Math.min(1, travelled / morphVh);
+    const u = extraVh > 0 ? Math.min(1, Math.max(0, (travelled - morphVh - holdVh) / extraVh)) : 0;
     tRef.current = t;
-    apply(t);
+    uRef.current = u;
+    apply(t, u);
   });
 
   const scroll = mode === "scroll";
@@ -272,12 +292,12 @@ export function SameBoxScene({
       data-mode={mode}
       className={cn(
         "relative",
-        !scroll && "px-3 py-3",
+        !scroll && !expandToFull && "px-3 py-3",
         // Pulled up over the previous section's foot: drawn above it, and see-through outside the box.
         scroll && growFromCentre && "pointer-events-none z-30",
         className
       )}
-      style={scroll ? { height: `${100 + morphVh + holdVh}vh` } : undefined}
+      style={scroll ? { height: `${100 + morphVh + holdVh + extraVh}vh` } : undefined}
     >
       <div ref={frameRef} className={cn(scroll ? "sticky top-0 h-screen overflow-hidden" : "relative")}>
         {/* Where the box sits at rest, before it grows (measured, never seen). */}
@@ -298,7 +318,7 @@ export function SameBoxScene({
           className={cn(
             TONE[tone],
             "overflow-hidden",
-            scroll ? "pointer-events-auto absolute left-0 top-0 will-change-[width,height,left,top]" : "relative rounded-[28px]",
+            scroll ? "pointer-events-auto absolute left-0 top-0 will-change-[width,height,left,top]" : cn("relative", expandToFull ? "[background-attachment:fixed]" : "rounded-[28px]"),
             stageClassName
           )}
         >

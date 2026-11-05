@@ -56,7 +56,9 @@ function Card({ t, i, progress }: { t: Testimonial; i: number; progress: MotionV
           onMouseLeave={onLeave}
           className={cn(
             "relative flex min-h-[440px] flex-col justify-between overflow-hidden rounded-[24px] p-7 transition-transform duration-300 ease-out md:h-[min(68vh,540px)] md:p-12",
-            TONES[i % TONES.length]
+            TONES[i % TONES.length],
+            // The section is on the poster gradient, which pales serif words; on the light cards they stay cobalt.
+            !night && "[&_.em]:text-accent"
           )}
         >
           {/* Big quote mark */}
@@ -133,11 +135,18 @@ export function ClientVoices() {
   const { scrollYProgress } = useScroll({ target: stackRef, offset: ["start start", "end end"] });
 
   return (
-    <section aria-labelledby="voices-title" className="section relative bg-paper text-ink">
+    // Carries on from the full-screen process stage: the same blue, held still
+    // (fixed to the screen) while the cards scroll over it.
+    <section
+      aria-labelledby="voices-title"
+      className="section on-night bg-poster relative [background-attachment:fixed]"
+    >
       <Container>
         <div className="mb-10 md:mb-14">
-          <Eyebrow className="mb-5">Client voices</Eyebrow>
-          <MaskReveal id="voices-title" text={"In their\n*own words*"} className="text-display-l text-ink" />
+          <Eyebrow tone="night" className="mb-5">
+            Client voices
+          </Eyebrow>
+          <MaskReveal id="voices-title" text={"In their\n*own words*"} className="text-display-l text-night-ink" />
         </div>
 
         {/* [confirm] written consent from each person for name, photo and quote */}
