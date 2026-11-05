@@ -67,8 +67,9 @@ const STILL_P = 0.47;
 // The footage panel's share of the width once the split lands (md and up).
 const SPLIT = 0.4;
 // The exit wipe runs across this much scroll (in screen heights), starting the
-// moment the last paragraph has typed.
-const SWEEP = 0.4;
+// moment the last paragraph has typed. A full screen, so a natural scroll
+// lets you watch the edge tilt and blur rather than miss it in one flick.
+const SWEEP = 1.2;
 // The wipe's foot is past the left edge by this point of the wipe (0–1); the top follows.
 const FOOT_OUT = 0.6;
 // How far the foot swings out, in panel widths: higher turns the edge further.
@@ -311,8 +312,9 @@ export function WeAreSvayatta() {
           // overshoots so the band, too, ends up off the left of the screen.
           const v = exitP.current;
           const soft = Math.min(FEATHER_MAX, W * FEATHER);
-          // The whole edge slides left from the first moment, while it spins.
-          const top = B - (B + soft) * Math.sin((v * Math.PI) / 2);
+          // The whole edge slides left while it spins, easing in and out so it
+          // starts gently instead of lurching on the first bit of scroll.
+          const top = B - (B + soft) * ((1 - Math.cos(v * Math.PI)) / 2);
           const e = {
             top,
             // The foot swings far past the left edge, so the edge turns well past

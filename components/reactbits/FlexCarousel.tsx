@@ -1094,9 +1094,23 @@ const FlexCarousel = ({
         }
         draws.sort((a, b) => Math.abs(b.rel) - Math.abs(a.rel));
         const centre = draws.length ? draws[draws.length - 1] : null;
+        // Svayatta: the centred card is drawn clean on top after the lens pass,
+        // so leave it out of the lens scene. Otherwise its bent copy peeks out
+        // under the clean one mid-swipe (a smeared second line of its text).
+        const cleanCentre = !!centre && Math.abs(centre.rel) < m.widths[centre.i] && effects.sceneAlpha > 0;
         let first = true;
         for (const draw of draws) {
           const slot = slots[draw.i];
+          if (cleanCentre && draw === centre) {
+            instances.push({
+              index: draw.i,
+              x0: draw.x - draw.cw / 2,
+              x1: draw.x + draw.cw / 2,
+              y0: draw.y - draw.ch / 2,
+              y1: draw.y + draw.ch / 2
+            });
+            continue;
+          }
           cardProgram.uniforms.tMap.value = slot.texture;
           cardProgram.uniforms.uRect.value = [draw.x, draw.y, draw.cw + 2, draw.ch + 2];
           cardProgram.uniforms.uSize.value = [draw.cw, draw.ch];
@@ -1144,7 +1158,7 @@ const FlexCarousel = ({
 
         // Svayatta: draw the centred card once more, straight to the screen,
         // so the lens never bends or splits it.
-        if (centre && Math.abs(centre.rel) < m.widths[centre.i] && effects.sceneAlpha > 0) {
+        if (centre && cleanCentre) {
           const slot = slots[centre.i];
           cardProgram.uniforms.tMap.value = slot.texture;
           cardProgram.uniforms.uRect.value = [centre.x, centre.y, centre.cw + 2, centre.ch + 2];
