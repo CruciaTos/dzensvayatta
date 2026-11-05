@@ -41,11 +41,8 @@ const CENTER_SCALE = 1.7;
 const CENTER_MIN_WIDTH = 0.45;
 // The card shader zooms the artwork 8%; side cards (3:4) show this much of it.
 const ZOOM = 1.08;
-// Cards away from the centre are this much narrower than 3:4 (same height),
-// so the text column is cut to fit what they still show.
-const SIDE_SCALE = 0.8;
-const SAFE = Math.round(((H * 0.75) / ZOOM) * SIDE_SCALE);
-const PAD = 56;
+const SAFE = 880;
+const PAD = 64;
 const PAD_Y = 96;
 // The words stack up from the foot; they start higher than PAD_Y so the last
 // line sits clear of the glass rim's strongest bend (the rim splits colour).
@@ -173,7 +170,7 @@ function drawCard(service: Service, i: number, fonts: { display: string; serif: 
   ctx.fillStyle = "#0a1830";
   let size = 140;
   let title: string[] = [];
-  for (; size >= 68; size -= 4) {
+  for (; size >= 96; size -= 4) {
     ctx.font = `600 ${size}px ${fonts.display}`;
     ctx.letterSpacing = `${-Math.round(size / 36)}px`;
     const longest = Math.max(...service.title.split(/\s+/).map((w) => ctx.measureText(w).width));
@@ -392,7 +389,7 @@ export function ServicesTrack({ handoff = false }: { handoff?: boolean }) {
             fit="portrait"
             cardHeight={CARD_HEIGHT}
             centerScale={CENTER_SCALE}
-            sideScale={SIDE_SCALE}
+            sideScale={0.8}
             centerMinWidth={CENTER_MIN_WIDTH}
             anchorLeft
             centerY={CENTER_Y}
