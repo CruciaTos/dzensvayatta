@@ -5,6 +5,7 @@ import { Eyebrow } from "@/components/ui/Eyebrow";
 import { PillButton } from "@/components/ui/PillButton";
 import { ProcessCard } from "@/components/ui/ProcessCard";
 import { SameBoxScene } from "@/components/motion/SameBoxScene";
+import { CLIENT_VOICES_ID } from "@/lib/anchors";
 
 const TITLE = "How we *build*";
 const TITLE_CLASS = "text-display-l text-night-ink";
@@ -26,6 +27,8 @@ export function Process() {
       growFromCentre
       // After the hold, the stage opens out to the full screen; Client voices continues on it.
       expandToFull
+      // ...and its blue then stays pinned behind Client voices as a still backdrop.
+      backdropUntil={CLIENT_VOICES_ID}
       title={em(TITLE)}
       titleClassName={TITLE_CLASS}
       tone="night"

@@ -244,6 +244,17 @@ export function WeAreSvayatta() {
   const split = useRef(0);
   const stillRef = useRef(false);
   const [still, setStill] = useState(false);
+  // The footage plays only while the section is near the screen AND the
+  // footage has faded in: a full-screen blurred video is the heaviest thing here.
+  const nearScreen = useRef(false);
+  // null until the first frame is laid out, so that frame sets it either way.
+  const footageOn = useRef<boolean | null>(null);
+  const syncVideo = useCallback(() => {
+    const video = videoRef.current;
+    if (!video || stillRef.current) return;
+    if (nearScreen.current && footageOn.current === true) video.play().catch(() => {});
+    else video.pause();
+  }, []);
 
   const register = useCallback((key: string, el: HTMLSpanElement | null, start: number, end: number) => {
     if (!el) {
@@ -343,7 +354,16 @@ export function WeAreSvayatta() {
     // The blurred footage fades in behind and the type turns white.
     const flip = easeOutCubic(range(p, ...FLIP));
     if (stage) stage.style.color = mix(FROM_FG, TO_FG, flip);
-    if (footageRef.current) footageRef.current.style.opacity = String(flip);
+    if (footageRef.current) {
+      footageRef.current.style.opacity = String(flip);
+      const on = flip > 0;
+      if (on !== footageOn.current) {
+        footageOn.current = on;
+        // Fully faded out: don't composite it, and let the video stop.
+        footageRef.current.style.visibility = on ? "" : "hidden";
+        syncVideo();
+      }
+    }
     // Like the live site, the frame drifts down the clip as you scroll.
     if (videoRef.current) videoRef.current.style.objectPosition = `center ${20 + 60 * range(p, FLIP[0], 1)}%`;
     if (dotRef.current) dotRef.current.style.color = flip > 0.5 ? "inherit" : "";
@@ -365,7 +385,7 @@ export function WeAreSvayatta() {
 
     if (hintRef.current) hintRef.current.style.opacity = String(0.6 * (1 - range(p, 0, 0.06)));
     if (barRef.current) barRef.current.style.transform = `scaleX(${p})`;
-  }, []);
+  }, [syncVideo]);
 
   const { scrollYProgress } = useScroll({ target: trackRef, offset: ["start start", "end end"] });
   // The first paragraph types along the landing.
@@ -460,25 +480,12 @@ export function WeAreSvayatta() {
     };
   }, [apply, exitProgress, scrollYProgress, wipe]);
 
-  // Play the footage only while the section is on screen (poster frame under reduced motion).
+  // While the section is near the screen: play the footage (once it has faded
+  // in; poster frame under reduced motion), and flicker the glyphs of letters
+  // that are decoding (about 18 changes a second). Off screen, nothing runs.
   useEffect(() => {
     const section = sectionRef.current;
-    const video = videoRef.current;
-    if (!section || !video || still) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) video.play().catch(() => {});
-        else video.pause();
-      },
-      { rootMargin: "200px 0px" }
-    );
-    io.observe(section);
-    return () => io.disconnect();
-  }, [still]);
-
-  // Glyphs flicker while a letter is decoding (about 18 changes a second).
-  useEffect(() => {
-    if (still) return;
+    if (!section || still) return;
     let raf = 0;
     let last = 0;
     const tick = (now: number) => {
@@ -490,9 +497,25 @@ export function WeAreSvayatta() {
       }
       raf = requestAnimationFrame(tick);
     };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [still]);
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        nearScreen.current = entry.isIntersecting;
+        syncVideo();
+        if (entry.isIntersecting && !raf) raf = requestAnimationFrame(tick);
+        else if (!entry.isIntersecting) {
+          cancelAnimationFrame(raf);
+          raf = 0;
+        }
+      },
+      { rootMargin: "200px 0px" }
+    );
+    io.observe(section);
+    return () => {
+      io.disconnect();
+      cancelAnimationFrame(raf);
+      nearScreen.current = false;
+    };
+  }, [still, syncVideo]);
 
   const titleLines = MANIFESTO_TITLE.split("\n");
 

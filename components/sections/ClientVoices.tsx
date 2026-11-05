@@ -7,6 +7,7 @@ import { TESTIMONIALS } from "@/lib/testimonials";
 import type { Testimonial } from "@/types/content";
 import { em } from "@/lib/rich";
 import { cn } from "@/lib/utils";
+import { CLIENT_VOICES_ID } from "@/lib/anchors";
 import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { MaskReveal } from "@/components/motion/MaskReveal";
@@ -130,16 +131,18 @@ function Card({ t, i, progress }: { t: Testimonial; i: number; progress: MotionV
   );
 }
 
-export function ClientVoices() {
+export function ClientVoices({ overBackdrop = false }: { overBackdrop?: boolean }) {
   const stackRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: stackRef, offset: ["start start", "end end"] });
 
   return (
-    // Carries on from the full-screen process stage: the same blue, held still
-    // (fixed to the screen) while the cards scroll over it.
+    // On the poster blue. `overBackdrop`: it carries on from the full-screen
+    // process stage, whose blue stays pinned behind it (SameBoxScene's
+    // backdrop) while the cards scroll over, so it paints no background itself.
     <section
+      id={CLIENT_VOICES_ID}
       aria-labelledby="voices-title"
-      className="section on-night bg-poster relative [background-attachment:fixed]"
+      className={cn("section on-night bg-poster relative", overBackdrop && "bg-transparent bg-none after:hidden")}
     >
       <Container>
         <div className="mb-10 md:mb-14">

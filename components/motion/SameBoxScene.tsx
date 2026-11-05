@@ -2,6 +2,7 @@
 
 import { useMotionValueEvent, useScroll } from "motion/react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { boxOf, easeOutCubic, flipFrom, lerpBox, range, type Box } from "@/lib/motion";
 
@@ -57,6 +58,15 @@ interface SameBoxSceneProps {
   expandToFull?: boolean;
   /** Scroll distance for that final expansion, in viewport heights. */
   expandVh?: number;
+  /**
+   * With `expandToFull`: the id of the element the full-screen stage stays
+   * pinned behind, as a still backdrop, until it has scrolled past. Once the
+   * stage fills the screen, its background hands over to one fixed layer behind
+   * the page (drawn once, never repainted on scroll); the stage's content then
+   * scrolls away over it, and that element's content scrolls over it too.
+   * On small screens the backdrop runs from this scene's top to that element's end.
+   */
+  backdropUntil?: string;
   /** Destination content, laid out inside the stage. */
   children: ReactNode;
   className?: string;
@@ -99,6 +109,7 @@ export function SameBoxScene({
   growFromCentre = false,
   expandToFull = false,
   expandVh = 40,
+  backdropUntil,
   children,
   className,
   stageClassName,
@@ -120,6 +131,47 @@ export function SameBoxScene({
   const uRef = useRef(0);
   const extraVh = expandToFull ? expandVh : 0;
 
+  // The pinned backdrop (expandToFull + backdropUntil): a fixed window onto a
+  // full-screen poster, clipped to where it belongs on screen.
+  const pinned = expandToFull && !!backdropUntil;
+  const [portalHost, setPortalHost] = useState<HTMLElement | null>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const backdropInnerRef = useRef<HTMLDivElement>(null);
+  const modeRef = useRef<Mode>("static");
+  // The stage fills the screen (scroll mode): the backdrop has taken over its background.
+  const fullRef = useRef(false);
+
+  useEffect(() => {
+    if (pinned) setPortalHost(document.body);
+  }, [pinned]);
+
+  const placeBackdrop = useCallback(() => {
+    const wrap = backdropRef.current;
+    const inner = backdropInnerRef.current;
+    const scene = sceneRef.current;
+    if (!wrap || !inner || !scene) return;
+    const H = window.innerHeight;
+    const until = backdropUntil ? document.getElementById(backdropUntil) : null;
+    const end = (until ?? scene).getBoundingClientRect().bottom;
+    // Desktop: only once the stage fills the screen. Small screens: from the scene's top.
+    const top = modeRef.current === "scroll" ? (fullRef.current ? 0 : H) : Math.max(0, scene.getBoundingClientRect().top);
+    const bottom = Math.max(0, H - end);
+    if (top >= H - bottom) {
+      wrap.style.visibility = "hidden";
+      return;
+    }
+    wrap.style.visibility = "visible";
+    wrap.style.top = `${top}px`;
+    wrap.style.bottom = `${bottom}px`;
+    // The poster stays put on screen; only the window onto it moves.
+    inner.style.transform = `translate3d(0, ${-top}px, 0)`;
+  }, [backdropUntil]);
+
+  const { scrollY } = useScroll();
+  useMotionValueEvent(scrollY, "change", () => {
+    if (pinned) placeBackdrop();
+  });
+
   const { scrollYProgress } = useScroll({ target: sceneRef, offset: ["start start", "end end"] });
 
   const apply = useCallback(
@@ -137,9 +189,17 @@ export function SameBoxScene({
       box.style.width = `${b.w}px`;
       box.style.height = `${b.h}px`;
       box.style.borderRadius = `${b.r}px`;
-      // Once it opens out to full screen, its background is held to the screen so
-      // the next section can carry on the identical (fixed) background with no seam.
-      box.style.backgroundAttachment = u > 0 ? "fixed" : "";
+      // Full screen: the box now matches the pinned backdrop exactly, so it drops
+      // its own background and the backdrop shows through. Its content then
+      // scrolls away over a background that stays still.
+      if (pinned) {
+        const full = u >= 0.999;
+        if (full !== fullRef.current) {
+          fullRef.current = full;
+          box.toggleAttribute("data-full", full);
+          placeBackdrop();
+        }
+      }
 
       if (sourceRef.current) {
         const o = 1 - range(t, 0, 0.25);
@@ -179,7 +239,7 @@ export function SameBoxScene({
         if (real) real.style.visibility = done ? "visible" : "hidden";
       }
     },
-    [growFromCentre]
+    [growFromCentre, pinned, placeBackdrop]
   );
 
   const measure = useCallback(() => {
@@ -262,6 +322,19 @@ export function SameBoxScene({
     return () => ro.disconnect();
   }, [mode, measure]);
 
+  // The backdrop follows the mode (and the page's size).
+  useLayoutEffect(() => {
+    modeRef.current = mode;
+    if (!pinned) return;
+    if (mode === "static") {
+      fullRef.current = false;
+      boxRef.current?.removeAttribute("data-full");
+    }
+    placeBackdrop();
+    window.addEventListener("resize", placeBackdrop);
+    return () => window.removeEventListener("resize", placeBackdrop);
+  }, [mode, pinned, placeBackdrop, portalHost]);
+
   // Clear every inline style when leaving scroll mode, so the static layout is clean.
   useLayoutEffect(() => {
     if (mode !== "static") return;
@@ -318,7 +391,12 @@ export function SameBoxScene({
           className={cn(
             TONE[tone],
             "overflow-hidden",
-            scroll ? "pointer-events-auto absolute left-0 top-0 will-change-[width,height,left,top]" : cn("relative", expandToFull ? "[background-attachment:fixed]" : "rounded-[28px]"),
+            scroll ? "pointer-events-auto absolute left-0 top-0 will-change-[width,height,left,top]" : cn("relative", !expandToFull && "rounded-[28px]"),
+            // Over the pinned backdrop: no background of its own (keeps the tone's text colours).
+            pinned &&
+              (scroll
+                ? "data-[full]:bg-transparent data-[full]:bg-none data-[full]:after:hidden"
+                : "bg-transparent bg-none after:hidden"),
             stageClassName
           )}
         >
@@ -351,6 +429,24 @@ export function SameBoxScene({
           </div>
         )}
       </div>
+
+      {/* The pinned backdrop: fixed behind the whole page (below every section's
+          own background), so only transparent stretches show it, and clipped to
+          where it belongs. Its own layer, painted once. */}
+      {portalHost &&
+        createPortal(
+          <div
+            ref={backdropRef}
+            aria-hidden="true"
+            className="pointer-events-none invisible fixed inset-x-0 top-0 bottom-0 -z-10 overflow-hidden"
+          >
+            <div
+              ref={backdropInnerRef}
+              className="on-night bg-poster absolute inset-x-0 top-0 h-screen will-change-transform"
+            />
+          </div>,
+          portalHost
+        )}
     </section>
   );
 }
