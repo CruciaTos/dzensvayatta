@@ -33,7 +33,7 @@ const GROUP_LABEL =Object.fromEntries(SERVICE_GROUPS.map((g) => [g.id, g.label])
 // set to exactly what the centre card shows on this screen.
 const H = 1280;
 // Carousel settings the artwork has to match.
-const CARD_HEIGHT = 0.54;
+const CARD_HEIGHT = 0.675;
 const CENTER_SCALE = 1.7;
 const CENTER_MIN_WIDTH = 0.45;
 // The card shader zooms the artwork 8%; side cards (3:4) show this much of it.
@@ -358,8 +358,10 @@ export function ServicesTrack({ handoff = false }: { handoff?: boolean }) {
         </div>
       </div>
 
-      {/* Tall enough that cards bent by the lens at the sides never get clipped. */}
-      <div ref={stageRef} className="relative mt-4 h-[clamp(672px,103vh,1032px)] md:mt-6">
+      {/* Just tall enough that cards bent by the lens at the sides don't get
+          clipped, without a big empty band between the heading and the cards.
+          Cards are CARD_HEIGHT of this, so they keep their size. */}
+      <div ref={stageRef} className="relative mt-2 h-[clamp(540px,82vh,830px)] md:mt-3">
         {items && (
           <FlexCarousel
             items={items}
