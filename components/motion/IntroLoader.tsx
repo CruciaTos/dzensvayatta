@@ -7,6 +7,7 @@ import type { VeilWordElement } from "@/components/reactbits/DitherVeilWord";
 import { INTRO_STORAGE_KEY } from "@/lib/intro";
 
 const STAGE_WAIT_MS = 3000; // give up waiting for the hero's name (fonts, WebGL) after this
+const QUIET_MAX_MS = 500; // wait at most this long for an idle moment before the flip starts
 const FLIP_MS = 90; // one flap
 const FLIPS = 12; // random letters shown before each real one
 const STAGGER_MS = 100; // between letters
@@ -98,6 +99,14 @@ export function IntroLoader() {
       if (cancelled) return;
       const ctx = stage?.getContext("2d");
       if (!hero || !stage || !ctx) return void fadeOut();
+
+      // Hydration and the page's other first effects are still finishing; start
+      // flipping once the main thread goes quiet so no frame of it is a long one.
+      await new Promise<void>((resolve) => {
+        if ("requestIdleCallback" in window) window.requestIdleCallback(() => resolve(), { timeout: QUIET_MAX_MS });
+        else later(resolve, 100);
+      });
+      if (cancelled) return;
 
       const flapStart = performance.now();
       const src = hero.veilSource!;

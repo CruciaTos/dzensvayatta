@@ -259,10 +259,14 @@ export default function DitherVeilWord({
     let timer = 0;
     let visible = true;
     let started = false;
+    // Nothing is drawn until the fonts are in: laying out earlier would draw each
+    // word full size in a fallback face (and upload it) only to redo it at once.
+    let fontsReady = false;
 
     const render = () => renderer.render({ scene: mesh });
 
     const layout = () => {
+      if (!fontsReady) return;
       const w = Math.max(1, container.clientWidth);
       const h = Math.max(1, container.clientHeight);
       renderer.setSize(w, h);
@@ -390,7 +394,6 @@ export default function DitherVeilWord({
 
     const ro = new ResizeObserver(layout);
     ro.observe(container);
-    layout();
 
     // Start once the fonts are in. While the site's intro runs, stay blank
     // underneath it: its wordmark lands on this word and the intro ends in the
@@ -416,6 +419,7 @@ export default function DitherVeilWord({
       document.fonts?.load(`${word.weight ?? 700} 64px ${resolveFamily(word.family)}`, word.text).catch(() => [])
     );
     Promise.all([...faces, document.fonts?.ready]).then(() => {
+      fontsReady = true;
       layout();
       whenIntroDone();
     });
