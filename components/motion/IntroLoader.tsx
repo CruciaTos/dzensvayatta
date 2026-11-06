@@ -105,19 +105,28 @@ export function IntroLoader() {
       const alpha = Number(hero.dataset.inkOpacity) || 1;
       const inkCss = Number(hero.dataset.inkWidth) || hero.getBoundingClientRect().width * 0.98;
 
-      // The stage is the hero name's box: same bitmap size, same CSS size.
-      stage.width = src.width;
-      stage.height = src.height;
-      const W = stage.width;
-      const H = stage.height;
+      // The stage is the hero name's box (same CSS size), small at the middle of
+      // the screen to start, then grown onto the hero.
+      const W = src.width; // the hero name's bitmap
+      const H = src.height;
+      const startInk = Math.min(Math.max(window.innerWidth * 0.36, 240), 420);
+      const k0 = Math.min(1, startInk / inkCss);
+      // While it is small only that many pixels are ever seen, so the flipping is
+      // drawn into a bitmap shrunk by k0 (about a tenth of the full area) and the
+      // full-size bitmap is only drawn once, when the growing starts.
+      const f = Math.max(0.1, k0);
+      stage.width = Math.max(1, Math.ceil(W * f));
+      stage.height = Math.max(1, Math.ceil(H * f));
+      ctx.setTransform(f, 0, 0, f, 0, 0); // everything below is in the full bitmap's pixels
       const box0 = hero.getBoundingClientRect();
       stage.style.width = `${box0.width}px`;
       stage.style.height = `${box0.height}px`;
       stage.style.opacity = String(alpha);
-
-      // Small at the middle of the screen to start, then grown onto the hero.
-      const startInk = Math.min(Math.max(window.innerWidth * 0.36, 240), 420);
-      const k0 = Math.min(1, startInk / inkCss);
+      // The settled letters, shrunk once.
+      const small = document.createElement("canvas");
+      small.width = stage.width;
+      small.height = stage.height;
+      small.getContext("2d")!.drawImage(src, 0, 0, small.width, small.height);
       const fx = window.innerWidth / 2;
       const fy = window.innerHeight / 2;
       let bw = box0.width;
@@ -167,7 +176,7 @@ export function IntroLoader() {
         ctx.translate(0, -mid);
         ctx.globalAlpha = dim;
         if (step === slot.seq.length - 1) {
-          ctx.drawImage(src, slot.x0, 0, slot.x1 - slot.x0, H, slot.x0, 0, slot.x1 - slot.x0, H);
+          ctx.drawImage(small, slot.x0 * f, 0, (slot.x1 - slot.x0) * f, small.height, slot.x0, 0, slot.x1 - slot.x0, H);
         } else {
           ctx.fillStyle = "#fff";
           ctx.font = set.font;
@@ -213,14 +222,10 @@ export function IntroLoader() {
         if (cancelled) return;
         cancelAnimationFrame(raf);
         raf = 0;
-        // Settled: the stage holds the hero name's bitmap, whole.
+        // Settled: the stage holds the hero name's bitmap, whole, at full size.
         const box = hero.getBoundingClientRect();
-        if (src.width !== W || src.height !== H) {
-          stage.width = src.width;
-          stage.height = src.height;
-        } else {
-          ctx.clearRect(0, 0, W, H);
-        }
+        stage.width = src.width; // resizing clears it and resets the transform
+        stage.height = src.height;
         ctx.drawImage(src, 0, 0);
         stage.style.width = `${box.width}px`;
         stage.style.height = `${box.height}px`;
