@@ -24,6 +24,9 @@ export interface VeilWord {
   lang?: string;
 }
 
+/** The word's box, carrying the first word's bitmap for the site intro's match cut. */
+export type VeilWordElement = HTMLDivElement & { veilSource?: HTMLCanvasElement; veilSet?: VeilWordMetrics };
+
 export interface DitherVeilWordProps {
   words: VeilWord[];
   inkColor?: string;
@@ -128,12 +131,28 @@ const resolveFamily = (family: string) =>
     getComputedStyle(document.documentElement).getPropertyValue(name).trim() || "sans-serif"
   );
 
-/** Draws a word as large as fits, centred on its ink, white on transparent. */
-function drawWord(canvas: HTMLCanvasElement, w: number, h: number, word: VeilWord) {
+/** How a word was set on its canvas (canvas pixels), so the site intro can set letters the same way. */
+export interface VeilWordMetrics {
+  text: string;
+  /** Canvas `font` and `letterSpacing` values the word was drawn with. */
+  font: string;
+  letterSpacing: string;
+  /** Where the text starts (x) and its baseline (y). */
+  x: number;
+  y: number;
+  /** Width of the ink. */
+  inkW: number;
+}
+
+/**
+ * Draws a word as large as fits, centred on its ink, white on transparent.
+ * Returns how it was set, or null if there is no 2D context.
+ */
+function drawWord(canvas: HTMLCanvasElement, w: number, h: number, word: VeilWord): VeilWordMetrics | null {
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext("2d");
-  if (!ctx) return;
+  if (!ctx) return null;
   ctx.clearRect(0, 0, w, h);
   const family = resolveFamily(word.family);
   const set = (size: number) => {
@@ -150,6 +169,14 @@ function drawWord(canvas: HTMLCanvasElement, w: number, h: number, word: VeilWor
   ctx.fillStyle = "#fff";
   ctx.textBaseline = "alphabetic";
   ctx.fillText(word.text, x, y);
+  return {
+    text: word.text,
+    font: ctx.font,
+    letterSpacing: ctx.letterSpacing,
+    x,
+    y,
+    inkW: m.actualBoundingBoxLeft + m.actualBoundingBoxRight,
+  };
 }
 
 export default function DitherVeilWord({
@@ -243,7 +270,16 @@ export default function DitherVeilWord({
       uniforms.uCell.value = Math.max(1, Math.round(pixelSize * renderer.dpr));
       uniforms.uBand.value = canvas.width * band;
       words.forEach((word, i) => {
-        drawWord(sources[i], canvas.width, canvas.height, word);
+        const set = drawWord(sources[i], canvas.width, canvas.height, word);
+        // The site's intro match-cuts onto the first word (see IntroLoader): it flips
+        // letters set the same way, then lands on this exact bitmap.
+        if (i === 0 && set && set.inkW > 0) {
+          container.dataset.inkWidth = String(set.inkW / renderer.dpr);
+          container.dataset.inkOpacity = String(inkOpacity);
+          const el = container as VeilWordElement;
+          el.veilSource = sources[0];
+          el.veilSet = set;
+        }
         textures[i].image = sources[i];
         textures[i].needsUpdate = true;
       });
@@ -304,13 +340,16 @@ export default function DitherVeilWord({
       raf = requestAnimationFrame(tick);
     };
 
-    const begin = () => {
+    // `cut`: the site intro's wordmark has just landed on this exact word, so
+    // show it whole in this frame (no dither-in) and carry on with the swaps.
+    const begin = (cut = false) => {
       if (started) return;
       started = true;
-      if (still) {
+      if (still || cut) {
         uniforms.uIntro.value = 1;
         render();
         phase = "hold";
+        if (!still) enterHold(performance.now());
         return;
       }
       phase = "intro";
@@ -353,17 +392,19 @@ export default function DitherVeilWord({
     ro.observe(container);
     layout();
 
-    // Start once the fonts are in and the site's intro (logo into the navbar) has finished.
+    // Start once the fonts are in. While the site's intro runs, stay blank
+    // underneath it: its wordmark lands on this word and the intro ends in the
+    // same frame ("done"), a match cut, so this word appears whole right then.
     let mo: MutationObserver | null = null;
     const html = document.documentElement;
     const whenIntroDone = () => {
       const state = html.dataset.intro;
       if (state === "run" || state === "move") {
         mo = new MutationObserver(() => {
-          if (html.dataset.intro !== "run" && html.dataset.intro !== "move") {
-            mo?.disconnect();
-            window.setTimeout(begin, 250);
-          }
+          const next = html.dataset.intro;
+          if (next === "run" || next === "move") return;
+          mo?.disconnect();
+          begin(true);
         });
         mo.observe(html, { attributes: true, attributeFilter: ["data-intro"] });
       } else {
@@ -393,7 +434,7 @@ export default function DitherVeilWord({
   }, []);
 
   return (
-    <div ref={containerRef} aria-hidden="true" className={`relative ${className}`.trim()}>
+    <div ref={containerRef} data-veil-word aria-hidden="true" className={`relative ${className}`.trim()}>
       {fallback && (
         <span
           lang={words[0]?.lang}

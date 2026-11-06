@@ -50,7 +50,9 @@ export function FooterReveal({ children, footer }: { children: ReactNode; footer
   });
 
   return (
-    <div className="relative">
+    // PageTransition's <ViewTransition> puts view-transition-name/-class on this
+    // first element on the client only; the server HTML can't carry them yet.
+    <div className="relative" suppressHydrationWarning>
       <main id="main-content" ref={mainRef} className={still ? undefined : "sticky"}>
         {children}
       </main>
